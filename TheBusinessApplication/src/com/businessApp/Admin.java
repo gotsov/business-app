@@ -49,19 +49,22 @@ public class Admin {
 				
 				try{
 					Statement stmt = con.createStatement();
-			        ResultSet rs = stmt.executeQuery("SELECT * FROM allclients");
+			        ResultSet rs = stmt.executeQuery("SELECT * FROM allsales");
 			        System.out.println("[id, name, email, bought category, bought product, quantity, price, date]");
-			         
+			        
+			        String name, email, category, product, date;
+			        Double price;
+			        int quantity, id;
 			        while (rs.next()) {
-			           int id = rs.getInt("id_client");
-			           String name = rs.getString("name");
-			           String email = rs.getString("email");
-			           String boughtCategory = rs.getString("boughtcategory");
-			           String boughtProduct = rs.getString("boughtproduct");
-			           int quantity = rs.getInt("quantity");
-			           Double price = rs.getDouble("price");
-			           String date = rs.getString("date");
-			           System.out.println(id + "\t" + name + "\t" + email + "\t" + boughtCategory +"\t" + boughtProduct + "\t" + quantity + "\t" + price + "\t" + date);
+			           id = rs.getInt("id_sale");
+			           name = rs.getString("name");
+			           email = rs.getString("email");
+			           category = rs.getString("category");
+			           product = rs.getString("product");
+			           quantity = rs.getInt("quantity");
+			           price = rs.getDouble("price");
+			           date = rs.getString("date");
+			           System.out.println(id + "\t" + name + "\t" + email + "\t" + category +"\t" + product + "\t" + quantity + "\t" + price + "\t" + date);
 			        }
 			      } 
 				catch(SQLException e){
@@ -102,7 +105,7 @@ public class Admin {
 			        ResultSet rs = stmt.executeQuery("SELECT * FROM allrepresentatives");
 			        System.out.println("[id, name, category]");
 			         
-			        String name, category = null, email, boughtProduct;
+			        String name, category = null, email, product;
 			        int id, quantity;
 			        double price;
 			        Date date;
@@ -136,18 +139,18 @@ public class Admin {
 						category = rs.getString("category");
 					}
 						
-					rs = stmt.executeQuery("SELECT * FROM clients" + category);
+					rs = stmt.executeQuery("SELECT * FROM allsales WHERE category = '" + category + "'");
 				    System.out.println("[id, name, email, bought product, quantity, price, date]");
 				        
 				    while (rs.next()) {
-				    	id = rs.getInt("id_client");
+				    	id = rs.getInt("id_sale");
 				        name = rs.getString("name");
 				        email = rs.getString("email");
-				        boughtProduct = rs.getString("boughtproduct");
+				        product = rs.getString("product");
 				        quantity = rs.getInt("quantity");
 				        price = rs.getDouble("price");
 				        date = rs.getDate("date");
-				        System.out.println(id + "\t" + name + "\t" + email +"\t" + boughtProduct + "\t" + quantity + "\t" + price + "\t" + date);
+				        System.out.println(id + "\t" + name + "\t" + email +"\t" + product + "\t" + quantity + "\t" + price + "\t" + date);
 				    }
 			    } 
 				catch(SQLException e){
@@ -178,27 +181,27 @@ public class Admin {
 		try {
 			
 			Statement stmt = con.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT * FROM allclients");
+	        ResultSet rs = stmt.executeQuery("SELECT * FROM allsales");
 	        
 	        java.sql.Date dateToCompare;
 	        
-	        String name, email, boughtProduct;
+	        String name, email, product;
 	        int id, quantity;
 	        double price;
 	        
 	        while(rs.next())
 	        {
-	        	id = rs.getInt("id_client");
+	        	id = rs.getInt("id_sale");
 	        	name = rs.getString("name");
 	        	email = rs.getString("email");
-	        	boughtProduct = rs.getString("boughtproduct");
+	        	product = rs.getString("product");
 	        	quantity = rs.getInt("quantity");
 	        	price = rs.getDouble("price");
 	        	dateToCompare = rs.getDate("date");
 	        	
 	        	if(dateToCompare.compareTo(startDate) >= 0 && dateToCompare.compareTo(endDate) <= 0)
 	        	{
-	        		System.out.println(id + "\t" + name + "\t" + email +"\t" + boughtProduct + "\t" + quantity + "\t" + price + "\t" + dateToCompare);
+	        		System.out.println(id + "\t" + name + "\t" + email +"\t" + product + "\t" + quantity + "\t" + price + "\t" + dateToCompare);
 	        	}
 	        }
      
@@ -445,13 +448,15 @@ public class Admin {
 				try{
 					Statement stmt = con.createStatement();
 			        ResultSet rs = stmt.executeQuery("SELECT * FROM allrepresentatives");
-			        System.out.println("[id, name, brand]");
-			         
+			        System.out.println("[id, name, username, category]");
+			        
+			        String name, username, password, category;
 			        while (rs.next()) {
 			           int id = rs.getInt("id_rep");
-			           String name = rs.getString("name");
-			           String password = rs.getString("password");
-			           String category = rs.getString("category");
+			           name = rs.getString("name");
+			           username = rs.getString("username");
+			           password = rs.getString("password");
+			           category = rs.getString("category");
 			           System.out.println(id + "\t" + name + "\t" + password +"\t" + category);
 			        }
 			    } 
@@ -475,8 +480,9 @@ public class Admin {
 				
 				System.out.println("What do you want to change: ");
 				System.out.println("a. name");
-				System.out.println("b. password");
-				System.out.println("c. category");
+				System.out.println("b. username");
+				System.out.println("c. password");
+				System.out.println("d. category");
 				System.out.println("choose: ");
 				choice = scan.next();
 				
@@ -488,7 +494,7 @@ public class Admin {
 					try {
 						Statement stmt = con.createStatement();
 						stmt.execute("SELECT * FROM allrepresentatives");
-						String query = "UPDATE allrepresentatives SET name = "+ "'" + newName + "'" +"WHERE id_rep = "+ ch;
+						String query = "UPDATE allrepresentatives SET name = " + "'" + newName + "'" +"WHERE id_rep = "+ ch;
 
 						PreparedStatement pstmt = con.prepareStatement(query);
 
@@ -500,6 +506,24 @@ public class Admin {
 					System.out.println("new name set");
 					break;
 				case "b":
+					System.out.println("name: ");
+					String newUsername = scan.next();
+
+					try {
+						Statement stmt = con.createStatement();
+						stmt.execute("SELECT * FROM allrepresentatives");
+						String query = "UPDATE allrepresentatives SET username = "+ "'" + newUsername + "'" +"WHERE id_rep = "+ ch;
+
+						PreparedStatement pstmt = con.prepareStatement(query);
+
+						pstmt.execute();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					
+					System.out.println("new username set");
+					break;
+				case "c":
 					System.out.println("new password: ");
 					String newPass = scan.next();
 
@@ -517,7 +541,7 @@ public class Admin {
 					
 					System.out.println("new password set");
 					break;
-				case "c":
+				case "d":
 					System.out.println("category: ");
 					String newCategory = scan.next();
 

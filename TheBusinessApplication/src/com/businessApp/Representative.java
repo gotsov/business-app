@@ -17,6 +17,7 @@ public class Representative {
 	public static int idRepresentative = 100;
 	private int id;
 	private String name;
+	private String username;
 	private String password;
 	private String category;
 	
@@ -25,20 +26,22 @@ public class Representative {
 	{
 		setId();
 		setName();
+		setUsername();
 		setCategory();
 		setPassword();
 		
-		createRepTableByCategory();
+//		createRepTableByCategory();
 	}
 	
 	public Representative(String category)
 	{
 		setId();
 		setName();
+		setUsername();
 		setPassword();
 		this.category = category;
 		
-		createRepTableByCategory();
+//		createRepTableByCategory();
 	}
 	
 	public Representative(int id, String name, String password, String category) {
@@ -57,6 +60,16 @@ public class Representative {
 		System.out.println("name: ");
 		String name = scan.nextLine();
 		this.name = name;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public void setUsername() {
+		System.out.println("username: ");
+		String username = scan.nextLine();
+		this.username = username;
 	}
 	
 	public String getCategory() {
@@ -120,27 +133,27 @@ public class Representative {
 		return idRepresentative;
 	}
 	
-	public void createRepTableByCategory()
-	{
-		 String sqlCreate = "CREATE TABLE IF NOT EXISTS clients" + this.getCategory()
-			+ "  (id_client         INT,"
-			+ "   name 				VARCHAR(100),"
-			+ "   email             VARCHAR(100),"
-			+ "	  boughtproduct     VARCHAR(100),"
-			+ "	  quantity          INT,"
-			+ "	  price             DOUBLE,"
-			+ "   date              DATE,"
-			+ "primary key(id_client))";
-
-		 try {
-			 	Statement stmt = con.createStatement();
-			 	stmt.execute(sqlCreate);
-			 	System.out.println("TABLE CREATED");
-		 }catch (SQLException e) {
-			 // TODO Auto-generated catch block
-			 e.printStackTrace();
-		 }
-	}
+//	public void createRepTableByCategory()
+//	{
+//		 String sqlCreate = "CREATE TABLE IF NOT EXISTS clients" + this.getCategory()
+//			+ "  (id_client         INT,"
+//			+ "   name 				VARCHAR(100),"
+//			+ "   email             VARCHAR(100),"
+//			+ "	  product     VARCHAR(100),"
+//			+ "	  quantity          INT,"
+//			+ "	  price             DOUBLE,"
+//			+ "   date              DATE,"
+//			+ "primary key(id_client))";
+//
+//		 try {
+//			 	Statement stmt = con.createStatement();
+//			 	stmt.execute(sqlCreate);
+//			 	System.out.println("TABLE CREATED");
+//		 }catch (SQLException e) {
+//			 // TODO Auto-generated catch block
+//			 e.printStackTrace();
+//		 }
+//	}
 	
 	public static void addOrder()              //asks for client name, client email, id_prod, quantity, date
 	{
@@ -197,7 +210,7 @@ public class Representative {
 			Statement stmt = con.createStatement();
 	        ResultSet rs = stmt.executeQuery("SELECT * FROM clients" + categoryRep);
 	        
-	        String name, email, boughtProduct;
+	        String name, email, product;
 	        int id, quantity;
 	        double price;
 	        Date date;
@@ -206,12 +219,12 @@ public class Representative {
 	        	id = rs.getInt("id_client");
 	        	name = rs.getString("name");
 	        	email = rs.getString("email");
-	        	boughtProduct = rs.getString("boughtproduct");
+	        	product = rs.getString("product");
 	        	quantity = rs.getInt("quantity");
 	        	price = rs.getDouble("price");
 	        	date = rs.getDate("date");
 	        	
-	        	System.out.println(id + "\t" + name + "\t" + email +"\t" + boughtProduct + "\t" + quantity + "\t" + price + "\t" + date);
+	        	System.out.println(id + "\t" + name + "\t" + email +"\t" + product + "\t" + quantity + "\t" + price + "\t" + date);
 		    }
 	        
 	        while(true)
@@ -241,8 +254,8 @@ public class Representative {
 
 
 				stmt = con.createStatement();
-				stmt.execute("SELECT * FROM allclients");
-				String query = "UPDATE allclients SET name = "+ "'" + newName + "'" +"WHERE id_client = "+ ch;
+				stmt.execute("SELECT * FROM allsales");
+				String query = "UPDATE allsales SET name = "+ "'" + newName + "'" +"WHERE id_client = "+ ch;
 
 				PreparedStatement pstmt = con.prepareStatement(query);
 
@@ -262,8 +275,8 @@ public class Representative {
 				System.out.println("new email: ");
 				String newEmail = scan.next();
 	
-				stmt.execute("SELECT * FROM allclients");
-				query = "UPDATE allclients SET email = "+ "'" + newEmail + "'" +"WHERE id_client = "+ ch;
+				stmt.execute("SELECT * FROM allsales");
+				query = "UPDATE allsales SET email = "+ "'" + newEmail + "'" +"WHERE id_client = "+ ch;
 
 				pstmt = con.prepareStatement(query);
 
@@ -300,7 +313,7 @@ public class Representative {
 			Statement stmt = con.createStatement();
 	        ResultSet rs = stmt.executeQuery("SELECT * FROM clients" + categoryRep);
 	        
-	        String name, email, boughtProduct;
+	        String name, email, product;
 	        int id, quantity;
 	        double price;
 	        Date date;
@@ -309,12 +322,12 @@ public class Representative {
 	        	id = rs.getInt("id_client");
 	        	name = rs.getString("name");
 	        	email = rs.getString("email");
-	        	boughtProduct = rs.getString("boughtproduct");
+	        	product = rs.getString("product");
 	        	quantity = rs.getInt("quantity");
 	        	price = rs.getDouble("price");
 	        	date = rs.getDate("date");
 	        	
-	        	System.out.println(id + "\t" + name + "\t" + email +"\t" + boughtProduct + "\t" + quantity + "\t" + price + "\t" + date);
+	        	System.out.println(id + "\t" + name + "\t" + email +"\t" + product + "\t" + quantity + "\t" + price + "\t" + date);
 		    }
 		}catch(SQLException e)
 		{
