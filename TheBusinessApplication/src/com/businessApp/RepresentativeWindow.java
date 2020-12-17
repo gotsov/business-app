@@ -32,27 +32,9 @@ import javax.swing.JButton;
 
 public class RepresentativeWindow extends JFrame {
 	
-	static DBConnection cDB = new DBConnection();
-	static Connection con = cDB.createConnection();
 	private JTable tableCatalog;
 	private String category;
 	private String username;
-
-	/**
-	 * Launch the application.
-	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					RepresentativeWindow frame = new RepresentativeWindow();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
 
 	/**
 	 * Create the frame.
@@ -163,8 +145,9 @@ public class RepresentativeWindow extends JFrame {
 			}
 			
 			ArrayList<Order> catalog = new ArrayList<>();
-			Statement stmt = con.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT * FROM allsales WHERE category = '" + this.category + "'");
+			
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE category = '" + this.category + "'");
+			
 	        while(rs.next())
 	        {  	
 	        	Order o = new Order(rs.getInt("id_sale"), rs.getString("name"), rs.getString("email"), rs.getString("product"), rs.getInt("quantity"), rs.getDouble("price"), rs.getDate("date"));

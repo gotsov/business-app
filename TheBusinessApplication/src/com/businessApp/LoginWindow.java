@@ -22,9 +22,6 @@ import java.sql.Statement;
 import java.awt.event.ActionEvent;
 
 public class LoginWindow extends JFrame {
-	
-	static DBConnection cDB = new DBConnection();
-	static Connection con = cDB.createConnection();
 
 	private JPanel contentPane;
 	private JTextField userNameTxtField;
@@ -116,8 +113,9 @@ public class LoginWindow extends JFrame {
 				else if(rolesComboBox.getSelectedItem().equals("representative"))
 				{
 					try {
-						Statement stmt = con.createStatement();
-				        ResultSet rs = stmt.executeQuery("SELECT * FROM allrepresentatives");
+						
+						ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+						
 				        String username, password, category;
 				        while(rs.next())
 				        {

@@ -28,29 +28,12 @@ import javax.swing.JButton;
 public class NewOrderWindow extends JFrame {
 
 	private JPanel contentPane;
-	static DBConnection cDB = new DBConnection();
-	static Connection con = cDB.createConnection();
 	private JTextField txtFieldClientName;
 	private JTextField txtFieldClientEmail;
 	private JLabel lblDateOfOrder;
 
 	private String repName;
 	private String category;
-	/**
-	 * Launch the application.
-	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					NewOrderWindow frame = new NewOrderWindow();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
 
 	/**
 	 * Create the frame.
@@ -142,15 +125,21 @@ public class NewOrderWindow extends JFrame {
 		
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-//				Order newOrder = new Order(txtFieldClientName.getText(), txtFieldClientEmail.getText(), (String)comboBoxBoughtProduct.getSelectedItem(), Integer.parseInt((String) comboBoxQuantity.getSelectedItem()), dateChooser.getDate());
-//				System.out.println(newOrder.toString());
 				
-				 Date date = dateChooser.getDate();
-	             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
-	             String stringDate = dateFormat.format(date);  
+				Date selectedDate = dateChooser.getDate();
+	            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
+	            String date = dateFormat.format(selectedDate);  
 			
-				Client newClient  = new Client(txtFieldClientName.getText(), txtFieldClientEmail.getText(), (String)comboBoxBoughtProduct.getSelectedItem(), Integer.parseInt((String) comboBoxQuantity.getSelectedItem()), stringDate);
-				newClient.buyProduct();
+				
+	            Client newClient = new Client.Builder().name(txtFieldClientName.getText())
+	            										.email(txtFieldClientEmail.getText())
+	            										.product((String)comboBoxBoughtProduct.getSelectedItem())
+	            										.quantity(Integer.parseInt((String) comboBoxQuantity.getSelectedItem()))
+	            										.date(date)
+	            										.build();
+	
+	             
+	            newClient.buyProduct();
 				boolean isValid = newClient.validateOrder();
 				
 				if(isValid)
@@ -171,10 +160,9 @@ public class NewOrderWindow extends JFrame {
 	public void fillProductsComboBox(JComboBox<String> comboBoxBoughtProduct)
 	{
 		try
-		{
-			Statement stmt = con.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT * FROM allproducts WHERE category = '" + this.category + "'");
-	        
+		{     
+			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + this.category + "'");
+			
 	        while(rs.next())
 	        {
 	        	comboBoxBoughtProduct.addItem(rs.getString("name"));
@@ -191,8 +179,7 @@ public class NewOrderWindow extends JFrame {
 		
 		try
 		{
-			Statement stmt = con.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT * FROM allproducts WHERE name = '" + comboBoxBoughtProduct.getSelectedItem() + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + comboBoxBoughtProduct.getSelectedItem() + "'");
 	        
 	        int quantity = 0;
 	        while(rs.next())

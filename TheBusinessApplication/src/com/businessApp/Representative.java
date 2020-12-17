@@ -10,8 +10,7 @@ import java.util.Locale.Category;
 import java.util.Scanner;
 
 public class Representative {
-	static DBConnection cDB = new DBConnection();
-	static Connection con = cDB.createConnection();
+
 	static Scanner scan = new Scanner(System.in);
 	
 	public static int idRepresentative = 100;
@@ -99,9 +98,8 @@ public class Representative {
 	}
 
 	public void setId() {		
-		try {
-			Statement stmt = con.createStatement();	
-			ResultSet rs = stmt.executeQuery(" SELECT id_rep FROM allrepresentatives");
+		try {	
+			ResultSet rs = DBConnection.getData(" SELECT id_rep FROM allrepresentatives");
 					
 			while(rs.next())
 			{
@@ -118,49 +116,25 @@ public class Representative {
 	public static int getIdRepresentativeOfLast()
 	{
 		try {
-			Statement stmt = con.createStatement();	
-			ResultSet rs = stmt.executeQuery(" SELECT id_rep FROM allrepresentatives");
+			ResultSet rs = DBConnection.getData(" SELECT id_rep FROM allrepresentatives");
 					
 			while(rs.next())
 			{
 				idRepresentative = rs.getInt("id_rep");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		return idRepresentative;
-	}
+	}	
 	
-//	public void createRepTableByCategory()
+//	public static void addOrder()              //asks for client name, client email, id_prod, quantity, date
 //	{
-//		 String sqlCreate = "CREATE TABLE IF NOT EXISTS clients" + this.getCategory()
-//			+ "  (id_client         INT,"
-//			+ "   name 				VARCHAR(100),"
-//			+ "   email             VARCHAR(100),"
-//			+ "	  product     VARCHAR(100),"
-//			+ "	  quantity          INT,"
-//			+ "	  price             DOUBLE,"
-//			+ "   date              DATE,"
-//			+ "primary key(id_client))";
-//
-//		 try {
-//			 	Statement stmt = con.createStatement();
-//			 	stmt.execute(sqlCreate);
-//			 	System.out.println("TABLE CREATED");
-//		 }catch (SQLException e) {
-//			 // TODO Auto-generated catch block
-//			 e.printStackTrace();
-//		 }
+//		System.out.println("Enter information for the order...");
+//		Client c = new Client();
+//		c.buyProduct();
 //	}
-	
-	public static void addOrder()              //asks for client name, client email, id_prod, quantity, date
-	{
-		System.out.println("Enter information for the order...");
-		Client c = new Client();
-		c.buyProduct();
-	}
 	
 	public void menuRep()
 	{
@@ -177,7 +151,7 @@ public class Representative {
 		{
 			switch (choice) {
 			case "a":
-				addOrder();
+//				addOrder();
 				break;
 			case "b":
 				menuEditClient(this.category);
@@ -207,8 +181,7 @@ public class Representative {
 		System.out.println("Choose id of client to change: ");
 		
 		try{
-			Statement stmt = con.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT * FROM clients" + categoryRep);
+			ResultSet rs = DBConnection.getData("SELECT * FROM clients" + categoryRep);
 	        
 	        String name, email, product;
 	        int id, quantity;
@@ -251,43 +224,16 @@ public class Representative {
 			case "a":
 				System.out.println("name: ");
 				String newName = scan.next();
-
-
-				stmt = con.createStatement();
-				stmt.execute("SELECT * FROM allsales");
-				String query = "UPDATE allsales SET name = "+ "'" + newName + "'" +"WHERE id_client = "+ ch;
-
-				PreparedStatement pstmt = con.prepareStatement(query);
-
-				pstmt.execute();
-					
-				stmt.execute("SELECT * FROM clients" + categoryRep);
-				query = "UPDATE clients" + categoryRep + " SET name = "+ "'" + newName + "'" +"WHERE id_client = "+ ch;
-
-				pstmt = con.prepareStatement(query);
-
-				pstmt.execute();
-
+				
+				DBConnection.updateData("UPDATE allsales SET name = "+ "'" + newName + "'" +"WHERE id_client = "+ ch);
 				
 				System.out.println("new name set");
 				break;
 			case "b":
 				System.out.println("new email: ");
 				String newEmail = scan.next();
-	
-				stmt.execute("SELECT * FROM allsales");
-				query = "UPDATE allsales SET email = "+ "'" + newEmail + "'" +"WHERE id_client = "+ ch;
-
-				pstmt = con.prepareStatement(query);
-
-				pstmt.execute();
-					
-				stmt.execute("SELECT * FROM clients" + categoryRep);
-				query = "UPDATE clients" + categoryRep + " SET email = "+ "'" + newEmail + "'" +"WHERE id_client = "+ ch;
-				
-				pstmt = con.prepareStatement(query);
-
-				pstmt.execute();
+			
+				DBConnection.updateData("UPDATE allsales SET email = "+ "'" + newEmail + "'" +"WHERE id_client = "+ ch);
 
 				System.out.println("new email set");
 				break;
@@ -310,8 +256,8 @@ public class Representative {
 		try
 		{
 			System.out.println("catalog: ");
-			Statement stmt = con.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT * FROM clients" + categoryRep);
+			
+			ResultSet rs = DBConnection.getData("SELECT * FROM clients" + categoryRep);
 	        
 	        String name, email, product;
 	        int id, quantity;

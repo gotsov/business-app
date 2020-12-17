@@ -11,16 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class Admin {
-	
-	static DBConnection cDB = new DBConnection();
-	static Connection con = cDB.createConnection();
 	static Scanner scan = new Scanner(System.in);
-	
-	public Admin()
-	{
 		
-	}
-	
 	public static void menu()
 	{
 		Scanner scan = new Scanner(System.in);
@@ -47,9 +39,8 @@ public class Admin {
 			case "c":
 				System.out.println("List of all sales: ");
 				
-				try{
-					Statement stmt = con.createStatement();
-			        ResultSet rs = stmt.executeQuery("SELECT * FROM allsales");
+				try{	     
+			        ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
 			        System.out.println("[id, name, email, bought category, bought product, quantity, price, date]");
 			        
 			        String name, email, category, product, date;
@@ -101,8 +92,8 @@ public class Admin {
 				int ch;
 				
 				try{
-					Statement stmt = con.createStatement();
-			        ResultSet rs = stmt.executeQuery("SELECT * FROM allrepresentatives");
+					ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+					 
 			        System.out.println("[id, name, category]");
 			         
 			        String name, category = null, email, product;
@@ -131,15 +122,13 @@ public class Admin {
 						}
 					}
 					
-
-					stmt = con.createStatement();
-					rs = stmt.executeQuery("SELECT * FROM allrepresentatives WHERE id_rep = " + ch);
-						
+					rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE id_rep = " + ch);
+					
 					while (rs.next()) {
 						category = rs.getString("category");
 					}
 						
-					rs = stmt.executeQuery("SELECT * FROM allsales WHERE category = '" + category + "'");
+					rs = DBConnection.getData("SELECT * FROM allsales WHERE category = '" + category + "'");
 				    System.out.println("[id, name, email, bought product, quantity, price, date]");
 				        
 				    while (rs.next()) {
@@ -178,10 +167,8 @@ public class Admin {
 		
 	public static void getSalesInAPeriodOfTime(java.sql.Date startDate, java.sql.Date endDate)
 	{
-		try {
-			
-			Statement stmt = con.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT * FROM allsales");
+		try {			
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
 	        
 	        java.sql.Date dateToCompare;
 	        
@@ -228,10 +215,9 @@ public class Admin {
 				flag = 0;
 				Product p = new Product();
 		
-				try {
+				try {			
+					ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
 					
-					Statement stmt = con.createStatement();
-			        ResultSet rs = stmt.executeQuery("SELECT * FROM allrepresentatives");
 			        String categoryRep;
 			        while(rs.next())
 			        {
@@ -251,11 +237,10 @@ public class Admin {
 						System.out.println("We suggest you add representative for this category");
 							
 						createRepresentativeByCategory(p.getCategory());
-					}
-			        
-			        String query = " INSERT INTO allproducts (id_prod, name, category, price, quantity)" + " VALUES (?, ?, ?, ?, ?)";
-					PreparedStatement pstmt = con.prepareStatement(query);
-						
+					}	     
+					
+					PreparedStatement pstmt = DBConnection.getDataWithPrepStatement
+											(" INSERT INTO allproducts (id_prod, name, category, price, quantity)" + " VALUES (?, ?, ?, ?, ?)");
 					pstmt.setInt(1, p.getId());
 					pstmt.setString(2, p.getName());
 					pstmt.setString(3, p.getCategory());
@@ -274,9 +259,9 @@ public class Admin {
 			case "b":
 				System.out.println("Choose id of product to change: ");		
 				
-				try{
-					Statement stmt = con.createStatement();
-			        ResultSet rs = stmt.executeQuery("SELECT * FROM allproducts");
+				try{	       
+			        ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
+			        
 			        System.out.println("[id, name, category, price, quantity]");
 			         
 			        while (rs.next()) {
@@ -320,13 +305,8 @@ public class Admin {
 					String newName = scan.next();
 
 					try {
-						Statement stmt = con.createStatement();
-						stmt.execute("SELECT * FROM allproducts");
-						String query = "UPDATE allproducts SET name = "+ "'"+newName+"'" +"WHERE id_prod = "+ ch;
+						DBConnection.getData("UPDATE allproducts SET name = "+ "'" + newName + "'" +"WHERE id_prod = "+ ch);
 
-						PreparedStatement pstmt = con.prepareStatement(query);
-
-						pstmt.execute();
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -337,14 +317,9 @@ public class Admin {
 					System.out.println("price: ");
 					double newPrice = scan.nextDouble();
 					
-					try {
-						Statement stmt = con.createStatement();
-						stmt.execute("SELECT * FROM allproducts");
-						String query = "UPDATE allproducts SET price = "+ newPrice +"WHERE id_prod = "+ ch;
+					try {					
+						DBConnection.updateData("UPDATE allproducts SET price = "+ newPrice +"WHERE id_prod = "+ ch);
 
-						PreparedStatement pstmt = con.prepareStatement(query);
-
-						pstmt.execute();
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -364,9 +339,9 @@ public class Admin {
 			case "c":
 				System.out.println("Choose id of product to delete: ");
 				
-				try{
-					Statement stmt = con.createStatement();
-			        ResultSet rs = stmt.executeQuery("SELECT * FROM allproducts");
+				try{			
+					ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
+					
 			        System.out.println("[id, name, category, price, quantity]");
 			         
 			        while (rs.next()) 
@@ -378,37 +353,28 @@ public class Admin {
 			           int quantity = rs.getInt("quantity");
 			           System.out.println(id + "\t" + name + "\t" + category + "\t" + price + "\t" + quantity);
 			        }
+			        
+			        while(true)
+					{
+						System.out.println("choose id: ");
+						ch = scan.nextInt();
+						if(ch > 0 && ch <= Product.getIdProductOfLast())
+						{
+							break;
+						}
+						else
+						{
+							System.out.println("Invalid id");
+						}
+					}	      
+			        
+			        DBConnection.updateData("DELETE FROM allproducts WHERE id_prod = " + ch);
+					System.out.println("Product has been deleted");
 			   	} 
 				catch(SQLException e){
 					e.printStackTrace();
 				}
-				
-				while(true)
-				{
-					System.out.println("choose id: ");
-					ch = scan.nextInt();
-					if(ch > 0 && ch <= Product.getIdProductOfLast())
-					{
-						break;
-					}
-					else
-					{
-						System.out.println("Invalid id");
-					}
-				}
-				
-				try
-				{
-					String query = "DELETE FROM allproducts WHERE id_prod = " + ch;
-					PreparedStatement pstmt = con.prepareStatement(query);
-					pstmt.execute();
-					System.out.println("Product has been deleted");
-				}catch(SQLException e)
-				{
-					e.printStackTrace();
-				}
-					
-				System.out.println("Product deleted");				
+			
 				break;
 			default:
 				System.out.println("Invalid input");
@@ -445,9 +411,9 @@ public class Admin {
 			case "b":
 				System.out.println("Choose id of representative to change: ");
 				
-				try{
-					Statement stmt = con.createStatement();
-			        ResultSet rs = stmt.executeQuery("SELECT * FROM allrepresentatives");
+				try{				
+					ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+					
 			        System.out.println("[id, name, username, category]");
 			        
 			        String name, username, password, category;
@@ -491,14 +457,8 @@ public class Admin {
 					System.out.println("name: ");
 					String newName = scan.next();
 
-					try {
-						Statement stmt = con.createStatement();
-						stmt.execute("SELECT * FROM allrepresentatives");
-						String query = "UPDATE allrepresentatives SET name = " + "'" + newName + "'" +"WHERE id_rep = "+ ch;
-
-						PreparedStatement pstmt = con.prepareStatement(query);
-
-						pstmt.execute();
+					try {	
+						DBConnection.updateData("UPDATE allrepresentatives SET name = " + "'" + newName + "'" +"WHERE id_rep = "+ ch);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -509,14 +469,9 @@ public class Admin {
 					System.out.println("name: ");
 					String newUsername = scan.next();
 
-					try {
-						Statement stmt = con.createStatement();
-						stmt.execute("SELECT * FROM allrepresentatives");
-						String query = "UPDATE allrepresentatives SET username = "+ "'" + newUsername + "'" +"WHERE id_rep = "+ ch;
-
-						PreparedStatement pstmt = con.prepareStatement(query);
-
-						pstmt.execute();
+					try {					
+						DBConnection.updateData("UPDATE allrepresentatives SET username = "+ "'" + newUsername + "'" +"WHERE id_rep = "+ ch);
+						
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -527,14 +482,9 @@ public class Admin {
 					System.out.println("new password: ");
 					String newPass = scan.next();
 
-					try {
-						Statement stmt = con.createStatement();
-						stmt.execute("SELECT * FROM allrepresentatives");
-						String query = "UPDATE allrepresentatives SET password = "+ "'" + newPass + "'" +"WHERE id_rep = "+ ch;
-
-						PreparedStatement pstmt = con.prepareStatement(query);
-
-						pstmt.execute();
+					try {					
+						DBConnection.updateData("UPDATE allrepresentatives SET password = "+ "'" + newPass + "'" +"WHERE id_rep = "+ ch);
+						
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -545,14 +495,8 @@ public class Admin {
 					System.out.println("category: ");
 					String newCategory = scan.next();
 
-					try {
-						Statement stmt = con.createStatement();
-						stmt.execute("SELECT * FROM allrepresentatives");
-						String query = "UPDATE allrepresentatives SET category = "+ "'" + newCategory + "'" +"WHERE id_rep = "+ ch;
-
-						PreparedStatement pstmt = con.prepareStatement(query);
-
-						pstmt.execute();
+					try {				
+						DBConnection.updateData("UPDATE allrepresentatives SET category = "+ "'" + newCategory + "'" +"WHERE id_rep = "+ ch);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -568,9 +512,9 @@ public class Admin {
 			case "c":
 				System.out.println("Choose id of representative to delete: ");
 
-				try{
-					Statement stmt = con.createStatement();
-			        ResultSet rs = stmt.executeQuery("SELECT * FROM allrepresentatives");
+				try{		
+					ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+					
 			        System.out.println("[id, name, category]");
 			         
 			        while (rs.next()) {
@@ -579,35 +523,27 @@ public class Admin {
 			           String category = rs.getString("category");
 			           System.out.println(id + "\t" + name + "\t" + category);
 			        }
+			        
+			        while(true)
+					{
+						System.out.println("choose id: ");
+						ch = scan.nextInt();
+						if(ch > 0 && ch <= Representative.getIdRepresentativeOfLast())
+						{
+							break;
+						}
+						else
+						{
+							System.out.println("Invalid id");
+						}
+					}
+			        
+			        DBConnection.updateData("DELETE FROM allrepresentatives WHERE id_rep = " + ch);
 			    } 
 				catch(SQLException e){
 					e.printStackTrace();
 				}
-				
-				while(true)
-				{
-					System.out.println("choose id: ");
-					ch = scan.nextInt();
-					if(ch > 0 && ch <= Representative.getIdRepresentativeOfLast())
-					{
-						break;
-					}
-					else
-					{
-						System.out.println("Invalid id");
-					}
-				}
-				
-				try
-				{
-					String query = "DELETE FROM allrepresentatives WHERE id_rep = " + ch;
-					PreparedStatement pstmt = con.prepareStatement(query);
-					pstmt.execute();		
-				}catch(SQLException e)
-				{
-					e.printStackTrace();
-				}
-				
+			
 				System.out.println("Product has been deleted");
 				
 				break;
@@ -631,9 +567,9 @@ public class Admin {
 	public static void createRepresentative()
 	{
 		Representative r = new Representative();			
-		try {
-			String query = " INSERT INTO allrepresentatives (id_rep, name, password, category)" + " VALUES (?, ?, ?, ?)";
-			PreparedStatement pstmt = con.prepareStatement(query);
+		try {		
+			PreparedStatement pstmt = DBConnection.getDataWithPrepStatement
+											(" INSERT INTO allrepresentatives (id_rep, name, password, category)" + " VALUES (?, ?, ?, ?)");
 						
 			pstmt.setInt(1, r.getId());
 			pstmt.setString(2, r.getName());
@@ -653,10 +589,9 @@ public class Admin {
 		Representative r = new Representative(brand);		
 
 		try {
-			String query = " INSERT INTO allrepresentatives (id_rep, name, password, category)" + " VALUES (?, ?, ?, ?)";
-			PreparedStatement pstmt = con.prepareStatement(query);
-
-					
+			PreparedStatement pstmt = DBConnection.getDataWithPrepStatement
+					(" INSERT INTO allrepresentatives (id_rep, name, password, category)" + " VALUES (?, ?, ?, ?)");
+			
 			pstmt.setInt(1, r.getId());
 			pstmt.setString(2, r.getName());
 			pstmt.setString(3, r.getPassword());

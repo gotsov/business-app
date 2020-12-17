@@ -9,8 +9,6 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Product {
-	static DBConnection cDB = new DBConnection();
-	static Connection con = cDB.createConnection();
 	static Scanner scan = new Scanner(System.in);
 	
 	public static int idProduct = 100;
@@ -45,16 +43,13 @@ public class Product {
 	
 	public static int getIdProductOfLast()
 	{
-		try {
-			Statement stmt = con.createStatement();	
-			ResultSet rs = stmt.executeQuery(" SELECT id_prod FROM allproducts");
-					
+		try {		
+			ResultSet rs = DBConnection.getData(" SELECT id_prod FROM allproducts");
 			while(rs.next())
 			{
 				idProduct = rs.getInt("id_prod");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -63,8 +58,7 @@ public class Product {
 
 	public void setId() {		
 		try {
-			Statement stmt = con.createStatement();	
-			ResultSet rs = stmt.executeQuery(" SELECT id_prod FROM allproducts");
+			ResultSet rs = DBConnection.getData(" SELECT id_prod FROM allproducts");
 					
 			while(rs.next())
 			{
@@ -143,9 +137,9 @@ public class Product {
 		{
 			System.out.println("how much to add: ");
 			int q = scan.nextInt();
-
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT quantity FROM allproducts WHERE id_prod = " + ch);
+			
+			ResultSet rs = DBConnection.getData("SELECT quantity FROM allproducts WHERE id_prod = " + ch);
+			
 			int oldQ = 0;
 			
 			while(rs.next())
@@ -154,10 +148,9 @@ public class Product {
 			}
 			
 			int newQ = oldQ + q;
+
+			DBConnection.updateData("UPDATE allproducts SET quantity = "+ newQ +" WHERE id_prod = " + ch);
 			
-			String query = "UPDATE allproducts SET quantity = "+ newQ +" WHERE id_prod = " + ch;
-			PreparedStatement pstmt = con.prepareStatement(query);
-			pstmt.execute();
 			System.out.println("Quantity changed to " + newQ);
 		}
 		catch(InputMismatchException e){
@@ -177,9 +170,9 @@ public class Product {
 		{
 			System.out.println("how much to remove: ");
 			int q = scan.nextInt();
-
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT quantity FROM allproducts WHERE id_prod = " + ch);
+			
+			ResultSet rs = DBConnection.getData("SELECT quantity FROM allproducts WHERE id_prod = " + ch);
+			
 			int oldQ = 0;
 			
 			while(rs.next())
@@ -191,16 +184,16 @@ public class Product {
 			
 			if(newQ <= 0)
 			{
-				String query = "DELETE FROM allproducts WHERE id_prod = " + ch;
-				PreparedStatement pstmt = con.prepareStatement(query);
-				pstmt.execute();
+
+				DBConnection.updateData("DELETE FROM allproducts WHERE id_prod = " + ch);
+				
 				System.out.println("Product deleted. (quantity <= 0)");
 			}
 			else
 			{
-				String query = "UPDATE allproducts SET quantity = "+ newQ +" WHERE id_prod = " + ch;
-				PreparedStatement pstmt = con.prepareStatement(query);
-				pstmt.execute();
+				
+				DBConnection.updateData("UPDATE allproducts SET quantity = "+ newQ +" WHERE id_prod = " + ch);
+				
 				System.out.println("Quantity changed to " + newQ);
 			}
 			

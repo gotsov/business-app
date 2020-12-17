@@ -12,24 +12,6 @@ import javax.swing.JLabel;
 public class AdminWindow extends JFrame {
 
 	private JPanel contentPane;
-	static DBConnection cDB = new DBConnection();
-	static Connection con = cDB.createConnection();
-
-	/**
-	 * Launch the application.
-	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					AdminWindow frame = new AdminWindow();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
 
 	/**
 	 * Create the frame.

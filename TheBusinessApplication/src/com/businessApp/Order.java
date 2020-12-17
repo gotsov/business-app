@@ -1,7 +1,8 @@
 package com.businessApp;
 
 import java.sql.Connection;
-import java.util.Date;
+
+import java.sql.Date;
 import java.util.Locale;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,19 +13,15 @@ import java.time.temporal.TemporalAccessor;
 
 
 public class Order {
-	static DBConnection cDB = new DBConnection();
-	static Connection con = cDB.createConnection();
-	
 	private int id;
 	private String name;
 	private String email;
 	private String product;
 	private int quantity;
 	private Double price;
-	private java.sql.Date date;
+	private Date date;
 	
-	public Order(int id, String name, String email, String product, int quantity, Double price, java.sql.Date date) {
-		super();
+	public Order(int id, String name, String email, String product, int quantity, Double price, Date date) {
 		this.id = id;
 		this.name = name;
 		this.email = email;
@@ -62,12 +59,5 @@ public class Order {
 	public Date getDate() {
 		return date;
 	}
-
-	@Override
-	public String toString() {
-		return "Order [id=" + id + ", name=" + name + ", email=" + email + ", product=" + product
-				+ ", quantity=" + quantity + ", price=" + price + ", date=" + date + "]";
-	}
-	
 	
 }

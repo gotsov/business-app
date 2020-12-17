@@ -11,13 +11,7 @@ public class App {
 	public static Connection con;
 	static Scanner scan = new Scanner(System.in);
 	
-	public static void main(String[] args) {
-		
-		DBConnection cDB = new DBConnection();
-		con = cDB.createConnection();
-		
-		
-		
+	public static void main(String[] args) {		
 		while(true) {
 			System.out.println("Continue as:");
 			System.out.println("a. Admin");
