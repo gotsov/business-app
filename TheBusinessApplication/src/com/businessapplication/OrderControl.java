@@ -5,6 +5,9 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import com.businessapplication.Representative.Builder;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,14 +25,66 @@ public class OrderControl {
 	private Double price;
 	private Date date;
 	
-	public OrderControl(int id, String name, String email, String product, int quantity, Double price, Date date) {
-		this.id = id;
-		this.name = name;
-		this.email = email;
-		this.product = product;
-		this.quantity = quantity;
-		this.price = price;
-		this.date = date;
+	public OrderControl(Builder builder)
+	{
+		this.id = builder.id;
+		this.name = builder.name;
+		this.email = builder.email;
+		this.product = builder.product;
+		this.quantity = builder.quantity;
+		this.price = builder.price;
+		this.date =builder.date;
+	}
+	
+	public static class Builder
+	{
+		private int id;
+		private String name;
+		private String email;
+		private String product;
+		private int quantity;
+		private Double price;
+		private Date date;
+		
+		public Builder id(int id) {
+			this.id = id;
+			return this;
+		}
+		
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public Builder email(String email) {
+			this.email = email;
+			return this;
+		}
+		
+		public Builder product(String product) {
+			this.product = product;
+			return this;
+		}
+		
+		public Builder quantity(int quantity) {
+			this.quantity = quantity;
+			return this;
+		}
+		
+		public Builder price(double price) {
+			this.price = price;
+			return this;
+		}
+		
+		public Builder date(Date date) {
+			this.date = date;
+			return this;
+		}
+		
+		public OrderControl build() {
+			return new OrderControl(this);
+		}
+	
 	}
 	
 

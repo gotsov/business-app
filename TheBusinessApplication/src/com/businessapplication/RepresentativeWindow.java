@@ -22,8 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Vector;
 import java.awt.Font;
 import javax.swing.JTable;
@@ -53,8 +56,7 @@ import com.toedter.calendar.JDateChooser;
 public class RepresentativeWindow extends JFrame {
 	
 	private JTable tableCatalog;
-	private String category;
-	private String username;
+	
 	private JTable tableClients;
 	private JTextField txtFieldClientNameEdit;
 	private JTextField txtFieldClientEmailEdit;
@@ -64,15 +66,26 @@ public class RepresentativeWindow extends JFrame {
 	private ArrayList<OrderControl> clientsFromCatalog  = new ArrayList<>();
 	private JTextField txtFieldClientName;
 	private JTextField txtFieldClientEmail;
+	
+	private String nameRep;
+	private String categoryRep;
+	private String usernameRep;
+	private String passwordRep;
 
 	/**
 	 * Create the frame.
 	 */
-	public RepresentativeWindow(String username, String category) {
-		this.category = category;
-		this.username = username;
+	
+	
+	
+	public RepresentativeWindow(String nameRep, String usernameRep, String password, String category) {
+		
+		setResizable(false);
+		this.nameRep = nameRep;
+		this.categoryRep = category;
+		this.usernameRep = usernameRep;	
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 847, 626);
+		setBounds(100, 100, 866, 626);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -87,7 +100,7 @@ public class RepresentativeWindow extends JFrame {
 		getContentPane().setLayout(null);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(53, 49, 733, 162);
+		scrollPane.setBounds(53, 49, 776, 162);
 		getContentPane().add(scrollPane);
 		
 		tableCatalog = new JTable();
@@ -150,6 +163,8 @@ public class RepresentativeWindow extends JFrame {
 		});
 		
 		TableColumnModel columnModel2 = tableClients.getColumnModel();
+		
+		tableClients.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 		columnModel2 = tableClients.getColumnModel();
 		columnModel2.getColumn(0).setPreferredWidth(40);
 		columnModel2.getColumn(1).setPreferredWidth(120);
@@ -161,13 +176,9 @@ public class RepresentativeWindow extends JFrame {
 		lblClients.setBounds(53, 224, 381, 23);
 		getContentPane().add(lblClients);
 		
-		JButton btnRefreshTable = new JButton("Refresh tables");
-		btnRefreshTable.setFont(new Font("Arial", Font.PLAIN, 19));
-		btnRefreshTable.setBounds(625, 9, 161, 32);
-		getContentPane().add(btnRefreshTable);
-		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(479, 224, 307, 307);
+		tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		tabbedPane.setBounds(479, 224, 350, 307);
 		getContentPane().add(tabbedPane);
 		
 		JPanel panel3 = new JPanel();
@@ -177,63 +188,63 @@ public class RepresentativeWindow extends JFrame {
 		JLabel label = new JLabel("Client name:");
 		label.setHorizontalAlignment(SwingConstants.RIGHT);
 		label.setFont(new Font("Arial", Font.PLAIN, 18));
-		label.setBounds(35, 13, 110, 30);
+		label.setBounds(55, 13, 110, 30);
 		panel3.add(label);
 		
 		txtFieldClientName = new JTextField();
 		txtFieldClientName.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		txtFieldClientName.setColumns(10);
-		txtFieldClientName.setBounds(157, 15, 133, 26);
+		txtFieldClientName.setBounds(177, 15, 133, 26);
 		panel3.add(txtFieldClientName);
 		
 		txtFieldClientEmail = new JTextField();
 		txtFieldClientEmail.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		txtFieldClientEmail.setColumns(10);
-		txtFieldClientEmail.setBounds(157, 58, 133, 26);
+		txtFieldClientEmail.setBounds(177, 58, 133, 26);
 		panel3.add(txtFieldClientEmail);
 		
 		JLabel label_1 = new JLabel("Client e-mail:");
 		label_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_1.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_1.setBounds(35, 56, 110, 30);
+		label_1.setBounds(55, 56, 110, 30);
 		panel3.add(label_1);
 		
 		JLabel label_2 = new JLabel("Bought product:");
 		label_2.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_2.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_2.setBounds(-8, 99, 153, 30);
+		label_2.setBounds(12, 99, 153, 30);
 		panel3.add(label_2);
 		
 		JComboBox<String> comboBoxBoughtProduct = new JComboBox();
 		comboBoxBoughtProduct.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxBoughtProduct.setBounds(157, 99, 133, 26);
+		comboBoxBoughtProduct.setBounds(177, 99, 133, 26);
 		panel3.add(comboBoxBoughtProduct);
 		
 		JComboBox<String> comboBoxQuantity = new JComboBox();
 		comboBoxQuantity.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxQuantity.setBounds(157, 144, 133, 26);
+		comboBoxQuantity.setBounds(177, 144, 133, 26);
 		panel3.add(comboBoxQuantity);
 		
 		JLabel label_3 = new JLabel("Quantity bought:");
 		label_3.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_3.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_3.setBounds(-8, 139, 153, 30);
+		label_3.setBounds(12, 139, 153, 30);
 		panel3.add(label_3);
 		
 		JLabel label_4 = new JLabel("Date of order:");
 		label_4.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_4.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_4.setBounds(-8, 182, 153, 30);
+		label_4.setBounds(12, 182, 153, 30);
 		panel3.add(label_4);
 		
 		JDateChooser dateChooser = new JDateChooser();
 		dateChooser.setDateFormatString("yyyy-MM-dd");
-		dateChooser.setBounds(157, 186, 133, 26);
+		dateChooser.setBounds(177, 186, 133, 26);
 		panel3.add(dateChooser);
 		
 		JButton btnAdd = new JButton("Add");
 		btnAdd.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnAdd.setBounds(91, 222, 133, 38);
+		btnAdd.setBounds(111, 222, 133, 38);
 		panel3.add(btnAdd);
 		
 		JPanel panel = new JPanel();
@@ -242,43 +253,43 @@ public class RepresentativeWindow extends JFrame {
 		
 		JLabel lblIdOfClient = new JLabel("ID of client to edit: ");
 		lblIdOfClient.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblIdOfClient.setBounds(0, 31, 167, 26);
+		lblIdOfClient.setBounds(30, 28, 167, 26);
 		lblIdOfClient.setFont(new Font("Arial", Font.PLAIN, 19));
 		panel.add(lblIdOfClient);
 		
 		JLabel lblWhatDoYou = new JLabel("Change client's:");
 		lblWhatDoYou.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblWhatDoYou.setFont(new Font("Arial", Font.PLAIN, 19));
-		lblWhatDoYou.setBounds(-18, 72, 179, 26);
+		lblWhatDoYou.setBounds(12, 69, 179, 26);
 		panel.add(lblWhatDoYou);
 		
 		JComboBox comboBoxChange = new JComboBox();
 		comboBoxChange.setModel(new DefaultComboBoxModel(new String[] {"", "name", "e-mail", "name & e-mail"}));
 		comboBoxChange.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxChange.setBounds(173, 73, 111, 26);
+		comboBoxChange.setBounds(203, 70, 111, 26);
 		panel.add(comboBoxChange);
 		
 		JComboBox comboBoxIdClient = new JComboBox();
 		comboBoxIdClient.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxIdClient.setBounds(173, 32, 55, 26);
+		comboBoxIdClient.setBounds(203, 29, 55, 26);
 		panel.add(comboBoxIdClient);
 		
 		JLabel lblNewName = new JLabel("New name:");
 		lblNewName.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewName.setFont(new Font("Arial", Font.PLAIN, 19));
-		lblNewName.setBounds(-9, 124, 111, 26);
+		lblNewName.setBounds(21, 121, 111, 26);
 		panel.add(lblNewName);
 		
 		JLabel lblNewEmail = new JLabel("New e-mail:");
 		lblNewEmail.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewEmail.setFont(new Font("Arial", Font.PLAIN, 19));
-		lblNewEmail.setBounds(-2, 163, 104, 26);
+		lblNewEmail.setBounds(28, 160, 104, 26);
 		panel.add(lblNewEmail);
 		
 		txtFieldClientNameEdit = new JTextField();
 		txtFieldClientNameEdit.setEnabled(false);
 		txtFieldClientNameEdit.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		txtFieldClientNameEdit.setBounds(114, 128, 170, 22);
+		txtFieldClientNameEdit.setBounds(144, 125, 170, 22);
 		panel.add(txtFieldClientNameEdit);
 		txtFieldClientNameEdit.setColumns(10);
 		
@@ -286,12 +297,12 @@ public class RepresentativeWindow extends JFrame {
 		txtFieldClientEmailEdit.setEnabled(false);
 		txtFieldClientEmailEdit.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		txtFieldClientEmailEdit.setColumns(10);
-		txtFieldClientEmailEdit.setBounds(114, 167, 170, 22);
+		txtFieldClientEmailEdit.setBounds(144, 164, 170, 22);
 		panel.add(txtFieldClientEmailEdit);
 		
 		JButton btnEditClient = new JButton("Edit Client");
 		btnEditClient.setEnabled(false);
-		btnEditClient.setBounds(84, 202, 144, 48);
+		btnEditClient.setBounds(102, 199, 144, 48);
 		panel.add(btnEditClient);
 		btnEditClient.setFont(new Font("Arial", Font.PLAIN, 20));
 		
@@ -302,17 +313,17 @@ public class RepresentativeWindow extends JFrame {
 		JLabel lblIdOfClient_1 = new JLabel("ID of client to delete: ");
 		lblIdOfClient_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblIdOfClient_1.setFont(new Font("Arial", Font.PLAIN, 19));
-		lblIdOfClient_1.setBounds(12, 94, 199, 26);
+		lblIdOfClient_1.setBounds(40, 98, 199, 26);
 		panel_1.add(lblIdOfClient_1);
 		
 		JComboBox comboBoxIdClientToDelete = new JComboBox();
 		comboBoxIdClientToDelete.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxIdClientToDelete.setBounds(215, 95, 55, 26);
+		comboBoxIdClientToDelete.setBounds(243, 99, 55, 26);
 		panel_1.add(comboBoxIdClientToDelete);
 		
 		JButton btnDeleteClient = new JButton("Delete Client");
 		btnDeleteClient.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnDeleteClient.setBounds(70, 167, 171, 48);
+		btnDeleteClient.setBounds(98, 171, 171, 48);
 		panel_1.add(btnDeleteClient);
 		
 		JPanel panel_2 = new JPanel();
@@ -322,30 +333,30 @@ public class RepresentativeWindow extends JFrame {
 		JLabel lblClientsName = new JLabel("Client's name:");
 		lblClientsName.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblClientsName.setFont(new Font("Arial", Font.PLAIN, 19));
-		lblClientsName.setBounds(0, 74, 130, 26);
+		lblClientsName.setBounds(26, 74, 130, 26);
 		panel_2.add(lblClientsName);
 		
 		JLabel lblClientsEmail = new JLabel("Client's e-mail:");
 		lblClientsEmail.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblClientsEmail.setFont(new Font("Arial", Font.PLAIN, 19));
-		lblClientsEmail.setBounds(7, 113, 123, 26);
+		lblClientsEmail.setBounds(33, 113, 123, 26);
 		panel_2.add(lblClientsEmail);
 		
 		txtFieldClientNameAdd = new JTextField();
 		txtFieldClientNameAdd.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		txtFieldClientNameAdd.setColumns(10);
-		txtFieldClientNameAdd.setBounds(142, 81, 148, 22);
+		txtFieldClientNameAdd.setBounds(168, 81, 148, 22);
 		panel_2.add(txtFieldClientNameAdd);
 		
 		txtFieldClientEmailAdd = new JTextField();
 		txtFieldClientEmailAdd.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		txtFieldClientEmailAdd.setColumns(10);
-		txtFieldClientEmailAdd.setBounds(142, 116, 148, 22);
+		txtFieldClientEmailAdd.setBounds(168, 116, 148, 22);
 		panel_2.add(txtFieldClientEmailAdd);
 		
 		JButton btnAddClient = new JButton("Add client");
 		btnAddClient.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnAddClient.setBounds(93, 166, 144, 48);
+		btnAddClient.setBounds(119, 166, 144, 48);
 		panel_2.add(btnAddClient);
 
 		
@@ -355,33 +366,7 @@ public class RepresentativeWindow extends JFrame {
 			}
 		});
 		
-		showCatalog();
-		fillComboBoxIdClient(comboBoxIdClient);
-		fillComboBoxIdClient(comboBoxIdClientToDelete);
-		fillProductsComboBox(comboBoxBoughtProduct);
-		fillQuantityComboBox(comboBoxBoughtProduct, comboBoxQuantity);
-		
-		JButton btnNewOrder = new JButton("Add new order");
-		btnNewOrder.setBounds(351, 205, 172, 42);
-		getContentPane().add(btnNewOrder);
-		
-		btnNewOrder.setFont(new Font("Arial", Font.PLAIN, 20));
-		
-		btnNewOrder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				NewOrderWindow newOrder = new NewOrderWindow(username, category);
-				newOrder.setVisible(true);
-				
-			}
-		});	
-		
-		btnRefreshTable.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showCatalog();
-				fillComboBoxIdClient(comboBoxIdClient);
-				fillComboBoxIdClient(comboBoxIdClientToDelete);
-			}
-		});
+		updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 		
 		comboBoxChange.addActionListener(new ActionListener() {		
 			@Override
@@ -409,12 +394,27 @@ public class RepresentativeWindow extends JFrame {
 			}
 		});
 		
+		comboBoxBoughtProduct.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				fillComboBoxQuantity(comboBoxBoughtProduct, comboBoxQuantity);
+			}
+		});
+		
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				java.util.Date selectedDate = dateChooser.getDate();
 	            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
 	            String date = dateFormat.format(selectedDate);  
-			
+	            
+	            Representative thisRepresentative = new Representative.Builder().name(nameRep)
+	            																.idOfRepresentative(getIdOfRepresentative())
+	            																.username(usernameRep)
+	            																.password(passwordRep)
+	            																.category(categoryRep)
+	            																.numberOfSales(getNumberOfSales())
+	            																.profit(getProfit())
+	            																.build();
 				
 	            Client newClient = new Client.Builder().name(txtFieldClientName.getText())
 	            										.email(txtFieldClientEmail.getText())
@@ -425,13 +425,14 @@ public class RepresentativeWindow extends JFrame {
 	            										.build();
 	
 	             
-	            Representative.addSale(newClient);		
+	            thisRepresentative.addSale(newClient);		
 				
 				if(newClient.isFirstTimeClient())
 				{
-					JOptionPane.showMessageDialog(null, "Order has been added");
-					fillProductsComboBox(comboBoxBoughtProduct);
-					fillQuantityComboBox(comboBoxBoughtProduct, comboBoxQuantity);
+					JOptionPane.showMessageDialog(null, "Client [" + newClient.getName() + ", " + newClient.getEmail() 
+					                                   + "] bought [" + newClient.getQuantityBought() + "x " + newClient.getProductBought() + "].");
+					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+
 				}
 				else
 				{
@@ -453,6 +454,7 @@ public class RepresentativeWindow extends JFrame {
 							.build();
 					
 					Representative.editClient(clientToEdit);
+					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 				}
 				
 				else if(comboBoxChange.getSelectedItem().equals("e-mail")) {
@@ -466,6 +468,7 @@ public class RepresentativeWindow extends JFrame {
 					System.out.println(clientToEdit.isFirstTimeClient());
 					if(clientToEdit.isFirstTimeClient()) {
 						Representative.editClient(clientToEdit);
+						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 					}
 					else {
 						JOptionPane.showMessageDialog(getContentPane(), "Not unique e-mail");
@@ -482,9 +485,10 @@ public class RepresentativeWindow extends JFrame {
 					System.out.println(clientToEdit.isFirstTimeClient());
 					if(clientToEdit.isFirstTimeClient()) {
 						Representative.editClient(clientToEdit);
+						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 					}
 					else {
-						JOptionPane.showMessageDialog(getContentPane(), "Not unique e-mail");
+						JOptionPane.showMessageDialog(null, "Not unique e-mail");
 					}
 
 				}
@@ -503,6 +507,8 @@ public class RepresentativeWindow extends JFrame {
 											.build();
 					
 				Representative.deleteClient(clientToDelete);
+				JOptionPane.showMessageDialog(null, "Client ["+ clientToDelete.getName() + ", " + clientToDelete.getEmail() + "] has been deleted.");
+				updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 			}
 		});
 		
@@ -519,16 +525,15 @@ public class RepresentativeWindow extends JFrame {
 				System.out.println(clientToAdd.isFirstTimeClient());
 				if(clientToAdd.isFirstTimeClient()) {
 					Representative.addClient(clientToAdd);
+					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 				}
 				else {
-					JOptionPane.showMessageDialog(getContentPane(), "Not unique e-mail");
+					JOptionPane.showMessageDialog(null, "Not unique e-mail");
 				}
 				Representative.addClient(clientToAdd);
 			}
 		});
 	}
-	
-	
 	
 	public String getEmailOfClientById(int id)
 	{
@@ -550,7 +555,7 @@ public class RepresentativeWindow extends JFrame {
 		
 	}
 		
-	public void showCatalog()
+	public void loadTables()
 	{
 		try
 		{
@@ -569,22 +574,18 @@ public class RepresentativeWindow extends JFrame {
 			
 			ArrayList<OrderControl> catalog = new ArrayList<>();
 			
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE category = '" + this.category + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE category = '" + this.categoryRep + "'");
 			
 	        while(rs.next())
-	        {  	
-	        	
-	        	//it throws nullpoint exception when I do it with Builder design pattern
-	        	OrderControl o = new OrderControl(
-	        				rs.getInt("id_sale"), 
-	        				rs.getString("name"),
-	        				rs.getString("email"),
-	        				rs.getString("product"), 
-	        				rs.getInt("quantity"), 
-	        				rs.getDouble("price"), 
-	        				rs.getDate("date")
-	        				);
-	        	
+	        {  	      	
+	        	OrderControl o = new OrderControl.Builder().id(rs.getInt("id_sale"))
+	        											   .name(rs.getString("name"))
+	        											   .email(rs.getString("email"))
+	        											   .product(rs.getString("product"))
+	        											   .quantity(rs.getInt("quantity"))
+	        											   .price(rs.getDouble("price"))
+	        											   .date(rs.getDate("date"))
+	        											   .build();	
 	        	catalog.add(o);
 	        }
 	        
@@ -623,8 +624,10 @@ public class RepresentativeWindow extends JFrame {
 	
 	}
 	
-	public void fillComboBoxIdClient(JComboBox<String> ComboBoxIdClient)
+	public void fillComboBoxClient(JComboBox<String> ComboBoxIdClient)
 	{		
+		ComboBoxIdClient.removeAllItems();
+		
 		for(OrderControl clientInCatalog : clientsFromCatalog)
 		{
 			ComboBoxIdClient.addItem(""+clientInCatalog.getId());
@@ -632,11 +635,14 @@ public class RepresentativeWindow extends JFrame {
 		
 	}
 	
-	public void fillProductsComboBox(JComboBox<String> comboBoxBoughtProduct)
+	public void fillComboBoxProducts(JComboBox<String> comboBoxBoughtProduct)
 	{
+		
+		// clears comboBox before updating it
+		comboBoxBoughtProduct.removeAllItems();
 		try
 		{     
-			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + this.category + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + this.categoryRep + "'");
 			
 	        while(rs.next())
 	        {
@@ -648,8 +654,10 @@ public class RepresentativeWindow extends JFrame {
 		
 	}
 	
-	public void fillQuantityComboBox(JComboBox<String> comboBoxBoughtProduct, JComboBox<String> comboBoxQuantity)
+	public void fillComboBoxQuantity(JComboBox<String> comboBoxBoughtProduct, JComboBox<String> comboBoxQuantity)
 	{
+		
+		// clears comboBox before updating it
 		comboBoxQuantity.removeAllItems();
 		
 		try
@@ -672,4 +680,57 @@ public class RepresentativeWindow extends JFrame {
 		}
 		
 	}
+	
+	public int getIdOfRepresentative()
+	{
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.usernameRep + "'");
+			rs.next();
+			
+			return rs.getInt("id_rep");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+	
+	public int getNumberOfSales()
+	{
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.usernameRep + "'");
+			rs.next();
+			
+			return rs.getInt("numberofsales");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+	
+	public double getProfit()
+	{
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.usernameRep + "'");
+			rs.next();
+			
+			System.out.println("rs.getDouble(\"profit\") = " + rs.getDouble("profit"));
+			return rs.getDouble("profit");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+	
+	public void updateTablesAndComboBoxes(JComboBox<String> comboBoxIdClient,JComboBox<String> comboBoxIdClientToDelete,
+											JComboBox<String> comboBoxBoughtProduct,JComboBox<String> comboBoxQuantity) {
+		loadTables();
+		fillComboBoxClient(comboBoxIdClient);
+		fillComboBoxClient(comboBoxIdClientToDelete);
+		fillComboBoxProducts(comboBoxBoughtProduct);
+		fillComboBoxQuantity(comboBoxBoughtProduct, comboBoxQuantity);
+	}
+
 }

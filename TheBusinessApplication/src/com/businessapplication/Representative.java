@@ -9,7 +9,11 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Locale.Category;
+
+import com.businessapplication.Client.Builder;
+
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -18,40 +22,106 @@ public class Representative {
 	static Scanner scan = new Scanner(System.in);
 	
 	public static int idRepresentative = 100;
-	private int id;
+	private int idOfRepresentative;
 	private String name;
 	private String username;
 	private String password;
 	private String category;
+	private Double profit;
+	private int numOfSales;
 	
 	
-	public Representative()
+//	public Representative()
+//	{
+//		setId();
+//		setName();
+//		setUsername();
+//		setCategory();
+//		setPassword();
+//		
+////		createRepTableByCategory();
+//	}
+//	
+//	public Representative(String category)
+//	{
+//		setId();
+//		setName();
+//		setUsername();
+//		setPassword();
+//		this.category = category;
+//		
+////		createRepTableByCategory();
+//	}
+//	
+//	public Representative(int id, String name, String password, String category) {
+//		this.id = id;
+//		this.name = name;
+//		this.password = password;
+//		this.category = category;
+//	}
+	
+	public Representative(Builder builder)
 	{
-		setId();
-		setName();
-		setUsername();
-		setCategory();
-		setPassword();
-		
-//		createRepTableByCategory();
+		this.name = builder.name;
+		this.idOfRepresentative = builder.idOfRepresentative;
+		this.username = builder.username;
+		this.password = builder.password;
+		this.category = builder.category;
+		this.numOfSales = builder.numberOfSales;
+		this.profit = builder.profit;
 	}
 	
-	public Representative(String category)
+	public static class Builder
 	{
-		setId();
-		setName();
-		setUsername();
-		setPassword();
-		this.category = category;
+		private String name;
+		private int idOfRepresentative;
+		private String username;
+		private String password;
+		private String category;
+		private int numberOfSales;
+		private double profit;
 		
-//		createRepTableByCategory();
-	}
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public Builder username(String username) {
+			this.username = username;
+			return this;
+		}
+		
+		public Builder password(String password) {
+			this.password = password;
+			return this;
+		}
+		
+		public Builder category(String category) {
+			this.category = category;
+			return this;
+		}
 	
-	public Representative(int id, String name, String password, String category) {
-		this.id = id;
-		this.name = name;
-		this.password = password;
-		this.category = category;
+		public Builder idOfRepresentative(int idOfRepresentative) {
+			this.idOfRepresentative = idOfRepresentative;
+			return this;
+		}
+		
+		public Builder numberOfSales(int numberOfSales) {
+			this.numberOfSales = numberOfSales;
+			return this;
+		}
+		
+		public Builder profit(double profit)
+		{
+			this.profit = profit;
+			return this;
+		}
+		
+		public Representative build() {
+			return new Representative(this);
+		}
+
+		
 	}
 
 	public String getName() {
@@ -96,8 +166,12 @@ public class Representative {
 		this.password = password;
 	}
 	
-	public int getId() {
-		return id;
+	public int getIdOfRepresentative() {
+		return idOfRepresentative;
+	}
+	
+	public int getNumberOfSales() {
+		return this.numOfSales;
 	}
 
 	public void setId() {		
@@ -108,12 +182,12 @@ public class Representative {
 			{
 				idRepresentative = rs.getInt("id_rep");
 			}
-			this.id = ++idRepresentative;
+			this.idOfRepresentative = ++idRepresentative;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 			
-		this.id = idRepresentative;
+		this.idOfRepresentative = idRepresentative;
 	}
 	
 	public static int getIdRepresentativeOfLast()
@@ -132,6 +206,21 @@ public class Representative {
 		return idRepresentative;
 	}	
 	
+	public void setProfit(Double newProfit)
+	{
+		this.profit = newProfit;
+	}
+	
+	public double getProfit()
+	{
+		return this.profit;
+	}
+	
+	public void setNumOfSales(int newNumOfSales)
+	{
+		this.numOfSales = newNumOfSales;
+	}
+	
 //	public static void addOrder()              //asks for client name, client email, id_prod, quantity, date
 //	{
 //		System.out.println("Enter information for the order...");
@@ -140,34 +229,18 @@ public class Representative {
 //	}
 	
 	
-	public static void addSale(Client newClient)
+	public void addSale(Client newClient)
 	{
 		System.out.println("What was the order (choose product by id)");
 		int ch;
 		
-		try{	
-			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
-			
-	        System.out.println("[id, name, category, price, quantity]");
-	         
-	        while (rs.next()) {
-	           int id = rs.getInt("id_prod");
-	           String name = rs.getString("name");
-	           String category = rs.getString("category");
-	           double price = rs.getDouble("price");
-	           int quantity = rs.getInt("quantity");
-	           System.out.println(id + "\t" + name + "\t" + category + "\t" + price + "\t" + quantity);
-	        }
-	        
-	        rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + newClient.getProductBought() + "'");
+		try{	        
+	        ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + newClient.getProductBought() + "'");
 			
 			int quantityOfProduct = 0;
 			int newQuantity;
 
-			String categoryProduct = null;
 			double priceProduct = 0;
-			
-			
 			
 			while(rs.next())
 			{
@@ -175,13 +248,20 @@ public class Representative {
 				priceProduct = rs.getDouble("price");		
 			}
 			
-			double fullPrice = newClient.getQuantityBought() * priceProduct;
+			System.out.println("newClient.getQuantityBought() = " + newClient.getQuantityBought());
+			System.out.println("priceProduct = " + priceProduct);
+			
+			double fullPriceOfSale = newClient.getQuantityBought() * priceProduct;
 			
 			NumberFormat formatter = new DecimalFormat("#0.00");
-			String formatedFullPrice = formatter.format(fullPrice);
-			NumberFormat format = NumberFormat.getInstance(Locale.ROOT);
+			String formatedFullPrice = formatter.format(fullPriceOfSale);
+			
+			//using FRANCE because when using ROOT or getDefault the results are incorrect
+			NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
 			Number number = format.parse(formatedFullPrice);
-			fullPrice = number.doubleValue();
+			fullPriceOfSale = number.doubleValue();
+			
+			System.out.println("fullPriceOfSale = " + fullPriceOfSale);
 			
 			boolean isValid = newClient.isFirstTimeClient() && validateSale(newClient);
 			
@@ -210,9 +290,10 @@ public class Representative {
 				pstmt.setString(4, newClient.getCategoryOfProductBought());
 				pstmt.setString(5, newClient.getProductBought());
 				pstmt.setInt(6, newClient.getQuantityBought());
-				pstmt.setDouble(7, fullPrice);
+				pstmt.setDouble(7, fullPriceOfSale);
 				pstmt.setDate(8, newClient.getSqlDateOfSale());
 				pstmt.execute();
+				
 				
 				if(newClient.isFirstTimeClient())
 				{
@@ -226,6 +307,23 @@ public class Representative {
 					pstmt.execute();
 				}
 				
+				//Add to numberofsales and profit
+				int newNumOfSales = this.numOfSales + 1;
+				setNumOfSales(newNumOfSales);
+				
+				System.out.println("this.numOfSales = " + this.numOfSales);
+				System.out.println("this.idOfRepresentative = " + this.idOfRepresentative);
+				DBConnection.updateData("UPDATE allrepresentatives SET numberofsales = " + this.numOfSales + " WHERE id_rep = " + this.idOfRepresentative);
+				
+				
+				System.out.println("fullPriceOfSale = " + fullPriceOfSale);
+				double newProfit = getProfit() + fullPriceOfSale;
+				setProfit(newProfit);
+				
+				System.out.println("this.profit = " + this.profit);
+				
+				DBConnection.updateData("UPDATE allrepresentatives SET profit = " + this.profit + " WHERE id_rep = " + this.idOfRepresentative);
+
 			}
 	        
 		} 
@@ -233,6 +331,8 @@ public class Representative {
 			e.printStackTrace();
 		}
 	}
+	
+
 	
 	public static boolean validateSale(Client clientToVarify) {
 		return clientToVarify.getEmail().matches("^(.+)@(.+)$");
@@ -290,6 +390,18 @@ public class Representative {
 			
 			clientToSetId.setIdOfSale(++Client.idSale);
 		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void setSqlDate(Client clientToSetSqlDate)
+	{
+		try {
+			java.util.Date utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(clientToSetSqlDate.getDateOfSale());
+			Date sqlDate = new Date(utilDate.getTime());
+			
+			clientToSetSqlDate.setSqlDateOfSale(sqlDate);
+		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 	}

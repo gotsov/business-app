@@ -237,7 +237,7 @@ public class Admin {
 						System.out.println("There is NO representative with this category");
 						System.out.println("We suggest you add representative for this category");
 							
-						createRepresentativeByCategory(p.getCategory());
+//						createRepresentativeByCategory(p.getCategory());
 					}	     
 					
 					PreparedStatement pstmt = DBConnection.insertData
@@ -390,7 +390,39 @@ public class Admin {
 			
 		}
 	}
+	
+	
+	public static void addProduct(Product newProduct) {
+		try {		
+			PreparedStatement pstmt = DBConnection.insertData
+									(" INSERT INTO allproducts (id_prod, name, category, price, quantity)" + " VALUES (?, ?, ?, ?, ?)");
+			pstmt.setInt(1, newProduct.getId());
+			pstmt.setString(2, newProduct.getName());
+			pstmt.setString(3, newProduct.getCategory());
+			pstmt.setDouble(4, newProduct.getPrice());
+			pstmt.setInt(5, newProduct.getQuantity());
+				
+			pstmt.execute();
+	        
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}	
 
+		System.out.println("product added");
+	}
+	
+	public static void deleteProduct(Product productToDelete)
+	{
+		try {		
+			DBConnection.updateData("DELETE FROM allproducts WHERE id_prod = " + productToDelete.getId());
+	        
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}	
+
+		System.out.println("product deleted");
+	}
+	
 	public static void menuRepresentatives()
 	{	
 		System.out.println("What do you want to do: ");
@@ -407,7 +439,7 @@ public class Admin {
 		{
 			switch (choice) {
 			case "a":			
-				createRepresentative();
+//				createRepresentative();
 				break;
 			case "b":
 				System.out.println("Choose id of representative to change: ");
@@ -565,45 +597,45 @@ public class Admin {
 		
 	}
 	
-	public static void createRepresentative()
-	{
-		Representative r = new Representative();			
-		try {		
-			PreparedStatement pstmt = DBConnection.insertData
-											(" INSERT INTO allrepresentatives (id_rep, name, password, category)" + " VALUES (?, ?, ?, ?)");
-						
-			pstmt.setInt(1, r.getId());
-			pstmt.setString(2, r.getName());
-			pstmt.setString(3, r.getPassword());		
-			pstmt.setString(4, r.getCategory());
-					
-			pstmt.execute();
-		} catch (SQLException e) {
-				
-			e.printStackTrace();
-		}
-
-	}
+//	public static void createRepresentative()
+//	{
+//	//	Representative r = new Representative();			
+//		try {		
+//			PreparedStatement pstmt = DBConnection.insertData
+//											(" INSERT INTO allrepresentatives (id_rep, name, password, category)" + " VALUES (?, ?, ?, ?)");
+//						
+//			pstmt.setInt(1, r.getIdOfRepresentative());
+//			pstmt.setString(2, r.getName());
+//			pstmt.setString(3, r.getPassword());		
+//			pstmt.setString(4, r.getCategory());
+//					
+//			pstmt.execute();
+//		} catch (SQLException e) {
+//				
+//			e.printStackTrace();
+//		}
+//
+//	}
 	
-	public static void createRepresentativeByCategory(String brand)
-	{
-		Representative r = new Representative(brand);		
-
-		try {
-			PreparedStatement pstmt = DBConnection.insertData
-					(" INSERT INTO allrepresentatives (id_rep, name, password, category)" + " VALUES (?, ?, ?, ?)");
-			
-			pstmt.setInt(1, r.getId());
-			pstmt.setString(2, r.getName());
-			pstmt.setString(3, r.getPassword());
-			pstmt.setString(4, r.getCategory());
-					
-			pstmt.execute();
-		} catch (SQLException e) {
-
-			e.printStackTrace();
-		}
-	}
+//	public static void createRepresentativeByCategory(String brand)
+//	{
+//		Representative r = new Representative(brand);		
+//
+//		try {
+//			PreparedStatement pstmt = DBConnection.insertData
+//					(" INSERT INTO allrepresentatives (id_rep, name, password, category)" + " VALUES (?, ?, ?, ?)");
+//			
+//			pstmt.setInt(1, r.getId());
+//			pstmt.setString(2, r.getName());
+//			pstmt.setString(3, r.getPassword());
+//			pstmt.setString(4, r.getCategory());
+//					
+//			pstmt.execute();
+//		} catch (SQLException e) {
+//
+//			e.printStackTrace();
+//		}
+//	}
 	
 }
 

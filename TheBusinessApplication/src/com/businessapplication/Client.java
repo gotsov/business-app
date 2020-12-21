@@ -187,6 +187,10 @@ public class Client {
 		return sqlDateOfSale;
 	}
 	
+	public void setSqlDateOfSale(Date sqlDateOfSale) {
+		this.sqlDateOfSale = sqlDateOfSale;
+	}
+	
 	public String getName() {
 		return name;
 	}
