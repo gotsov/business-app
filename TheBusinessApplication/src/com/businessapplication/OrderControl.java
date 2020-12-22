@@ -1,19 +1,10 @@
 package com.businessapplication;
 
-import java.sql.Connection;
-
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Locale;
-
-import com.businessapplication.Representative.Builder;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 
 
 public class OrderControl {
@@ -24,6 +15,7 @@ public class OrderControl {
 	private int quantity;
 	private Double price;
 	private Date date;
+	private String representativeUsername;
 	
 	public OrderControl(Builder builder)
 	{
@@ -34,6 +26,7 @@ public class OrderControl {
 		this.quantity = builder.quantity;
 		this.price = builder.price;
 		this.date =builder.date;
+		this.representativeUsername = builder.representativeUsername;
 	}
 	
 	public static class Builder
@@ -45,6 +38,7 @@ public class OrderControl {
 		private int quantity;
 		private Double price;
 		private Date date;
+		private String representativeUsername;
 		
 		public Builder id(int id) {
 			this.id = id;
@@ -81,6 +75,11 @@ public class OrderControl {
 			return this;
 		}
 		
+		public Builder representativeUsername(String representativeUsername) {
+			this.representativeUsername = representativeUsername;
+			return this;
+		}
+		
 		public OrderControl build() {
 			return new OrderControl(this);
 		}
@@ -89,7 +88,7 @@ public class OrderControl {
 	
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 	
 	public void setId(int id)
@@ -98,56 +97,31 @@ public class OrderControl {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	public String getProduct() {
-		return product;
+		return this.product;
 	}
 
 	public int getQuantity() {
 		return quantity;
 	}
+	public String getRepresentativeUsername() {
+		return this.representativeUsername;
+	}
 
 	public Double getPrice() {
-		return price;
+		return this.price;
 	}
 
 	public Date getDate() {
-		return date;
+		return this.date;
 	}
-
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((email == null) ? 0 : email.hashCode());
-		return result;
-	}
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		OrderControl other = (OrderControl) obj;
-		if (email == null) {
-			if (other.email != null)
-				return false;
-		} else if (!email.equals(other.email))
-			return false;
-		return true;
-	}
-
 
 	public static ArrayList<OrderControl> removeRepeatingClients(ArrayList<OrderControl> catalog) {
 		
@@ -171,21 +145,8 @@ public class OrderControl {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
 		return catalog;
-		
-		
+
 	}
 
-
-	@Override
-	public String toString() {
-		return "Order [id=" + id + ", name=" + name + ", email=" + email + "]";
-	}
-	
-	
-	
-	
-	
-	
 }

@@ -1,10 +1,9 @@
 package com.businessapplication;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,8 +17,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-
-import com.mysql.cj.protocol.x.ContinuousOutputStream;
 
 import javax.swing.JScrollPane;
 import javax.swing.JMenuBar;
@@ -35,6 +32,8 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 
 public class AdminWindow extends JFrame {
 
@@ -45,17 +44,19 @@ public class AdminWindow extends JFrame {
 	private JTextField textFieldNewCategory;
 	private JTextField textFieldQuantity;
 	private JTextField textFieldPrice;
-	private JTextField textField_4;
+	private JTextField textFieldEdit;
+	
+	private JTextField textFieldNameRep;
+	private JTextField textFieldCategoryRep;
+	private JTextField textFieldUsernameRep;
+	private JTextField textFieldEditRep;
 	
 	static ArrayList<Product> listProducts = new ArrayList<>();
 	static ArrayList<Representative> listRepresentatives = new ArrayList<>();
 	static ArrayList<String> allCategories = new ArrayList<>();
-	private JTextField textField_1;
-	private JTextField textField_5;
-	private JTextField textField_6;
-	private JTextField textField_7;
-	private JTextField textField_8;
-
+	static ArrayList<String> categoriesWithoutRepresentative = new ArrayList<>();
+	static ArrayList<String> categoriesWithRepresentative = new ArrayList<>();
+	
 	/**
 	 * Create the frame.
 	 */
@@ -91,7 +92,7 @@ public class AdminWindow extends JFrame {
 		panel_1.setLayout(null);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(174, 13, 462, 122);
+		scrollPane_1.setBounds(23, 13, 552, 122);
 		panel_1.add(scrollPane_1);
 		
 		tableRepresentatives = new JTable();
@@ -134,70 +135,46 @@ public class AdminWindow extends JFrame {
 		panel_5.setBounds(23, 150, 270, 272);
 		panel_1.add(panel_5);
 		
-		JLabel label = new JLabel("Product name:");
-		label.setHorizontalAlignment(SwingConstants.RIGHT);
-		label.setFont(new Font("Arial", Font.PLAIN, 18));
-		label.setBounds(0, 15, 122, 30);
-		panel_5.add(label);
+		JLabel lblName = new JLabel("Name:");
+		lblName.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblName.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblName.setBounds(0, 15, 122, 30);
+		panel_5.add(lblName);
 		
-		textField_1 = new JTextField();
-		textField_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textField_1.setColumns(10);
-		textField_1.setBounds(122, 17, 133, 26);
-		panel_5.add(textField_1);
+		textFieldNameRep = new JTextField();
+		textFieldNameRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldNameRep.setColumns(10);
+		textFieldNameRep.setBounds(122, 17, 133, 26);
+		panel_5.add(textFieldNameRep);
 		
-		JLabel label_1 = new JLabel("Category:");
-		label_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_1.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_1.setBounds(10, 58, 112, 30);
-		panel_5.add(label_1);
+		JLabel lblUsername = new JLabel("Username:");
+		lblUsername.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblUsername.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblUsername.setBounds(10, 57, 112, 30);
+		panel_5.add(lblUsername);
 		
-		JButton button_1 = new JButton("Add");
-		button_1.setFont(new Font("Arial", Font.PLAIN, 20));
-		button_1.setBounds(55, 221, 133, 38);
-		panel_5.add(button_1);
+		JButton btnAddRepresentative = new JButton("Add");
+		btnAddRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnAddRepresentative.setBounds(55, 221, 133, 38);
+		panel_5.add(btnAddRepresentative);
 		
-		JLabel label_2 = new JLabel("New category:");
-		label_2.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_2.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_2.setBounds(0, 100, 122, 30);
-		panel_5.add(label_2);
+		JLabel lblCategory_1 = new JLabel("Category:");
+		lblCategory_1.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblCategory_1.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblCategory_1.setBounds(0, 100, 122, 30);
+		panel_5.add(lblCategory_1);
 		
-		textField_5 = new JTextField();
-		textField_5.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textField_5.setEnabled(false);
-		textField_5.setColumns(10);
-		textField_5.setBounds(122, 100, 133, 26);
-		panel_5.add(textField_5);
+		textFieldCategoryRep = new JTextField();
+		textFieldCategoryRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldCategoryRep.setColumns(10);
+		textFieldCategoryRep.setBounds(122, 100, 133, 26);
+		panel_5.add(textFieldCategoryRep);
 		
-		JComboBox<String> comboBox = new JComboBox();
-		comboBox.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBox.setBounds(122, 58, 133, 26);
-		panel_5.add(comboBox);
-		
-		JLabel label_3 = new JLabel("Quantity:");
-		label_3.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_3.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_3.setBounds(0, 139, 122, 30);
-		panel_5.add(label_3);
-		
-		textField_6 = new JTextField();
-		textField_6.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textField_6.setColumns(10);
-		textField_6.setBounds(122, 139, 133, 26);
-		panel_5.add(textField_6);
-		
-		textField_7 = new JTextField();
-		textField_7.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textField_7.setColumns(10);
-		textField_7.setBounds(122, 178, 133, 26);
-		panel_5.add(textField_7);
-		
-		JLabel label_4 = new JLabel("Price:");
-		label_4.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_4.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_4.setBounds(0, 178, 122, 30);
-		panel_5.add(label_4);
+		textFieldUsernameRep = new JTextField();
+		textFieldUsernameRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldUsernameRep.setColumns(10);
+		textFieldUsernameRep.setBounds(122, 60, 133, 26);
+		panel_5.add(textFieldUsernameRep);
 		
 		JPanel panel_6 = new JPanel();
 		panel_6.setLayout(null);
@@ -205,21 +182,21 @@ public class AdminWindow extends JFrame {
 		panel_6.setBounds(305, 150, 270, 272);
 		panel_1.add(panel_6);
 		
-		JButton button_2 = new JButton("Delete");
-		button_2.setFont(new Font("Arial", Font.PLAIN, 20));
-		button_2.setBounds(67, 221, 133, 38);
-		panel_6.add(button_2);
+		JButton btnDeleteRepresentative = new JButton("Delete");
+		btnDeleteRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnDeleteRepresentative.setBounds(67, 221, 133, 38);
+		panel_6.add(btnDeleteRepresentative);
 		
-		JLabel label_5 = new JLabel("ID of product to delete: ");
-		label_5.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_5.setFont(new Font("Arial", Font.PLAIN, 19));
-		label_5.setBounds(9, 104, 200, 26);
-		panel_6.add(label_5);
+		JLabel lblIdOfRep_1 = new JLabel("ID of rep. to delete: ");
+		lblIdOfRep_1.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblIdOfRep_1.setFont(new Font("Arial", Font.PLAIN, 19));
+		lblIdOfRep_1.setBounds(-17, 103, 200, 26);
+		panel_6.add(lblIdOfRep_1);
 		
-		JComboBox<String> comboBox_1 = new JComboBox();
-		comboBox_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBox_1.setBounds(203, 105, 55, 26);
-		panel_6.add(comboBox_1);
+		JComboBox<String> comboBoxIdRepresentativeToDelete = new JComboBox();
+		comboBoxIdRepresentativeToDelete.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		comboBoxIdRepresentativeToDelete.setBounds(179, 104, 55, 26);
+		panel_6.add(comboBoxIdRepresentativeToDelete);
 		
 		JPanel panel_7 = new JPanel();
 		panel_7.setLayout(null);
@@ -227,21 +204,21 @@ public class AdminWindow extends JFrame {
 		panel_7.setBounds(585, 150, 270, 272);
 		panel_1.add(panel_7);
 		
-		JButton button_3 = new JButton("Edit");
-		button_3.setFont(new Font("Arial", Font.PLAIN, 20));
-		button_3.setBounds(75, 221, 133, 38);
-		panel_7.add(button_3);
+		JButton btnEditRepresentative = new JButton("Edit");
+		btnEditRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnEditRepresentative.setBounds(75, 221, 133, 38);
+		panel_7.add(btnEditRepresentative);
 		
-		JLabel label_6 = new JLabel("ID of product to edit: ");
-		label_6.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_6.setFont(new Font("Arial", Font.PLAIN, 19));
-		label_6.setBounds(0, 27, 200, 26);
-		panel_7.add(label_6);
+		JLabel lblIdOfRep = new JLabel("ID of rep. to edit: ");
+		lblIdOfRep.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblIdOfRep.setFont(new Font("Arial", Font.PLAIN, 19));
+		lblIdOfRep.setBounds(0, 27, 200, 26);
+		panel_7.add(lblIdOfRep);
 		
-		JComboBox<String> comboBox_2 = new JComboBox();
-		comboBox_2.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBox_2.setBounds(194, 28, 55, 26);
-		panel_7.add(comboBox_2);
+		JComboBox<String> comboBoxIdRepresentative = new JComboBox();
+		comboBoxIdRepresentative.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		comboBoxIdRepresentative.setBounds(194, 28, 55, 26);
+		panel_7.add(comboBoxIdRepresentative);
 		
 		JLabel label_7 = new JLabel("Edit:");
 		label_7.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -249,22 +226,38 @@ public class AdminWindow extends JFrame {
 		label_7.setBounds(44, 66, 61, 26);
 		panel_7.add(label_7);
 		
-		JComboBox<String> comboBox_3 = new JComboBox();
-		comboBox_3.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBox_3.setBounds(112, 67, 111, 26);
-		panel_7.add(comboBox_3);
+		JComboBox<String> comboBoxEditRepresentative = new JComboBox();
+		comboBoxEditRepresentative.setModel(new DefaultComboBoxModel(new String[] {"name", "username", "category"}));
+		comboBoxEditRepresentative.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		comboBoxEditRepresentative.setBounds(112, 67, 111, 26);
+		panel_7.add(comboBoxEditRepresentative);
 		
-		JLabel label_8 = new JLabel("New name:");
-		label_8.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_8.setFont(new Font("Arial", Font.PLAIN, 18));
-		label_8.setBounds(-12, 105, 146, 30);
-		panel_7.add(label_8);
+		JLabel lblEditTextRep = new JLabel("New name:");
+		lblEditTextRep.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblEditTextRep.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblEditTextRep.setBounds(-12, 105, 146, 30);
+		panel_7.add(lblEditTextRep);
 		
-		textField_8 = new JTextField();
-		textField_8.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textField_8.setColumns(10);
-		textField_8.setBounds(134, 105, 124, 26);
-		panel_7.add(textField_8);
+		textFieldEditRep = new JTextField();
+		textFieldEditRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldEditRep.setColumns(10);
+		textFieldEditRep.setBounds(134, 105, 124, 26);
+		panel_7.add(textFieldEditRep);
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(587, 43, 268, 92);
+		panel_1.add(scrollPane_2);
+		
+		DefaultListModel<String> model = new DefaultListModel<>();
+		JList listNoRep = new JList<>(model);
+		listNoRep.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		scrollPane_2.setViewportView(listNoRep);
+		
+		JLabel lblCategoriesWithNo = new JLabel("Categories with no representatives:");
+		lblCategoriesWithNo.setHorizontalAlignment(SwingConstants.LEFT);
+		lblCategoriesWithNo.setFont(new Font("Arial", Font.PLAIN, 17));
+		lblCategoriesWithNo.setBounds(587, 13, 255, 30);
+		panel_1.add(lblCategoriesWithNo);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(186, 13, 470, 124);
@@ -322,10 +315,10 @@ public class AdminWindow extends JFrame {
 		lblCategory.setBounds(10, 58, 112, 30);
 		panel.add(lblCategory);
 		
-		JButton button = new JButton("Add");
-		button.setFont(new Font("Arial", Font.PLAIN, 20));
-		button.setBounds(55, 221, 133, 38);
-		panel.add(button);
+		JButton btnAddProduct = new JButton("Add");
+		btnAddProduct.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnAddProduct.setBounds(55, 221, 133, 38);
+		panel.add(btnAddProduct);
 		
 		JLabel lblNewCategory = new JLabel("New category:");
 		lblNewCategory.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -334,7 +327,6 @@ public class AdminWindow extends JFrame {
 		panel.add(lblNewCategory);
 		
 		textFieldNewCategory = new JTextField();
-		textFieldNewCategory.setEnabled(false);
 		textFieldNewCategory.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textFieldNewCategory.setColumns(10);
 		textFieldNewCategory.setBounds(122, 100, 133, 26);
@@ -375,10 +367,10 @@ public class AdminWindow extends JFrame {
 		panelProducts.add(panel_3);
 		panel_3.setLayout(null);
 		
-		JButton btnDelete = new JButton("Delete");
-		btnDelete.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnDelete.setBounds(67, 221, 133, 38);
-		panel_3.add(btnDelete);
+		JButton btnDeleteClient = new JButton("Delete");
+		btnDeleteClient.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnDeleteClient.setBounds(67, 221, 133, 38);
+		panel_3.add(btnDeleteClient);
 		
 		JLabel lblIdOfProduct = new JLabel("ID of product to delete: ");
 		lblIdOfProduct.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -397,10 +389,10 @@ public class AdminWindow extends JFrame {
 		panelProducts.add(panel_4);
 		panel_4.setLayout(null);
 		
-		JButton btnEdit = new JButton("Edit");
-		btnEdit.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnEdit.setBounds(75, 221, 133, 38);
-		panel_4.add(btnEdit);
+		JButton btnEditProduct = new JButton("Edit");
+		btnEditProduct.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnEditProduct.setBounds(75, 221, 133, 38);
+		panel_4.add(btnEditProduct);
 		
 		JLabel lblIdOfProduct_1 = new JLabel("ID of product to edit: ");
 		lblIdOfProduct_1.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -420,7 +412,7 @@ public class AdminWindow extends JFrame {
 		panel_4.add(lblEdit);
 		
 		JComboBox comboBoxEdit = new JComboBox();
-		comboBoxEdit.setModel(new DefaultComboBoxModel(new String[] {"name", "category", "add quantity", "remove quantity", "price"}));
+		comboBoxEdit.setModel(new DefaultComboBoxModel(new String[] {"name", "category", "quantity", "price"}));
 		comboBoxEdit.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxEdit.setBounds(112, 67, 111, 26);
 		panel_4.add(comboBoxEdit);
@@ -431,11 +423,11 @@ public class AdminWindow extends JFrame {
 		lblEditText.setBounds(-12, 105, 146, 30);
 		panel_4.add(lblEditText);
 		
-		textField_4 = new JTextField();
-		textField_4.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textField_4.setColumns(10);
-		textField_4.setBounds(134, 105, 124, 26);
-		panel_4.add(textField_4);
+		textFieldEdit = new JTextField();
+		textFieldEdit.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldEdit.setColumns(10);
+		textFieldEdit.setBounds(134, 105, 124, 26);
+		panel_4.add(textFieldEdit);
 		
 		
 		mnLogout.addActionListener(new ActionListener() {
@@ -453,94 +445,237 @@ public class AdminWindow extends JFrame {
 				else if(comboBoxEdit.getSelectedItem().equals("category")) {
 					lblEditText.setText("New category:");
 				}
-				else if(comboBoxEdit.getSelectedItem().equals("add quantity")) {
-					lblEditText.setText("Add quantity:");
-				}
-				else if(comboBoxEdit.getSelectedItem().equals("remove quantity")) {
-					lblEditText.setText("Remove quantity");
+				else if(comboBoxEdit.getSelectedItem().equals("quantity")) {
+					lblEditText.setText("New quantity:");
 				}
 				else if(comboBoxEdit.getSelectedItem().equals("price")) {
 					lblEditText.setText("New price:");
 				}
-				else {
-
+			}
+		});
+		
+		comboBoxEditRepresentative.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(comboBoxEditRepresentative.getSelectedItem().equals("name")) {
+					lblEditTextRep.setText("New name:");
+				}
+				else if(comboBoxEditRepresentative.getSelectedItem().equals("category")) {
+					lblEditTextRep.setText("New category:");
+				}
+				else if(comboBoxEditRepresentative.getSelectedItem().equals("username")) {
+					lblEditTextRep.setText("New username:");
 				}
 			}
 		});
 		
-		button.addActionListener(new ActionListener() {
+		btnAddProduct.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				Product newProduct;
-				
-				if(comboBoxCategory.getSelectedItem().equals("new category")) {
-					newProduct = new Product.Builder().name(textFieldProductName.getText())
-							  .category(textFieldNewCategory.getText())
-							  .quantity(Integer.parseInt((String) textFieldQuantity.getText()))
-							  .price(Double.parseDouble((String) textFieldPrice.getText()))
-							  .build();
+				try {
+					Product newProduct;
+					
+					if(comboBoxCategory.getSelectedItem().equals("new category")) {
+						
+						newProduct = new Product.Builder().name(textFieldProductName.getText())
+														  .category(textFieldNewCategory.getText())
+														  .quantity(Integer.parseInt((String) textFieldQuantity.getText()))
+														  .price(Double.parseDouble((String) textFieldPrice.getText()))
+														  .build();
+					}
+					else {
+						newProduct = new Product.Builder().name(textFieldProductName.getText())
+													      .category((String)comboBoxCategory.getSelectedItem())
+													      .quantity(Integer.parseInt((String) textFieldQuantity.getText()))
+													      .price(Double.parseDouble((String) textFieldPrice.getText()))
+													      .build();
+					}
+					AdminController.addProduct(newProduct);
+					
+					JOptionPane.showMessageDialog(null, "Added [" + newProduct.getName() + ", x" + newProduct.getQuantity() + "]");
+					
+				} catch(NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Incorrect input");
 				}
-				else {
-					newProduct = new Product.Builder().name(textFieldProductName.getText())
-							  .category((String)comboBoxCategory.getSelectedItem())
-							  .quantity(Integer.parseInt((String) textFieldQuantity.getText()))
-							  .price(Double.parseDouble((String) textFieldPrice.getText()))
-							  .build();
-				}
-				
-				Admin.addProduct(newProduct);
+
 				textFieldNewCategory.setText("");
 				textFieldQuantity.setText("");
 				textFieldProductName.setText("");
 				textFieldPrice.setText("");
-				
-				JOptionPane.showMessageDialog(null, "Added [" + newProduct.getName() + ", x" + newProduct.getQuantity() + "]");
-				
-				updateTablesAndComboboxes(comboBoxCategory, comboBoxIdProduct, comboBoxIdProductToDelete);
-				
-				comboBoxCategory.addActionListener(new ActionListener() {		
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if(comboBoxCategory.getSelectedItem().equals("new category")) {
-							textFieldNewCategory.setEnabled(true);
-						}
-						else
-							textFieldNewCategory.setEnabled(false);
-					}
-				});
+						
+				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+											comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
 			}
 		});
 		
 
-		btnDelete.addActionListener(new ActionListener() {
+		btnDeleteClient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				int id = Integer.parseInt((String)comboBoxIdProductToDelete.getSelectedItem());
+				
+				//throws null pointer exception when using builder
 				
 //				Product productToDelete = new Product.Builder().id(id)
 //															   .build();
 				
 				Product productToDelete = new Product(id);
 				
-				Admin.deleteProduct(productToDelete);
+				AdminController.deleteProduct(productToDelete);
 				
 				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
 				
-				updateTablesAndComboboxes(comboBoxCategory, comboBoxIdProduct, comboBoxIdProductToDelete);
+				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+									comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
 			}
 		});
 		
-		updateTablesAndComboboxes(comboBoxCategory, comboBoxIdProduct, comboBoxIdProductToDelete);	
+
+		btnEditProduct.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				try {
+					Product productToEdit = null;
+					int idOfProductToEdit = Integer.parseInt((String)comboBoxIdProduct.getSelectedItem());
+					
+					for(Product p : listProducts)
+					{
+						if(p.getId() == idOfProductToEdit)
+						{
+							productToEdit = p;
+							break;
+						}
+					}
+					
+					if(comboBoxEdit.getSelectedItem().equals("name"))
+					{
+						productToEdit.setName(textFieldEdit.getText());
+						AdminController.editFieldProduct(productToEdit, "name");
+					}
+					else if(comboBoxEdit.getSelectedItem().equals("category"))
+					{
+						productToEdit.setCategory(textFieldEdit.getText());
+						AdminController.editFieldProduct(productToEdit, "category");
+					}
+					else if(comboBoxEdit.getSelectedItem().equals("quantity"))
+					{
+						productToEdit.setQuantity(Integer.parseInt(textFieldEdit.getText()));
+						AdminController.editFieldProduct(productToEdit, "quantity");
+					}
+					else if(comboBoxEdit.getSelectedItem().equals("price"))
+					{
+						productToEdit.setPrice(Double.parseDouble(textFieldEdit.getText()));
+						AdminController.editFieldProduct(productToEdit, "price");
+					}
+					
+				} catch(NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Incorrect input");
+				}
+				
+				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+										comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+			}
+		});
+		
+		btnAddRepresentative.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				Representative represenatativeToAdd = new Representative.Builder().name(textFieldNameRep.getText())
+																				  .username(textFieldUsernameRep.getText())
+																				  .category(textFieldCategoryRep.getText())
+																				  .numberOfSales(0)
+																				  .profit(0)
+																				  .build();
+				
+				AdminController.addRepresentative(represenatativeToAdd);
+				
+				JOptionPane.showMessageDialog(null, "Added [" + represenatativeToAdd.getName() + " (" + represenatativeToAdd.getUsername() + "), "
+																							+ "category: " + represenatativeToAdd.getCategory() + ".");
+				
+				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+									comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+			}
+			
+		});
+		
+
+		btnDeleteRepresentative.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int id = Integer.parseInt((String)comboBoxIdRepresentativeToDelete.getSelectedItem());
+				
+				Representative represenatativeToDelete = new Representative.Builder().id(id)
+																					 .build();
+				
+				AdminController.deleteRepresentative(represenatativeToDelete);
+				
+				JOptionPane.showMessageDialog(null, "Representative with [id = " + represenatativeToDelete.getId() + "] has been deleted");
+				
+				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+										comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+				
+			}
+		});
+		
+
+		btnEditRepresentative.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				try {
+					Representative representativeToEdit = null;
+					int idOfProductToEdit = Integer.parseInt((String)comboBoxIdRepresentative.getSelectedItem());
+					
+					for(Representative rep : listRepresentatives)
+					{
+						if(rep.getId() == idOfProductToEdit)
+						{
+							representativeToEdit = rep;
+							break;
+						}
+					}
+					
+					if(comboBoxEditRepresentative.getSelectedItem().equals("name"))
+					{
+						representativeToEdit.setName(textFieldEditRep.getText());
+						AdminController.editFieldRepresentative(representativeToEdit, "name");
+					}
+					else if(comboBoxEditRepresentative.getSelectedItem().equals("username"))
+					{
+						representativeToEdit.setUsername(textFieldEditRep.getText());
+						AdminController.editFieldRepresentative(representativeToEdit, "username");
+					}
+					else if(comboBoxEditRepresentative.getSelectedItem().equals("category"))
+					{
+						representativeToEdit.setCategory(textFieldEditRep.getText());
+						AdminController.editFieldRepresentative(representativeToEdit, "category");
+					}
+
+					
+				} catch(NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Incorrect input");
+				}
+				
+				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+										comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+			}
+		});
+		
+		
+		updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+									comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+
 	}
 	
-	public static void updateTablesAndComboboxes(JComboBox<String> comboBoxCategory,JComboBox<String> comboBoxIdProduct,JComboBox<String> comboBoxIdProductToDelete)
+	public static void updateTablesAndComboboxes(JComboBox<String> comboBoxIdProduct, JComboBox<String> comboBoxIdProductToDelete, 
+											JComboBox<String> comboBoxIdRepresentative, JComboBox<String> comboBoxIdRepresentativeToDelete,
+											JComboBox<String> comboBoxCategory, DefaultListModel<String> model)
 	{
-		comboBoxCategory.removeAllItems();
 		loadTablesAdmin();
-		getAllCategories(comboBoxCategory);
 		fillComboBoxProductsId(comboBoxIdProduct);
 		fillComboBoxProductsId(comboBoxIdProductToDelete);
-		fillComboBoxCategory(comboBoxCategory);
+		fillComboBoxRepresentativeId(comboBoxIdRepresentative);
+		fillComboBoxRepresentativeId(comboBoxIdRepresentativeToDelete);
+		getAllCategories(comboBoxCategory);
+		findCategoriesWithNoRepresentative(model);
+		
 	}
 	public static void loadTablesAdmin()
 	{
@@ -549,15 +684,10 @@ public class AdminWindow extends JFrame {
 			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel(); 
 			DefaultTableModel modelRepresentatives = (DefaultTableModel)tableRepresentatives.getModel(); 
 			
-			if(modelProducts.getRowCount() > 0)
-			{
-				modelProducts.setRowCount(0);
-			}
-			
-			if(modelRepresentatives.getRowCount() > 0)
-			{
-				modelRepresentatives.setRowCount(0);
-			}
+			modelProducts.setRowCount(0);		
+			modelRepresentatives.setRowCount(0);
+			listProducts.clear();
+			listRepresentatives.clear();
 			
 			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
 			
@@ -592,7 +722,7 @@ public class AdminWindow extends JFrame {
 	        while(rs.next())
 	        {  	
 	        	
-	        	Representative r = new Representative.Builder().idOfRepresentative(rs.getInt("id_rep"))
+	        	Representative r = new Representative.Builder().id(rs.getInt("id_rep"))
 	        												   .name(rs.getString("name"))
 	        												   .username(rs.getString("username"))
 	        												   .category(rs.getString("category"))
@@ -604,11 +734,9 @@ public class AdminWindow extends JFrame {
 	        }
 	        
 			Object[] row2 = new Object[7];
-			
-	        System.out.println("listProducts.size() = " +listProducts.size());
 	        
 	        for (int i = 0; i < listRepresentatives.size(); i++) {
-				row2[0] = listRepresentatives.get(i).getIdOfRepresentative();
+				row2[0] = listRepresentatives.get(i).getId();
 				row2[1] = listRepresentatives.get(i).getName();
 				row2[2] = listRepresentatives.get(i).getUsername();
 				row2[3] = listRepresentatives.get(i).getCategory();
@@ -624,7 +752,7 @@ public class AdminWindow extends JFrame {
 	
 	}
 	
-	public static void getAllCategories(JComboBox<String> ComboBoxIdProduct )
+	public static void getAllCategories(JComboBox<String>  comboBoxCategory)
 	{
 		try {
 			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
@@ -640,6 +768,7 @@ public class AdminWindow extends JFrame {
 				}
 			}
 			
+			fillComboBoxCategory(comboBoxCategory);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -649,6 +778,8 @@ public class AdminWindow extends JFrame {
 	public static void fillComboBoxProductsId(JComboBox<String> comboBoxIdProduct)
 	{		
 		comboBoxIdProduct.removeAllItems();
+		allCategories.clear();
+		
 		for(Product product : listProducts)
 		{
 			comboBoxIdProduct.addItem(""+product.getId());
@@ -656,9 +787,20 @@ public class AdminWindow extends JFrame {
 		
 	}
 	
+	public static void fillComboBoxRepresentativeId(JComboBox<String> comboBoxIdRepresentative)
+	{		
+		comboBoxIdRepresentative.removeAllItems();
+		
+		for(Representative rep : listRepresentatives)
+		{
+			comboBoxIdRepresentative.addItem(""+rep.getId());
+		}
+		
+	}
+	
 	public static void fillComboBoxCategory(JComboBox<String> comboBoxCategory)
 	{	
-		
+		comboBoxCategory.removeAllItems();
 		for(String category : allCategories)
 		{
 			comboBoxCategory.addItem(category);
@@ -666,5 +808,38 @@ public class AdminWindow extends JFrame {
 		
 		comboBoxCategory.addItem("new category");
 		
+	}
+	
+	public static void findCategoriesWithNoRepresentative(DefaultListModel<String> model)
+	{
+		model.clear();
+		categoriesWithoutRepresentative.clear();
+		categoriesWithRepresentative.clear();
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+			
+			while(rs.next())
+			{
+				categoriesWithRepresentative.add(rs.getString("category"));
+			}			
+			
+			for(Product p : listProducts)
+			{
+				if(!categoriesWithRepresentative.contains(p.getCategory()) && !categoriesWithoutRepresentative.contains(p.getCategory())) {
+					categoriesWithoutRepresentative.add(p.getCategory());
+				}
+			}
+			
+			for(String category : categoriesWithoutRepresentative) {
+				model.addElement(category);
+			}
+
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
 	}
 }

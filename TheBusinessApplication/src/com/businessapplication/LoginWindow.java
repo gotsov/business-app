@@ -1,6 +1,5 @@
 package com.businessapplication;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -15,11 +14,8 @@ import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.awt.event.ActionEvent;
 
 public class LoginWindow extends JFrame {
@@ -33,7 +29,7 @@ public class LoginWindow extends JFrame {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
-			public void run() {
+			public void run() {			
 				try {
 					JPanel panel = new JPanel();
 					LoginWindow frame = new LoginWindow();
@@ -46,7 +42,7 @@ public class LoginWindow extends JFrame {
 			}
 		});
 	}
-
+	
 	/**
 	 * Create the frame.
 	 */
@@ -90,13 +86,13 @@ public class LoginWindow extends JFrame {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 		
-				login();					
+				loginCheck();					
 			}	
 		});
 			
 	}
 	
-	public void login()
+	public void loginCheck()
 	{
 		try {
 			

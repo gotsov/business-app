@@ -1,24 +1,9 @@
 package com.businessapplication;
 
-import java.sql.Connection;
-
-
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.text.NumberFormatter;
 
 public class Client {
 	public static int idSale = 100;
@@ -34,7 +19,6 @@ public class Client {
 	private Date sqlDateOfSale;
 
 	private boolean firstTimeClient;
-	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 	
 	public Client(Builder builder)
 	{
@@ -48,9 +32,9 @@ public class Client {
 		
 		checkForUniqueEmail();
 		
-		//check if a field that's is not idOdClient, name or email is null, 
+		//check if a field that's not idOfClient, name or email is null, 
 		//because when editing a sale only these three are used with the builder, 
-		//therefore it needn't procede to SetIdSale(), setIdClient(), setSqlDate()
+		//therefore it shouldn't execute SetIdSale(), setIdClient(), setSqlDate()
 		if(this.categoryOfProductBought != null)   
 		{
 			setIdSale();

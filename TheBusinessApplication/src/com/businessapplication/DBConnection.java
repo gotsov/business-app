@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class DBConnection {
 	
 	static private Connection con;
-	private static final String url = "jdbc:mysql://localhost/businessapp?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+	private static final String url = "jdbc:mysql://localhost:3306/businessapp?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	private static final String username = "root";
 	private static final String password = "root";
 	
