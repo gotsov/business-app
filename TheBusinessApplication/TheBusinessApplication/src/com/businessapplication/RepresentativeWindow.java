@@ -418,6 +418,7 @@ public class RepresentativeWindow extends JFrame {
 				}
 			}
 		});
+		//
 		
 		btnEditClient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {	
