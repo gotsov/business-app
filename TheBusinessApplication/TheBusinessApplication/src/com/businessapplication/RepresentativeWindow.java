@@ -43,19 +43,34 @@ public class RepresentativeWindow extends JFrame {
 	private JTextField txtFieldClientName;
 	private JTextField txtFieldClientEmail;
 	
-	private String categoryRep;
-	private String usernameRep;
-	private String passwordRep;
+	private String name;
+	private String category;
+	private String username;
+	private String password;
+	private int id;
 	private ArrayList<OrderControl> clientsFromCatalog  = new ArrayList<>();
 	
 	/**
 	 * Create the frame.
 	 */
-	public RepresentativeWindow(String nameRep, String usernameRep, String password, String category) {
+	public RepresentativeWindow(int id, String name, String username, String password, String category) {
 		
 		setResizable(false);
-		this.categoryRep = category;
-		this.usernameRep = usernameRep;	
+		this.id = id;
+		this.name  = name;
+		this.category = category;
+		this.username = username;	
+		this.password = password;
+		
+		Representative thisRepresentative = new Representative.Builder().id(id)
+																		.name(name)
+																		.username(username)
+																		.category(category)
+																		.password(password)
+																		.numberOfSales(getNumberOfSales())
+        																.profit(getProfit())
+																		.build();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 866, 626);
 		
@@ -348,7 +363,7 @@ public class RepresentativeWindow extends JFrame {
 					txtFieldClientEmailEdit.setEnabled(false);
 					btnEditClient.setEnabled(true);
 				}
-				else if(comboBoxChange.getSelectedItem().equals("e-mail")) {
+				else if(comboBoxChange.getSelectedItem().equals("email")) {
 					txtFieldClientNameEdit.setEnabled(false);
 					txtFieldClientEmailEdit.setEnabled(true);
 					btnEditClient.setEnabled(true);
@@ -377,16 +392,7 @@ public class RepresentativeWindow extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				java.util.Date selectedDate = dateChooser.getDate();
 	            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
-	            String date = dateFormat.format(selectedDate);  
-	            
-	            Representative thisRepresentative = new Representative.Builder().name(nameRep)
-	            																.id(getIdOfRepresentative())
-	            																.username(usernameRep)
-	            																.password(passwordRep)
-	            																.category(categoryRep)
-	            																.numberOfSales(getNumberOfSales())
-	            																.profit(getProfit())
-	            																.build();
+	            String date = dateFormat.format(selectedDate);      
 				
 	            Client newClient = new Client.Builder().name(txtFieldClientName.getText())
 	            									   .email(txtFieldClientEmail.getText())
@@ -397,7 +403,7 @@ public class RepresentativeWindow extends JFrame {
 	            									   .build();
 	
 	             
-	            thisRepresentative.addSale(newClient, usernameRep);		
+	            thisRepresentative.addSale(newClient);		
 				
 				if(newClient.isFirstTimeClient())
 				{
@@ -412,6 +418,7 @@ public class RepresentativeWindow extends JFrame {
 				}
 			}
 		});
+		//
 		
 		btnEditClient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {	
@@ -431,7 +438,7 @@ public class RepresentativeWindow extends JFrame {
 					idClient = clientToEdit.getIdOfClient();
 					idSale = getIdOfSale();
 					
-					Representative.editClient(clientToEdit, "name", idClient, idSale);
+					thisRepresentative.editClient(clientToEdit, "name", idClient, idSale);
 					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 				}
 				
@@ -447,7 +454,7 @@ public class RepresentativeWindow extends JFrame {
 						idClient = clientToEdit.getIdOfClient();
 						idSale = getIdOfSale();
 						
-						Representative.editClient(clientToEdit, "email", idClient, idSale);
+						thisRepresentative.editClient(clientToEdit, "email", idClient, idSale);
 						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 					}
 					else {
@@ -467,7 +474,7 @@ public class RepresentativeWindow extends JFrame {
 						idClient = clientToEdit.getIdOfClient();
 						idSale = getIdOfSale();
 						
-						Representative.editClient(clientToEdit, "name & e-mail", idClient, idSale);
+						thisRepresentative.editClient(clientToEdit, "name & e-mail", idClient, idSale);
 						
 						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 					}
@@ -492,7 +499,7 @@ public class RepresentativeWindow extends JFrame {
 											.email(email)
 											.build();
 					
-				Representative.deleteClient(clientToDelete);
+				thisRepresentative.deleteClient(clientToDelete);
 				JOptionPane.showMessageDialog(null, "Client ["+ clientToDelete.getName() + ", " + clientToDelete.getEmail() + "] has been deleted.");
 				
 				updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
@@ -511,13 +518,13 @@ public class RepresentativeWindow extends JFrame {
 				
 				System.out.println(clientToAdd.isFirstTimeClient());
 				if(clientToAdd.isFirstTimeClient()) {
-					Representative.addClient(clientToAdd);
+					thisRepresentative.addClient(clientToAdd);
 					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 				}
 				else {
 					JOptionPane.showMessageDialog(null, "Not unique e-mail");
 				}
-				Representative.addClient(clientToAdd);
+				thisRepresentative.addClient(clientToAdd);
 			}
 		});
 	}
@@ -568,7 +575,7 @@ public class RepresentativeWindow extends JFrame {
 			
 			ArrayList<OrderControl> catalog = new ArrayList<>();
 			
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + this.usernameRep + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + this.username + "'");
 			
 	        while(rs.next())
 	        {  	      	
@@ -636,12 +643,24 @@ public class RepresentativeWindow extends JFrame {
 		comboBoxBoughtProduct.removeAllItems();
 		try
 		{     
-			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + this.categoryRep + "'");
+			if(this.category.equals("all")) {
+				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
+				
+				 while(rs.next())
+				 {
+			        	comboBoxBoughtProduct.addItem(rs.getString("name"));
+				 }
+			}
+			else {
+				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + this.category + "'");
+				
+				 while(rs.next())
+				 {
+			        	comboBoxBoughtProduct.addItem(rs.getString("name"));
+				 }
+			}
 			
-	        while(rs.next())
-	        {
-	        	comboBoxBoughtProduct.addItem(rs.getString("name"));
-	        }
+	       
 		} catch(SQLException e) {
 			e.printStackTrace();
 		}
@@ -678,7 +697,7 @@ public class RepresentativeWindow extends JFrame {
 	public int getIdOfRepresentative()
 	{
 		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.usernameRep + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.username + "'");
 			rs.next();
 			
 			return rs.getInt("id_rep");
@@ -692,7 +711,7 @@ public class RepresentativeWindow extends JFrame {
 	public int getIdOfSale()
 	{
 		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + this.usernameRep + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + this.username + "'");
 			rs.next();
 			
 			return rs.getInt("id_sale");
@@ -706,7 +725,7 @@ public class RepresentativeWindow extends JFrame {
 	public int getNumberOfSales()
 	{
 		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.usernameRep + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.username + "'");
 			rs.next();
 			
 			return rs.getInt("numberofsales");
@@ -720,7 +739,7 @@ public class RepresentativeWindow extends JFrame {
 	public double getProfit()
 	{
 		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.usernameRep + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.username + "'");
 			rs.next();
 			
 			System.out.println("rs.getDouble(\"profit\") = " + rs.getDouble("profit"));

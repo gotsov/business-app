@@ -16,6 +16,7 @@ public class OrderControl {
 	private Double price;
 	private Date date;
 	private String representativeUsername;
+	private String category;
 	
 	public OrderControl(Builder builder)
 	{
@@ -27,6 +28,7 @@ public class OrderControl {
 		this.price = builder.price;
 		this.date =builder.date;
 		this.representativeUsername = builder.representativeUsername;
+		this.category = builder.category;
 	}
 	
 	public static class Builder
@@ -39,6 +41,7 @@ public class OrderControl {
 		private Double price;
 		private Date date;
 		private String representativeUsername;
+		private String category;
 		
 		public Builder id(int id) {
 			this.id = id;
@@ -57,6 +60,11 @@ public class OrderControl {
 		
 		public Builder product(String product) {
 			this.product = product;
+			return this;
+		}
+		
+		public Builder category(String category) {
+			this.category = category;
 			return this;
 		}
 		
@@ -111,8 +119,13 @@ public class OrderControl {
 	public int getQuantity() {
 		return quantity;
 	}
+	
 	public String getRepresentativeUsername() {
 		return this.representativeUsername;
+	}
+	
+	public String getCategory() {
+		return this.category;
 	}
 
 	public Double getPrice() {
