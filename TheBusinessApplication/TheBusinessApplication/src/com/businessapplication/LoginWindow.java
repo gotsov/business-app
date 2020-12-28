@@ -99,6 +99,7 @@ public class LoginWindow extends JFrame {
 			ResultSet rs = DBConnection.getData("SELECT * FROM users");
 			
 	        String username, name, password, usertype, category;
+	        int id;
 	        
 	        String passwordToCheck = new String(passwordField.getPassword());
 	        
@@ -107,6 +108,7 @@ public class LoginWindow extends JFrame {
 	        	username = rs.getString("username");
 	        	
 	        	if(username.equals(userNameTxtField.getText())) {
+	        		id = rs.getInt("id_user");
 	        		usertype = rs.getString("usertype");
 	        		name = rs.getString("name");
 	        		category = rs.getString("category");
@@ -116,14 +118,14 @@ public class LoginWindow extends JFrame {
 	        		{
 	        			if(usertype.equals("representative"))
 	        			{
-	        				RepresentativeWindow repWin = new RepresentativeWindow(name, username, password, category);
+	        				RepresentativeWindow repWin = new RepresentativeWindow(id, name, username, password, category);
 							repWin.setVisible(true);
 							repWin.setTitle("Sales Representative - " + name + " (" + username + ") / " + category);
 							//setVisible(false);
 	        			}
 	        			else
 	        			{
-		        			AdminWindow adminWin = new AdminWindow();
+		        			AdminWindow adminWin = new AdminWindow(id, name, username, password);
 							adminWin.setVisible(true);
 							adminWin.setTitle("Admin - " + name + " (" + username + ")");
 	        			}

@@ -4,11 +4,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AdminController {	
+public abstract class AdminController {	
 	public static int idUser = 1;
 	
 	//will be used when adding new admins to users table
-	public static int getIdUser()
+	public int getIdUser()
 	{
 		try {	
 			ResultSet rs = DBConnection.getData(" SELECT id_user FROM users");
@@ -31,7 +31,7 @@ public class AdminController {
 		return 0;
 	}
 	
-	public static void addProduct(Product newProduct) {
+	public void addProduct(Product newProduct) {
 		try {		
 			PreparedStatement pstmt = DBConnection.insertData
 									(" INSERT INTO allproducts (id_prod, name, category, price, quantity)" + " VALUES (?, ?, ?, ?, ?)");
@@ -50,7 +50,7 @@ public class AdminController {
 		System.out.println("product added");
 	}
 	
-	public static void deleteProduct(Product productToDelete)
+	public void deleteProduct(Product productToDelete)
 	{
 		try {		
 			DBConnection.updateData("DELETE FROM allproducts WHERE id_prod = " + productToDelete.getId());
@@ -62,7 +62,7 @@ public class AdminController {
 		System.out.println("product deleted");
 	}
 	
-	public static void editFieldProduct(Product productToEdit, String fieldToEdit) {
+	public void editFieldProduct(Product productToEdit, String fieldToEdit) {
 		
 		try {			
 			if(fieldToEdit.equals("name")) {
@@ -85,7 +85,7 @@ public class AdminController {
 		}
 	}
 	
-	public static void addRepresentative(Representative representativeToAdd)
+	public void addRepresentative(Representative representativeToAdd)
 	{
 		try {		
 			PreparedStatement pstmt = DBConnection.insertData
@@ -118,7 +118,7 @@ public class AdminController {
 		System.out.println("representative added");
 	}
 	
-	public static void deleteRepresentative(Representative representativeToDelete)
+	public void deleteRepresentative(Representative representativeToDelete)
 	{
 		try {		
 			DBConnection.updateData("DELETE FROM allrepresentatives WHERE id_rep = " + representativeToDelete.getId());
@@ -131,7 +131,7 @@ public class AdminController {
 		System.out.println("representatives deleted");
 	}
 	
-	public static void editFieldRepresentative(Representative representativeToEdit, String fieldToEdit)
+	public void editFieldRepresentative(Representative representativeToEdit, String fieldToEdit)
 	{
 		System.out.println("representativeToEdit = " + representativeToEdit);
 		System.out.println("fieldToEdit = " + fieldToEdit);
@@ -160,7 +160,7 @@ public class AdminController {
 	}
 	
 	//haven't implemented this yet
-	public static void getSalesInAPeriodOfTime(java.sql.Date startDate, java.sql.Date endDate)
+	public void getSalesInAPeriodOfTime(java.sql.Date startDate, java.sql.Date endDate)
 	{
 		try {			
 			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");

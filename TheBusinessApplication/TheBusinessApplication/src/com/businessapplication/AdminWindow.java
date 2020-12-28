@@ -57,10 +57,27 @@ public class AdminWindow extends JFrame {
 	static ArrayList<String> categoriesWithoutRepresentative = new ArrayList<>();
 	static ArrayList<String> categoriesWithRepresentative = new ArrayList<>();
 	
+	private int id;
+	private String name;
+	private String username;
+	private String password;
+	
 	/**
 	 * Create the frame.
 	 */
-	public AdminWindow() {
+	public AdminWindow(int id, String name, String username, String password) {
+		
+		this.id = id;
+		this.name = name;
+		this.username = username;
+		this.password = password;
+		
+		Admin thisAdmin = new Admin.Builder().id(id)
+											 .name(name)
+											 .username(username)
+											 .password(password)
+											 .build();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 902, 558);
 		
@@ -430,6 +447,8 @@ public class AdminWindow extends JFrame {
 		panel_4.add(textFieldEdit);
 		
 		
+//		Admin admin = new Admin.Builder().id
+		
 		mnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				setVisible(false);
@@ -489,7 +508,7 @@ public class AdminWindow extends JFrame {
 													      .price(Double.parseDouble((String) textFieldPrice.getText()))
 													      .build();
 					}
-					AdminController.addProduct(newProduct);
+					thisAdmin.addProduct(newProduct);
 					
 					JOptionPane.showMessageDialog(null, "Added [" + newProduct.getName() + ", x" + newProduct.getQuantity() + "]");
 					
@@ -520,7 +539,7 @@ public class AdminWindow extends JFrame {
 				
 				Product productToDelete = new Product(id);
 				
-				AdminController.deleteProduct(productToDelete);
+				thisAdmin.deleteProduct(productToDelete);
 				
 				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
 				
@@ -549,22 +568,22 @@ public class AdminWindow extends JFrame {
 					if(comboBoxEdit.getSelectedItem().equals("name"))
 					{
 						productToEdit.setName(textFieldEdit.getText());
-						AdminController.editFieldProduct(productToEdit, "name");
+						thisAdmin.editFieldProduct(productToEdit, "name");
 					}
 					else if(comboBoxEdit.getSelectedItem().equals("category"))
 					{
 						productToEdit.setCategory(textFieldEdit.getText());
-						AdminController.editFieldProduct(productToEdit, "category");
+						thisAdmin.editFieldProduct(productToEdit, "category");
 					}
 					else if(comboBoxEdit.getSelectedItem().equals("quantity"))
 					{
 						productToEdit.setQuantity(Integer.parseInt(textFieldEdit.getText()));
-						AdminController.editFieldProduct(productToEdit, "quantity");
+						thisAdmin.editFieldProduct(productToEdit, "quantity");
 					}
 					else if(comboBoxEdit.getSelectedItem().equals("price"))
 					{
 						productToEdit.setPrice(Double.parseDouble(textFieldEdit.getText()));
-						AdminController.editFieldProduct(productToEdit, "price");
+						thisAdmin.editFieldProduct(productToEdit, "price");
 					}
 					
 				} catch(NumberFormatException e) {
@@ -586,7 +605,7 @@ public class AdminWindow extends JFrame {
 																				  .profit(0)
 																				  .build();
 				
-				AdminController.addRepresentative(represenatativeToAdd);
+				thisAdmin.addRepresentative(represenatativeToAdd);
 				
 				JOptionPane.showMessageDialog(null, "Added [" + represenatativeToAdd.getName() + " (" + represenatativeToAdd.getUsername() + "), "
 																							+ "category: " + represenatativeToAdd.getCategory() + ".");
@@ -605,7 +624,7 @@ public class AdminWindow extends JFrame {
 				Representative represenatativeToDelete = new Representative.Builder().id(id)
 																					 .build();
 				
-				AdminController.deleteRepresentative(represenatativeToDelete);
+				thisAdmin.deleteRepresentative(represenatativeToDelete);
 				
 				JOptionPane.showMessageDialog(null, "Representative with [id = " + represenatativeToDelete.getId() + "] has been deleted");
 				
@@ -635,17 +654,17 @@ public class AdminWindow extends JFrame {
 					if(comboBoxEditRepresentative.getSelectedItem().equals("name"))
 					{
 						representativeToEdit.setName(textFieldEditRep.getText());
-						AdminController.editFieldRepresentative(representativeToEdit, "name");
+						thisAdmin.editFieldRepresentative(representativeToEdit, "name");
 					}
 					else if(comboBoxEditRepresentative.getSelectedItem().equals("username"))
 					{
 						representativeToEdit.setUsername(textFieldEditRep.getText());
-						AdminController.editFieldRepresentative(representativeToEdit, "username");
+						thisAdmin.editFieldRepresentative(representativeToEdit, "username");
 					}
 					else if(comboBoxEditRepresentative.getSelectedItem().equals("category"))
 					{
 						representativeToEdit.setCategory(textFieldEditRep.getText());
-						AdminController.editFieldRepresentative(representativeToEdit, "category");
+						thisAdmin.editFieldRepresentative(representativeToEdit, "category");
 					}
 
 					

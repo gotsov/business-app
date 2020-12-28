@@ -7,7 +7,6 @@ import java.util.Scanner;
 import com.businessapplication.OrderControl.Builder;
 
 public class Product {
-	static Scanner scan = new Scanner(System.in);
 	
 	public static int idProduct = 100;
 	protected int id;
@@ -87,20 +86,20 @@ public class Product {
 		return id;
 	}
 	
-	public static int getIdProductOfLast()
-	{
-		try {		
-			ResultSet rs = DBConnection.getData(" SELECT id_prod FROM allproducts");
-			while(rs.next())
-			{
-				idProduct = rs.getInt("id_prod");
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return idProduct;
-	}
+//	public static int getIdProductOfLast()
+//	{
+//		try {		
+//			ResultSet rs = DBConnection.getData(" SELECT id_prod FROM allproducts");
+//			while(rs.next())
+//			{
+//				idProduct = rs.getInt("id_prod");
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return idProduct;
+//	}
 
 	public void setId() {		
 		try {
