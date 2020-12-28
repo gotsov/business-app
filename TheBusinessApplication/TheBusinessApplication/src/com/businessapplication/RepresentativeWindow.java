@@ -643,12 +643,24 @@ public class RepresentativeWindow extends JFrame {
 		comboBoxBoughtProduct.removeAllItems();
 		try
 		{     
-			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + this.category + "'");
+			if(this.category.equals("all")) {
+				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
+				
+				 while(rs.next())
+				 {
+			        	comboBoxBoughtProduct.addItem(rs.getString("name"));
+				 }
+			}
+			else {
+				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + this.category + "'");
+				
+				 while(rs.next())
+				 {
+			        	comboBoxBoughtProduct.addItem(rs.getString("name"));
+				 }
+			}
 			
-	        while(rs.next())
-	        {
-	        	comboBoxBoughtProduct.addItem(rs.getString("name"));
-	        }
+	       
 		} catch(SQLException e) {
 			e.printStackTrace();
 		}

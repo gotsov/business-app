@@ -1,8 +1,12 @@
 package com.businessapplication;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public abstract class AdminController {	
 	public static int idUser = 1;
@@ -160,55 +164,101 @@ public abstract class AdminController {
 	}
 	
 	//haven't implemented this yet
-	public void getSalesInAPeriodOfTime(java.sql.Date startDate, java.sql.Date endDate)
+	public ArrayList<OrderControl> filterSalesByDate(String startDate, String endDate, ArrayList<OrderControl> listAllSales)
 	{
+		
+		ArrayList<OrderControl> filteredByDateList = new ArrayList<>();
+		
 		try {			
 			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
+			
+			java.util.Date utilStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
+			
+			java.util.Date utilEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
+			
+	        Date dateToCompare;
 	        
-	        java.sql.Date dateToCompare;
-	        
-	        String name, email, product;
+	        String name, email, product, representativeUsername, category;
 	        int id, quantity;
 	        double price;
 	        
 	        while(rs.next())
-	        {
+	        {     	
 	        	id = rs.getInt("id_sale");
-	        	name = rs.getString("name");
 	        	email = rs.getString("email");
 	        	product = rs.getString("product");
+	        	category = rs.getString("category");
 	        	quantity = rs.getInt("quantity");
 	        	price = rs.getDouble("price");
+	        	representativeUsername = rs.getString("representative_username");
 	        	dateToCompare = rs.getDate("date");
 	        	
-	        	if(dateToCompare.compareTo(startDate) >= 0 && dateToCompare.compareTo(endDate) <= 0)
+	        	if(dateToCompare.compareTo(utilStartDate) >= 0 && dateToCompare.compareTo(utilEndDate) <= 0)
 	        	{
-	        		System.out.println("id, name, email, product, quantity, price, date");
-	        		System.out.println(id + "\t" + name + "\t" + email +"\t" + product + "\t" + quantity + "\t" + price + "\t" + dateToCompare);
+	        		OrderControl sale = new OrderControl.Builder().id(id)
+	        													  .email(email)
+	        													  .representativeUsername(representativeUsername)
+	        													  .category(category)
+	        													  .product(product)
+	        													  .quantity(quantity)
+	        													  .price(price)
+	        													  .date(dateToCompare)
+	        													  .build();
+	        		filteredByDateList.add(sale);
 	        	}
 	        }
      
+		} catch (SQLException | ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return filteredByDateList;
+	}
+
+	public ArrayList<OrderControl> filterSalesByRepresentativeUsername(ArrayList<OrderControl> listAllSales, String username)
+	{
+		ArrayList<OrderControl> filteredByUsernameList = new ArrayList<>();
+		
+		try {			
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
+					
+	        Date date;
+	        String name, email, product, representativeUsername, category;
+	        int id, quantity;
+	        double price;
+	        
+			while(rs.next())
+	        {     	
+	        	id = rs.getInt("id_sale");
+	        	email = rs.getString("email");
+	        	product = rs.getString("product");
+	        	category = rs.getString("category");
+	        	quantity = rs.getInt("quantity");
+	        	price = rs.getDouble("price");
+	        	representativeUsername = rs.getString("representative_username");
+	        	date = rs.getDate("date");
+	        	
+	        	if(representativeUsername.equals(username))
+	        	{
+	        		OrderControl sale = new OrderControl.Builder().id(id)
+	        													  .email(email)
+	        													  .representativeUsername(representativeUsername)
+	        													  .category(category)
+	        													  .product(product)
+	        													  .quantity(quantity)
+	        													  .price(price)
+	        													  .date(date)
+	        													  .build();
+	        		filteredByUsernameList.add(sale);
+	        	}
+	        }
+ 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		return filteredByUsernameList;
 	}
-	
-//	Date startDate, endDate;
-//	
-//try {
-//java.util.Date utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(stringDate);
-//java.sql.Date sqlStartDate = new java.sql.Date(utilDate.getTime());
-//		
-//System.out.println("Enter start of period: (yyyy-MM-dd)");
-//stringDate = scan.next();
-//		
-//utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(stringDate);
-//java.sql.Date sqlEndDate = new java.sql.Date(utilDate.getTime());
-//		
-//getSalesInAPeriodOfTime(sqlStartDate, sqlEndDate);
-//} catch (ParseException e1) {
-//e1.printStackTrace();
-//}
 	
 }
 

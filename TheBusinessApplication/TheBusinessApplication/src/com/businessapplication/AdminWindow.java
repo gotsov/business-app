@@ -6,7 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -35,11 +38,15 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
+import com.toedter.calendar.JDateChooser;
+
 public class AdminWindow extends JFrame {
 
 	private JPanel contentPane;
 	private static JTable tableProducts;
 	private static JTable tableRepresentatives;
+	private static JTable tableAllSales;
 	private JTextField textFieldProductName;
 	private JTextField textFieldNewCategory;
 	private JTextField textFieldQuantity;
@@ -53,6 +60,7 @@ public class AdminWindow extends JFrame {
 	
 	static ArrayList<Product> listProducts = new ArrayList<>();
 	static ArrayList<Representative> listRepresentatives = new ArrayList<>();
+	static ArrayList<OrderControl> listAllSales = new ArrayList<>();
 	static ArrayList<String> allCategories = new ArrayList<>();
 	static ArrayList<String> categoriesWithoutRepresentative = new ArrayList<>();
 	static ArrayList<String> categoriesWithRepresentative = new ArrayList<>();
@@ -61,6 +69,7 @@ public class AdminWindow extends JFrame {
 	private String name;
 	private String username;
 	private String password;
+	private JTextField textFieldRepUsername;
 	
 	/**
 	 * Create the frame.
@@ -109,204 +118,34 @@ public class AdminWindow extends JFrame {
 		panel_1.setLayout(null);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(23, 13, 552, 122);
+		scrollPane_1.setBounds(23, 13, 552, 214);
 		panel_1.add(scrollPane_1);
-		
-		tableRepresentatives = new JTable();
-		scrollPane_1.setViewportView(tableRepresentatives);
-		tableRepresentatives.setFont(new Font("Arial", Font.PLAIN, 16));
-		tableRepresentatives.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"id", "name", "username", "category", "sales", "profit (lv.)"
-			}
-		));
-		
-		JPanel panel_2 = new JPanel();
-		tabbedPane.addTab("Analize", null, panel_2, null);
-		panel_2.setLayout(null);
-		
-		TableColumnModel columnModel2 = tableRepresentatives.getColumnModel();
-		
-		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-		tableRepresentatives.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-		
-		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment( JLabel.RIGHT );
-		tableRepresentatives.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
-		tableRepresentatives.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
-		
-		columnModel2.getColumn(0).setPreferredWidth(40);
-		columnModel2.getColumn(1).setPreferredWidth(120);
-		columnModel2.getColumn(2).setPreferredWidth(120);
-		columnModel2.getColumn(3).setPreferredWidth(80);
-		columnModel2.getColumn(4).setPreferredWidth(40);
-		columnModel2.getColumn(5).setPreferredWidth(60);
-		tableRepresentatives.setRowHeight(30);
 		
 		JPanel panel_5 = new JPanel();
 		panel_5.setLayout(null);
 		panel_5.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Add representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_5.setBounds(23, 150, 270, 272);
+		panel_5.setBounds(23, 233, 270, 189);
 		panel_1.add(panel_5);
+				
+		JPanel panel_2 = new JPanel();
+		tabbedPane.addTab("Analize", null, panel_2, null);
+		panel_2.setLayout(null);
 		
-		JLabel lblName = new JLabel("Name:");
-		lblName.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblName.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblName.setBounds(0, 15, 122, 30);
-		panel_5.add(lblName);
+		JLabel lblAllSales = new JLabel("All sales:");
+		lblAllSales.setHorizontalAlignment(SwingConstants.LEFT);
+		lblAllSales.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblAllSales.setBounds(12, 13, 114, 30);
+		panel_2.add(lblAllSales);
 		
-		textFieldNameRep = new JTextField();
-		textFieldNameRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textFieldNameRep.setColumns(10);
-		textFieldNameRep.setBounds(122, 17, 133, 26);
-		panel_5.add(textFieldNameRep);
-		
-		JLabel lblUsername = new JLabel("Username:");
-		lblUsername.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblUsername.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblUsername.setBounds(10, 57, 112, 30);
-		panel_5.add(lblUsername);
-		
-		JButton btnAddRepresentative = new JButton("Add");
-		btnAddRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnAddRepresentative.setBounds(55, 221, 133, 38);
-		panel_5.add(btnAddRepresentative);
-		
-		JLabel lblCategory_1 = new JLabel("Category:");
-		lblCategory_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCategory_1.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblCategory_1.setBounds(0, 100, 122, 30);
-		panel_5.add(lblCategory_1);
-		
-		textFieldCategoryRep = new JTextField();
-		textFieldCategoryRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textFieldCategoryRep.setColumns(10);
-		textFieldCategoryRep.setBounds(122, 100, 133, 26);
-		panel_5.add(textFieldCategoryRep);
-		
-		textFieldUsernameRep = new JTextField();
-		textFieldUsernameRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textFieldUsernameRep.setColumns(10);
-		textFieldUsernameRep.setBounds(122, 60, 133, 26);
-		panel_5.add(textFieldUsernameRep);
-		
-		JPanel panel_6 = new JPanel();
-		panel_6.setLayout(null);
-		panel_6.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Delete representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_6.setBounds(305, 150, 270, 272);
-		panel_1.add(panel_6);
-		
-		JButton btnDeleteRepresentative = new JButton("Delete");
-		btnDeleteRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnDeleteRepresentative.setBounds(67, 221, 133, 38);
-		panel_6.add(btnDeleteRepresentative);
-		
-		JLabel lblIdOfRep_1 = new JLabel("ID of rep. to delete: ");
-		lblIdOfRep_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblIdOfRep_1.setFont(new Font("Arial", Font.PLAIN, 19));
-		lblIdOfRep_1.setBounds(-17, 103, 200, 26);
-		panel_6.add(lblIdOfRep_1);
-		
-		JComboBox<String> comboBoxIdRepresentativeToDelete = new JComboBox();
-		comboBoxIdRepresentativeToDelete.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxIdRepresentativeToDelete.setBounds(179, 104, 55, 26);
-		panel_6.add(comboBoxIdRepresentativeToDelete);
-		
-		JPanel panel_7 = new JPanel();
-		panel_7.setLayout(null);
-		panel_7.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Edit representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_7.setBounds(585, 150, 270, 272);
-		panel_1.add(panel_7);
-		
-		JButton btnEditRepresentative = new JButton("Edit");
-		btnEditRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnEditRepresentative.setBounds(75, 221, 133, 38);
-		panel_7.add(btnEditRepresentative);
-		
-		JLabel lblIdOfRep = new JLabel("ID of rep. to edit: ");
-		lblIdOfRep.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblIdOfRep.setFont(new Font("Arial", Font.PLAIN, 19));
-		lblIdOfRep.setBounds(0, 27, 200, 26);
-		panel_7.add(lblIdOfRep);
-		
-		JComboBox<String> comboBoxIdRepresentative = new JComboBox();
-		comboBoxIdRepresentative.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxIdRepresentative.setBounds(194, 28, 55, 26);
-		panel_7.add(comboBoxIdRepresentative);
-		
-		JLabel label_7 = new JLabel("Edit:");
-		label_7.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_7.setFont(new Font("Arial", Font.PLAIN, 19));
-		label_7.setBounds(44, 66, 61, 26);
-		panel_7.add(label_7);
-		
-		JComboBox<String> comboBoxEditRepresentative = new JComboBox();
-		comboBoxEditRepresentative.setModel(new DefaultComboBoxModel(new String[] {"name", "username", "category"}));
-		comboBoxEditRepresentative.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxEditRepresentative.setBounds(112, 67, 111, 26);
-		panel_7.add(comboBoxEditRepresentative);
-		
-		JLabel lblEditTextRep = new JLabel("New name:");
-		lblEditTextRep.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblEditTextRep.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblEditTextRep.setBounds(-12, 105, 146, 30);
-		panel_7.add(lblEditTextRep);
-		
-		textFieldEditRep = new JTextField();
-		textFieldEditRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textFieldEditRep.setColumns(10);
-		textFieldEditRep.setBounds(134, 105, 124, 26);
-		panel_7.add(textFieldEditRep);
-		
-		JScrollPane scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(587, 43, 268, 92);
-		panel_1.add(scrollPane_2);
+		JScrollPane scrollPane_3 = new JScrollPane();
+		scrollPane_3.setBounds(12, 49, 845, 161);
+		panel_2.add(scrollPane_3);
 		
 		DefaultListModel<String> model = new DefaultListModel<>();
-		JList listNoRep = new JList<>(model);
-		listNoRep.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-		scrollPane_2.setViewportView(listNoRep);
-		
-		JLabel lblCategoriesWithNo = new JLabel("Categories with no representatives:");
-		lblCategoriesWithNo.setHorizontalAlignment(SwingConstants.LEFT);
-		lblCategoriesWithNo.setFont(new Font("Arial", Font.PLAIN, 17));
-		lblCategoriesWithNo.setBounds(587, 13, 255, 30);
-		panel_1.add(lblCategoriesWithNo);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(186, 13, 470, 124);
+		scrollPane.setBounds(128, 13, 587, 124);
 		panelProducts.add(scrollPane);
-		
-		tableProducts = new JTable();
-		scrollPane.setViewportView(tableProducts);
-		tableProducts.setFont(new Font("Arial", Font.PLAIN, 16));
-		tableProducts.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"id", "name", "category", "quantity", "price"
-			}
-		));
-		
-		centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-		tableProducts.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-		
-		centerRenderer = new DefaultTableCellRenderer();
-		rightRenderer.setHorizontalAlignment( JLabel.RIGHT );
-		tableProducts.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
-		tableProducts.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
-		
-		TableColumnModel columnModel1 = tableProducts.getColumnModel();
-		columnModel1.getColumn(0).setPreferredWidth(40);
-		columnModel1.getColumn(1).setPreferredWidth(120);
-		columnModel1.getColumn(2).setPreferredWidth(120);
-		columnModel1.getColumn(3).setPreferredWidth(80);
-		columnModel1.getColumn(4).setPreferredWidth(40);
-		tableProducts.setRowHeight(30);
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "Add product", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -447,7 +286,301 @@ public class AdminWindow extends JFrame {
 		panel_4.add(textFieldEdit);
 		
 		
-//		Admin admin = new Admin.Builder().id
+		
+		JLabel lblName = new JLabel("Name:");
+		lblName.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblName.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblName.setBounds(0, 15, 122, 30);
+		panel_5.add(lblName);
+		
+		textFieldNameRep = new JTextField();
+		textFieldNameRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldNameRep.setColumns(10);
+		textFieldNameRep.setBounds(122, 17, 133, 26);
+		panel_5.add(textFieldNameRep);
+		
+		JLabel lblUsername = new JLabel("Username:");
+		lblUsername.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblUsername.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblUsername.setBounds(10, 57, 112, 30);
+		panel_5.add(lblUsername);
+		
+		JButton btnAddRepresentative = new JButton("Add");
+		btnAddRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnAddRepresentative.setBounds(59, 143, 133, 38);
+		panel_5.add(btnAddRepresentative);
+		
+		JLabel lblCategory_1 = new JLabel("Category:");
+		lblCategory_1.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblCategory_1.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblCategory_1.setBounds(0, 100, 122, 30);
+		panel_5.add(lblCategory_1);
+		
+		textFieldCategoryRep = new JTextField();
+		textFieldCategoryRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldCategoryRep.setColumns(10);
+		textFieldCategoryRep.setBounds(122, 100, 133, 26);
+		panel_5.add(textFieldCategoryRep);
+		
+		textFieldUsernameRep = new JTextField();
+		textFieldUsernameRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldUsernameRep.setColumns(10);
+		textFieldUsernameRep.setBounds(122, 60, 133, 26);
+		panel_5.add(textFieldUsernameRep);
+		
+		JPanel panel_6 = new JPanel();
+		panel_6.setLayout(null);
+		panel_6.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Delete representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_6.setBounds(305, 233, 270, 189);
+		panel_1.add(panel_6);
+		
+		JButton btnDeleteRepresentative = new JButton("Delete");
+		btnDeleteRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnDeleteRepresentative.setBounds(68, 142, 133, 38);
+		panel_6.add(btnDeleteRepresentative);
+		
+		JLabel lblIdOfRep_1 = new JLabel("ID of rep. to delete: ");
+		lblIdOfRep_1.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblIdOfRep_1.setFont(new Font("Arial", Font.PLAIN, 19));
+		lblIdOfRep_1.setBounds(0, 64, 200, 26);
+		panel_6.add(lblIdOfRep_1);
+		
+		JComboBox<String> comboBoxIdRepresentativeToDelete = new JComboBox();
+		comboBoxIdRepresentativeToDelete.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		comboBoxIdRepresentativeToDelete.setBounds(196, 65, 55, 26);
+		panel_6.add(comboBoxIdRepresentativeToDelete);
+		
+		JPanel panel_7 = new JPanel();
+		panel_7.setLayout(null);
+		panel_7.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Edit representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_7.setBounds(585, 180, 270, 242);
+		panel_1.add(panel_7);
+		
+		JButton btnEditRepresentative = new JButton("Edit");
+		btnEditRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnEditRepresentative.setBounds(77, 191, 133, 38);
+		panel_7.add(btnEditRepresentative);
+		
+		JLabel lblIdOfRep = new JLabel("ID of rep. to edit: ");
+		lblIdOfRep.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblIdOfRep.setFont(new Font("Arial", Font.PLAIN, 19));
+		lblIdOfRep.setBounds(0, 27, 200, 26);
+		panel_7.add(lblIdOfRep);
+		
+		JComboBox<String> comboBoxIdRepresentative = new JComboBox();
+		comboBoxIdRepresentative.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		comboBoxIdRepresentative.setBounds(194, 28, 55, 26);
+		panel_7.add(comboBoxIdRepresentative);
+		
+		JLabel label_7 = new JLabel("Edit:");
+		label_7.setHorizontalAlignment(SwingConstants.RIGHT);
+		label_7.setFont(new Font("Arial", Font.PLAIN, 19));
+		label_7.setBounds(44, 66, 61, 26);
+		panel_7.add(label_7);
+		
+		JComboBox<String> comboBoxEditRepresentative = new JComboBox();
+		comboBoxEditRepresentative.setModel(new DefaultComboBoxModel(new String[] {"name", "username", "category"}));
+		comboBoxEditRepresentative.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		comboBoxEditRepresentative.setBounds(112, 67, 111, 26);
+		panel_7.add(comboBoxEditRepresentative);
+		
+		JLabel lblEditTextRep = new JLabel("New name:");
+		lblEditTextRep.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblEditTextRep.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblEditTextRep.setBounds(-12, 105, 146, 30);
+		panel_7.add(lblEditTextRep);
+		
+		textFieldEditRep = new JTextField();
+		textFieldEditRep.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldEditRep.setColumns(10);
+		textFieldEditRep.setBounds(134, 105, 124, 26);
+		panel_7.add(textFieldEditRep);
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(587, 75, 268, 92);
+		panel_1.add(scrollPane_2);
+		JList listNoRep = new JList<>(model);
+		scrollPane_2.setViewportView(listNoRep);
+		listNoRep.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		
+		JLabel lblCategoriesWithNo = new JLabel("Categories with no representatives:");
+		lblCategoriesWithNo.setHorizontalAlignment(SwingConstants.LEFT);
+		lblCategoriesWithNo.setFont(new Font("Arial", Font.PLAIN, 17));
+		lblCategoriesWithNo.setBounds(587, 13, 255, 20);
+		panel_1.add(lblCategoriesWithNo);
+		
+		JLabel lblwillBeSold = new JLabel("(will be sold by representative with ");
+		lblwillBeSold.setHorizontalAlignment(SwingConstants.LEFT);
+		lblwillBeSold.setFont(new Font("Arial", Font.PLAIN, 17));
+		lblwillBeSold.setBounds(587, 33, 255, 20);
+		panel_1.add(lblwillBeSold);
+		
+		JLabel lblCategoryall = new JLabel("category \"all\")");
+		lblCategoryall.setHorizontalAlignment(SwingConstants.LEFT);
+		lblCategoryall.setFont(new Font("Arial", Font.PLAIN, 17));
+		lblCategoryall.setBounds(587, 51, 255, 20);
+		panel_1.add(lblCategoryall);
+		
+		
+//		TABLES:
+		
+		tableProducts = new JTable();
+		scrollPane.setViewportView(tableProducts);
+		tableProducts.setFont(new Font("Arial", Font.PLAIN, 16));
+		tableProducts.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"id", "name", "category", "quantity", "price"
+			}
+		));
+		
+		tableRepresentatives = new JTable();
+		scrollPane_1.setViewportView(tableRepresentatives);
+		tableRepresentatives.setFont(new Font("Arial", Font.PLAIN, 16));
+		tableRepresentatives.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"id", "name", "username", "category", "sales", "profit (lv.)"
+			}
+		));
+
+		tableAllSales = new JTable();
+		scrollPane_3.setViewportView(tableAllSales);
+		tableAllSales.setFont(new Font("Arial", Font.PLAIN, 16));
+		tableAllSales.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"id_sale", "email_client", "username_rep", "category", "product", "quantity", "price(lv.)", "date"
+			}
+		));
+		
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+		DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+		
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		rightRenderer.setHorizontalAlignment( JLabel.RIGHT );
+		leftRenderer.setHorizontalAlignment( JLabel.LEFT );
+		
+		//Table products
+		TableColumnModel columnModelProducts = tableProducts.getColumnModel();
+		
+		columnModelProducts.getColumn(0).setPreferredWidth(40);
+		columnModelProducts.getColumn(1).setPreferredWidth(120);
+		columnModelProducts.getColumn(2).setPreferredWidth(120);
+		columnModelProducts.getColumn(3).setPreferredWidth(80);
+		columnModelProducts.getColumn(4).setPreferredWidth(40);
+		tableProducts.setRowHeight(30);
+		
+		tableProducts.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		tableProducts.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+		tableProducts.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+		
+		//Table representatives	
+		TableColumnModel columnModelRepresentatives = tableRepresentatives.getColumnModel();
+		columnModelRepresentatives.getColumn(0).setPreferredWidth(40);
+		columnModelRepresentatives.getColumn(1).setPreferredWidth(120);
+		columnModelRepresentatives.getColumn(2).setPreferredWidth(120);
+		columnModelRepresentatives.getColumn(3).setPreferredWidth(80);
+		columnModelRepresentatives.getColumn(4).setPreferredWidth(40);
+		columnModelRepresentatives.getColumn(5).setPreferredWidth(60);
+		tableRepresentatives.setRowHeight(30);
+				
+		tableRepresentatives.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		tableRepresentatives.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+		tableRepresentatives.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
+		
+		//Table allsales
+		TableColumnModel columnModelAllSales = tableAllSales.getColumnModel();
+		
+		columnModelAllSales.getColumn(0).setPreferredWidth(10);
+		columnModelAllSales.getColumn(1).setPreferredWidth(150);
+		columnModelAllSales.getColumn(2).setPreferredWidth(100);
+		columnModelAllSales.getColumn(3).setPreferredWidth(80);
+		columnModelAllSales.getColumn(4).setPreferredWidth(100);
+		columnModelAllSales.getColumn(5).setPreferredWidth(30);
+		columnModelAllSales.getColumn(6).setPreferredWidth(60);
+		columnModelAllSales.getColumn(7).setPreferredWidth(80);
+		tableAllSales.setRowHeight(30);
+		
+		JPanel panel_8 = new JPanel();
+		panel_8.setBorder(new TitledBorder(null, "Sales in a period", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_8.setBounds(12, 223, 285, 199);
+		panel_2.add(panel_8);
+		panel_8.setLayout(null);
+		
+		JDateChooser dateChooserStartDate = new JDateChooser();
+		dateChooserStartDate.setBounds(114, 43, 133, 26);
+		panel_8.add(dateChooserStartDate);
+		dateChooserStartDate.setDateFormatString("yyyy-MM-dd");
+		
+		JDateChooser dateChooserEndDate = new JDateChooser();
+		dateChooserEndDate.setDateFormatString("yyyy-MM-dd");
+		dateChooserEndDate.setBounds(114, 88, 133, 26);
+		panel_8.add(dateChooserEndDate);
+		
+		JLabel lblStartTime = new JLabel("Start date:");
+		lblStartTime.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblStartTime.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblStartTime.setBounds(25, 39, 89, 30);
+		panel_8.add(lblStartTime);
+		
+		JLabel lblEndDate = new JLabel("End date:");
+		lblEndDate.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblEndDate.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblEndDate.setBounds(25, 88, 89, 30);
+		panel_8.add(lblEndDate);
+		
+		JButton btnFilterByDate = new JButton("Filter");
+		btnFilterByDate.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnFilterByDate.setBounds(73, 148, 133, 38);
+		panel_8.add(btnFilterByDate);
+		
+		JButton btnRefresh = new JButton("Refresh");
+		btnRefresh.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnRefresh.setBounds(724, 5, 133, 38);
+		panel_2.add(btnRefresh);
+		
+		JPanel panel_9 = new JPanel();
+		panel_9.setLayout(null);
+		panel_9.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Filter by representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_9.setBounds(309, 223, 548, 129);
+		panel_2.add(panel_9);
+		
+		JLabel lblUsernameOfRepresentative = new JLabel("Username of representative to see sales:");
+		lblUsernameOfRepresentative.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblUsernameOfRepresentative.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblUsernameOfRepresentative.setBounds(0, 13, 350, 30);
+		panel_9.add(lblUsernameOfRepresentative);
+		
+		JComboBox<String> comboBoxUsernames = new JComboBox();
+		comboBoxUsernames.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		comboBoxUsernames.setBounds(353, 15, 139, 26);
+		panel_9.add(comboBoxUsernames);
+		
+		JLabel lblEnterNameif = new JLabel("Enter name (if not found in the list):");
+		lblEnterNameif.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblEnterNameif.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblEnterNameif.setBounds(0, 47, 350, 30);
+		panel_9.add(lblEnterNameif);
+		
+		textFieldRepUsername = new JTextField();
+		textFieldRepUsername.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldRepUsername.setColumns(10);
+		textFieldRepUsername.setBounds(353, 49, 133, 26);
+		panel_9.add(textFieldRepUsername);
+		
+		JButton btnFilterByRepresentative = new JButton("Filter");
+		btnFilterByRepresentative.setBounds(205, 84, 133, 38);
+		panel_9.add(btnFilterByRepresentative);
+		btnFilterByRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
+		
+		tableAllSales.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		tableAllSales.getColumnModel().getColumn(7).setCellRenderer(centerRenderer);
+		
 		
 		mnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -473,17 +606,14 @@ public class AdminWindow extends JFrame {
 			}
 		});
 		
-		comboBoxEditRepresentative.addActionListener(new ActionListener() {		
+		comboBoxUsernames.addActionListener(new ActionListener() {		
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(comboBoxEditRepresentative.getSelectedItem().equals("name")) {
-					lblEditTextRep.setText("New name:");
+				if(!comboBoxUsernames.getSelectedItem().equals("other")) {
+					textFieldRepUsername.setEnabled(false);	
 				}
-				else if(comboBoxEditRepresentative.getSelectedItem().equals("category")) {
-					lblEditTextRep.setText("New category:");
-				}
-				else if(comboBoxEditRepresentative.getSelectedItem().equals("username")) {
-					lblEditTextRep.setText("New username:");
+				else {
+					textFieldRepUsername.setEnabled(true);	
 				}
 			}
 		});
@@ -522,33 +652,10 @@ public class AdminWindow extends JFrame {
 				textFieldPrice.setText("");
 						
 				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-											comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+											comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
 			}
 		});
 		
-
-		btnDeleteClient.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				
-				int id = Integer.parseInt((String)comboBoxIdProductToDelete.getSelectedItem());
-				
-				//throws null pointer exception when using builder
-				
-//				Product productToDelete = new Product.Builder().id(id)
-//															   .build();
-				
-				Product productToDelete = new Product(id);
-				
-				thisAdmin.deleteProduct(productToDelete);
-				
-				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
-				
-				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-									comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
-			}
-		});
-		
-
 		btnEditProduct.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -591,7 +698,49 @@ public class AdminWindow extends JFrame {
 				}
 				
 				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-										comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+										comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+			}
+		});
+		
+
+		btnDeleteClient.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				int id = Integer.parseInt((String)comboBoxIdProductToDelete.getSelectedItem());
+				
+				//throws null pointer exception when using builder
+				
+//				Product productToDelete = new Product.Builder().id(id)
+//															   .build();
+				
+				Product productToDelete = new Product(id);
+				
+				thisAdmin.deleteProduct(productToDelete);
+				
+				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
+				
+				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+									comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+			}
+		});
+		
+
+		
+		
+		
+		
+		comboBoxEditRepresentative.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(comboBoxEditRepresentative.getSelectedItem().equals("name")) {
+					lblEditTextRep.setText("New name:");
+				}
+				else if(comboBoxEditRepresentative.getSelectedItem().equals("category")) {
+					lblEditTextRep.setText("New category:");
+				}
+				else if(comboBoxEditRepresentative.getSelectedItem().equals("username")) {
+					lblEditTextRep.setText("New username:");
+				}
 			}
 		});
 		
@@ -611,7 +760,7 @@ public class AdminWindow extends JFrame {
 																							+ "category: " + represenatativeToAdd.getCategory() + ".");
 				
 				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-									comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+									comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
 			}
 			
 		});
@@ -629,7 +778,7 @@ public class AdminWindow extends JFrame {
 				JOptionPane.showMessageDialog(null, "Representative with [id = " + represenatativeToDelete.getId() + "] has been deleted");
 				
 				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-										comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+										comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
 				
 			}
 		});
@@ -673,19 +822,63 @@ public class AdminWindow extends JFrame {
 				}
 				
 				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-										comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+										comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+			}
+		});
+		
+		btnFilterByDate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Date selectedStartDate = dateChooserStartDate.getDate();
+				Date selectedEndDate = dateChooserEndDate.getDate();
+				
+				
+	            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
+	            
+	            String dateStart = dateFormat.format(selectedStartDate);   
+	            String dateEnd = dateFormat.format(selectedEndDate);
+				
+				ArrayList<OrderControl> filteredByDateList = thisAdmin.filterSalesByDate(dateStart, dateEnd, listAllSales);
+				
+				loadTableFiltered(filteredByDateList);
+			}
+		});
+		
+
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+			}
+		});
+		
+		
+		btnFilterByRepresentative.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				String username;
+				
+				if(comboBoxUsernames.getSelectedItem().equals("other")) {
+					username = textFieldRepUsername.getText();
+				}
+				else {			
+					username = (String)comboBoxUsernames.getSelectedItem();
+				}
+				
+				ArrayList<OrderControl> filteredByUsernameList = thisAdmin.filterSalesByRepresentativeUsername(listAllSales, username);
+				
+				loadTableFiltered(filteredByUsernameList);
 			}
 		});
 		
 		
 		updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-									comboBoxIdRepresentativeToDelete, comboBoxCategory, model);
+									comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
 
 	}
 	
 	public static void updateTablesAndComboboxes(JComboBox<String> comboBoxIdProduct, JComboBox<String> comboBoxIdProductToDelete, 
 											JComboBox<String> comboBoxIdRepresentative, JComboBox<String> comboBoxIdRepresentativeToDelete,
-											JComboBox<String> comboBoxCategory, DefaultListModel<String> model)
+											JComboBox<String> comboBoxCategory, DefaultListModel<String> model, JComboBox<String> comboBoxUsernames)
 	{
 		loadTablesAdmin();
 		fillComboBoxProductsId(comboBoxIdProduct);
@@ -695,18 +888,47 @@ public class AdminWindow extends JFrame {
 		getAllCategories(comboBoxCategory);
 		findCategoriesWithNoRepresentative(model);
 		
+		fillComboBoxUsernames(comboBoxUsernames);
+		
 	}
+	
+	public static void loadTableFiltered(ArrayList<OrderControl> filteredList)
+	{
+		DefaultTableModel modelAllSales = (DefaultTableModel)tableAllSales.getModel(); 
+		
+		modelAllSales.setRowCount(0);
+		
+		Object[] row = new Object[8];
+        
+        for (int i = 0; i < filteredList.size(); i++) {
+			row[0] = filteredList.get(i).getId();
+			row[1] = filteredList.get(i).getEmail();
+			row[2] = filteredList.get(i).getRepresentativeUsername();
+			row[3] = filteredList.get(i).getCategory();
+			row[4] = filteredList.get(i).getProduct();
+			row[5] = filteredList.get(i).getQuantity();
+			row[6] = filteredList.get(i).getPrice();
+			row[7] = filteredList.get(i).getDate();
+
+			modelAllSales.addRow(row);
+		}   
+        
+	}
+	
 	public static void loadTablesAdmin()
 	{
 		try
 		{
 			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel(); 
 			DefaultTableModel modelRepresentatives = (DefaultTableModel)tableRepresentatives.getModel(); 
+			DefaultTableModel modelAllSales = (DefaultTableModel)tableAllSales.getModel();
 			
 			modelProducts.setRowCount(0);		
 			modelRepresentatives.setRowCount(0);
+			modelAllSales.setRowCount(0);
 			listProducts.clear();
 			listRepresentatives.clear();
+			listAllSales.clear();
 			
 			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
 			
@@ -723,7 +945,7 @@ public class AdminWindow extends JFrame {
 	        	listProducts.add(p);
 	        }
 	        
-			Object[] row = new Object[7];
+			Object[] row = new Object[5];
 	        
 	        for (int i = 0; i < listProducts.size(); i++) {
 				row[0] = listProducts.get(i).getId();
@@ -752,7 +974,7 @@ public class AdminWindow extends JFrame {
 	        	listRepresentatives.add(r);
 	        }
 	        
-			Object[] row2 = new Object[7];
+			Object[] row2 = new Object[6];
 	        
 	        for (int i = 0; i < listRepresentatives.size(); i++) {
 				row2[0] = listRepresentatives.get(i).getId();
@@ -763,6 +985,39 @@ public class AdminWindow extends JFrame {
 				row2[5] = listRepresentatives.get(i).getProfit();
 	
 				modelRepresentatives.addRow(row2);
+			}   
+	        
+	        rs = DBConnection.getData("SELECT * FROM allsales");
+			
+	        while(rs.next())
+	        {  	
+	        	
+	        	OrderControl o = new OrderControl.Builder().id(rs.getInt("id_sale"))
+						   								   .email(rs.getString("email"))
+						   								   .representativeUsername(rs.getString("representative_username"))
+						   								   .product(rs.getString("product"))
+						   								   .category(rs.getString("category"))
+						   								   .quantity(rs.getInt("quantity"))
+						   								   .price(rs.getDouble("price"))
+						   								   .date(rs.getDate("date"))
+						   								   .build();	
+	        	
+	        	listAllSales.add(o);
+	        }
+	        
+			Object[] row3 = new Object[8];
+	        
+	        for (int i = 0; i < listAllSales.size(); i++) {
+				row3[0] = listAllSales.get(i).getId();
+				row3[1] = listAllSales.get(i).getEmail();
+				row3[2] = listAllSales.get(i).getRepresentativeUsername();
+				row3[3] = listAllSales.get(i).getCategory();
+				row3[4] = listAllSales.get(i).getProduct();
+				row3[5] = listAllSales.get(i).getQuantity();
+				row3[6] = listAllSales.get(i).getPrice();
+				row3[7] = listAllSales.get(i).getDate();
+	
+				modelAllSales.addRow(row3);
 			}   
 	        
 		}catch(SQLException e){
@@ -781,7 +1036,7 @@ public class AdminWindow extends JFrame {
 			{
 				category = rs.getString("category");
 				
-				if(!allCategories.contains(category))
+				if(!allCategories.contains(category) && !category.equals("all"))
 				{
 					allCategories.add(category);
 				}
@@ -804,6 +1059,17 @@ public class AdminWindow extends JFrame {
 			comboBoxIdProduct.addItem(""+product.getId());
 		}
 		
+	}
+	
+	public static void fillComboBoxUsernames(JComboBox<String> comboBoxUsernames)
+	{
+		comboBoxUsernames.removeAllItems();
+		comboBoxUsernames.addItem("other");
+		
+		for(Representative rep : listRepresentatives)
+		{
+			comboBoxUsernames.addItem(""+rep.getUsername());
+		}
 	}
 	
 	public static void fillComboBoxRepresentativeId(JComboBox<String> comboBoxIdRepresentative)
