@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class AdminController {	
 	public static int idUser = 1;
@@ -260,5 +263,83 @@ public abstract class AdminController {
 		return filteredByUsernameList;
 	}
 	
+	
+	public String getMostSalesByCriteria(String criteria)
+	{
+		String mostFrequentCriteria = "";
+		int numSales = 0;
+		
+		HashMap<String, Integer> categoriesHash = new HashMap<>();
+		
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
+			String result;
+			while(rs.next())
+			{
+				result = rs.getString(criteria);
+				
+				if(categoriesHash.containsKey(result)) {
+					categoriesHash.put(result, categoriesHash.get(result) + 1);
+				}
+				else {
+					categoriesHash.put(result, 1);
+				}
+			}
+			
+			Set<Map.Entry<String, Integer> > set = categoriesHash.entrySet();
+			
+			
+			for(Map.Entry<String, Integer> me : set)
+			{
+				if(me.getValue() > numSales)	{
+					numSales = me.getValue();
+					mostFrequentCriteria = me.getKey();
+				}
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return mostFrequentCriteria + " - " + numSales + " sales";
+	}
+	
+	public int getNumberOfClients()
+	{
+		int numOfClients = 0;
+		
+		try {
+			ResultSet rs = DBConnection.getData("SELECT COUNT(*) from allclients");
+			rs.next();
+			
+			numOfClients = rs.getInt(1);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return numOfClients;
+	}
+	
+	public double getTotalProfit()
+	{
+		double totalProfit = 0;
+		
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * from allsales");
+			
+			while(rs.next())
+			{
+				totalProfit += rs.getDouble("price");
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return totalProfit;
+	}
 }
 

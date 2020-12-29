@@ -57,6 +57,7 @@ public class AdminWindow extends JFrame {
 	private JTextField textFieldCategoryRep;
 	private JTextField textFieldUsernameRep;
 	private JTextField textFieldEditRep;
+	private JTextField textFieldRepUsername;
 	
 	static ArrayList<Product> listProducts = new ArrayList<>();
 	static ArrayList<Representative> listRepresentatives = new ArrayList<>();
@@ -65,21 +66,15 @@ public class AdminWindow extends JFrame {
 	static ArrayList<String> categoriesWithoutRepresentative = new ArrayList<>();
 	static ArrayList<String> categoriesWithRepresentative = new ArrayList<>();
 	
-	private int id;
-	private String name;
-	private String username;
-	private String password;
-	private JTextField textFieldRepUsername;
+	private static int numberOfProducts;
+	private static int numberOfRepresentatives;
+	private static int numberOfSales;
+	
 	
 	/**
 	 * Create the frame.
 	 */
 	public AdminWindow(int id, String name, String username, String password) {
-		
-		this.id = id;
-		this.name = name;
-		this.username = username;
-		this.password = password;
 		
 		Admin thisAdmin = new Admin.Builder().id(id)
 											 .name(name)
@@ -547,7 +542,7 @@ public class AdminWindow extends JFrame {
 		JPanel panel_9 = new JPanel();
 		panel_9.setLayout(null);
 		panel_9.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Filter by representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_9.setBounds(309, 223, 548, 129);
+		panel_9.setBounds(309, 258, 548, 129);
 		panel_2.add(panel_9);
 		
 		JLabel lblUsernameOfRepresentative = new JLabel("Username of representative to see sales:");
@@ -561,7 +556,7 @@ public class AdminWindow extends JFrame {
 		comboBoxUsernames.setBounds(353, 15, 139, 26);
 		panel_9.add(comboBoxUsernames);
 		
-		JLabel lblEnterNameif = new JLabel("Enter name (if not found in the list):");
+		JLabel lblEnterNameif = new JLabel("Enter name (select \"other\"):");
 		lblEnterNameif.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEnterNameif.setFont(new Font("Arial", Font.PLAIN, 18));
 		lblEnterNameif.setBounds(0, 47, 350, 30);
@@ -580,6 +575,89 @@ public class AdminWindow extends JFrame {
 		
 		tableAllSales.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 		tableAllSales.getColumnModel().getColumn(7).setCellRenderer(centerRenderer);
+		
+		
+		JPanel panel_10 = new JPanel();
+		tabbedPane.addTab("Stats", null, panel_10, null);
+		panel_10.setLayout(null);
+		
+		JLabel lblNumberOfProducts = new JLabel("Number of products: ");
+		JLabel lblNumberOfRepresentatives = new JLabel("Number of representatives: ");
+		JLabel lblTotalNumberOfSales = new JLabel("Total number of sales: ");
+		JLabel lblMostSalesByCategory = new JLabel("Most sales by category: ");
+		JLabel lblNumberOfCategories = new JLabel("Number of categories: ");
+		JLabel lblMostSalesByProduct = new JLabel("Most sales by product: ");
+		JLabel lblRepresentativeWithMostSales = new JLabel("Representative with most sales: ");
+		JLabel lblTotalEarnings = new JLabel("Total earnings: ");
+		JLabel lblMostProfitableCategory = new JLabel("Most profitable category: ");
+		JLabel lblNumberOfClients = new JLabel("Number of clients: ");
+		
+		
+		updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+				comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+				lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+				lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+				lblMostProfitableCategory, lblNumberOfClients);
+		
+		lblNumberOfProducts.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNumberOfProducts.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblNumberOfProducts.setBounds(48, 13, 323, 30);
+		panel_10.add(lblNumberOfProducts);
+		
+		
+		lblNumberOfRepresentatives.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNumberOfRepresentatives.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblNumberOfRepresentatives.setBounds(48, 47, 374, 30);
+		panel_10.add(lblNumberOfRepresentatives);
+		
+		
+		lblTotalNumberOfSales.setHorizontalAlignment(SwingConstants.LEFT);
+		lblTotalNumberOfSales.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblTotalNumberOfSales.setBounds(48, 85, 286, 30);
+		panel_10.add(lblTotalNumberOfSales);
+		
+		
+		lblMostSalesByCategory.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMostSalesByCategory.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblMostSalesByCategory.setBounds(48, 186, 459, 30);
+		panel_10.add(lblMostSalesByCategory);
+		
+		
+		lblMostSalesByProduct.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMostSalesByProduct.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblMostSalesByProduct.setBounds(48, 225, 514, 30);
+		panel_10.add(lblMostSalesByProduct);
+		
+		
+		lblRepresentativeWithMostSales.setHorizontalAlignment(SwingConstants.LEFT);
+		lblRepresentativeWithMostSales.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblRepresentativeWithMostSales.setBounds(48, 268, 418, 30);
+		panel_10.add(lblRepresentativeWithMostSales);
+		
+		
+		lblTotalEarnings.setHorizontalAlignment(SwingConstants.LEFT);
+		lblTotalEarnings.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblTotalEarnings.setBounds(48, 380, 374, 30);
+		panel_10.add(lblTotalEarnings);
+		
+		
+		lblMostProfitableCategory.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMostProfitableCategory.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblMostProfitableCategory.setBounds(48, 342, 400, 30);
+		panel_10.add(lblMostProfitableCategory);
+		
+		
+		lblNumberOfClients.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNumberOfClients.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblNumberOfClients.setBounds(48, 117, 459, 30);
+		panel_10.add(lblNumberOfClients);
+		
+		
+		lblNumberOfCategories.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNumberOfCategories.setFont(new Font("Arial", Font.PLAIN, 20));
+		lblNumberOfCategories.setBounds(48, 149, 459, 30);
+		panel_10.add(lblNumberOfCategories);
+
 		
 		
 		mnLogout.addActionListener(new ActionListener() {
@@ -602,18 +680,6 @@ public class AdminWindow extends JFrame {
 				}
 				else if(comboBoxEdit.getSelectedItem().equals("price")) {
 					lblEditText.setText("New price:");
-				}
-			}
-		});
-		
-		comboBoxUsernames.addActionListener(new ActionListener() {		
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(!comboBoxUsernames.getSelectedItem().equals("other")) {
-					textFieldRepUsername.setEnabled(false);	
-				}
-				else {
-					textFieldRepUsername.setEnabled(true);	
 				}
 			}
 		});
@@ -651,8 +717,11 @@ public class AdminWindow extends JFrame {
 				textFieldProductName.setText("");
 				textFieldPrice.setText("");
 						
-				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-											comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+						lblMostProfitableCategory, lblNumberOfClients);
 			}
 		});
 		
@@ -697,8 +766,12 @@ public class AdminWindow extends JFrame {
 					JOptionPane.showMessageDialog(null, "Incorrect input");
 				}
 				
-				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-										comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+						lblMostProfitableCategory, lblNumberOfClients);
+				
 			}
 		});
 		
@@ -719,14 +792,13 @@ public class AdminWindow extends JFrame {
 				
 				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
 				
-				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-									comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+						lblMostProfitableCategory, lblNumberOfClients);
 			}
 		});
-		
-
-		
-		
 		
 		
 		comboBoxEditRepresentative.addActionListener(new ActionListener() {		
@@ -759,8 +831,11 @@ public class AdminWindow extends JFrame {
 				JOptionPane.showMessageDialog(null, "Added [" + represenatativeToAdd.getName() + " (" + represenatativeToAdd.getUsername() + "), "
 																							+ "category: " + represenatativeToAdd.getCategory() + ".");
 				
-				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-									comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+						lblMostProfitableCategory, lblNumberOfClients);
 			}
 			
 		});
@@ -777,8 +852,11 @@ public class AdminWindow extends JFrame {
 				
 				JOptionPane.showMessageDialog(null, "Representative with [id = " + represenatativeToDelete.getId() + "] has been deleted");
 				
-				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-										comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+						lblMostProfitableCategory, lblNumberOfClients);
 				
 			}
 		});
@@ -821,8 +899,11 @@ public class AdminWindow extends JFrame {
 					JOptionPane.showMessageDialog(null, "Incorrect input");
 				}
 				
-				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-										comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+						lblMostProfitableCategory, lblNumberOfClients);
 			}
 		});
 		
@@ -846,8 +927,11 @@ public class AdminWindow extends JFrame {
 
 		btnRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
+				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+						lblMostProfitableCategory, lblNumberOfClients);
 			}
 		});
 		
@@ -871,14 +955,15 @@ public class AdminWindow extends JFrame {
 		});
 		
 		
-		updateTablesAndComboboxes(comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-									comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames);
-
 	}
 	
-	public static void updateTablesAndComboboxes(JComboBox<String> comboBoxIdProduct, JComboBox<String> comboBoxIdProductToDelete, 
+	public static void updateTablesAndComboboxes(Admin thisAdmin, JComboBox<String> comboBoxIdProduct, JComboBox<String> comboBoxIdProductToDelete, 
 											JComboBox<String> comboBoxIdRepresentative, JComboBox<String> comboBoxIdRepresentativeToDelete,
-											JComboBox<String> comboBoxCategory, DefaultListModel<String> model, JComboBox<String> comboBoxUsernames)
+											JComboBox<String> comboBoxCategory, DefaultListModel<String> model, JComboBox<String> comboBoxUsernames,
+											JLabel lblNumberOfProducts, JLabel lblNumberOfRepresentatives,JLabel lblTotalNumberOfSales,
+											JLabel lblMostSalesByCategory, JLabel lblMostSalesByProduct, JLabel lblRepresentativeWithMostSales,
+											JLabel lblTotalEarnings, JLabel lblMostProfitableCategory, JLabel lblNumberOfClients, 
+											JLabel lblNumberOfCategories)
 	{
 		loadTablesAdmin();
 		fillComboBoxProductsId(comboBoxIdProduct);
@@ -890,6 +975,143 @@ public class AdminWindow extends JFrame {
 		
 		fillComboBoxUsernames(comboBoxUsernames);
 		
+		int numberOfCategories = categoriesWithRepresentative.size() + categoriesWithoutRepresentative.size();
+		String mostSalesByCategory = thisAdmin.getMostSalesByCriteria("category");
+		String mostSalesByProduct = thisAdmin.getMostSalesByCriteria("product");
+		String mostSalesByRepresentative = thisAdmin.getMostSalesByCriteria("representative_username");
+		int numberOfClients = thisAdmin.getNumberOfClients();
+		double totalProfit = thisAdmin.getTotalProfit();
+		
+		lblNumberOfProducts.setText("Number of products: " + numberOfProducts);
+		lblNumberOfRepresentatives.setText("Number of representatives: " + numberOfRepresentatives);
+		lblTotalNumberOfSales.setText("Total number of sales: " + numberOfSales);
+		lblMostSalesByCategory.setText("Most sales by category: " + mostSalesByCategory);
+		lblNumberOfCategories.setText("Number of categories: " + numberOfCategories);
+		lblMostSalesByProduct.setText("Most sales by product: " + mostSalesByProduct);
+		lblRepresentativeWithMostSales.setText("Representative with most sales: " + mostSalesByRepresentative);
+		lblTotalEarnings.setText("Total profit: " + totalProfit + "lv.");
+		lblMostProfitableCategory.setText("Most profitable category: ");
+		lblNumberOfClients.setText("Number of clients: " + numberOfClients);
+		
+	}
+	
+
+	
+	public static void loadTablesAdmin()
+	{
+		try
+		{
+			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel(); 
+			DefaultTableModel modelRepresentatives = (DefaultTableModel)tableRepresentatives.getModel(); 
+			DefaultTableModel modelAllSales = (DefaultTableModel)tableAllSales.getModel();
+			
+			modelProducts.setRowCount(0);		
+			modelRepresentatives.setRowCount(0);
+			modelAllSales.setRowCount(0);
+			listProducts.clear();
+			listRepresentatives.clear();
+			listAllSales.clear();
+			
+			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
+			
+			numberOfProducts = 0;
+	        while(rs.next())
+	        {  	
+	        	
+	        	Product p = new Product.Builder().id(rs.getInt("id_prod"))
+	        									 .name(rs.getString("name"))
+	        									 .category(rs.getString("category"))
+	        									 .quantity(rs.getInt("quantity"))
+	        									 .price(rs.getDouble("price"))
+	        									 .build();
+	        	
+	        	listProducts.add(p);
+	        	numberOfProducts++;
+	        }
+	        
+			Object[] row = new Object[5];
+	        
+	        for (int i = 0; i < listProducts.size(); i++) {
+				row[0] = listProducts.get(i).getId();
+				row[1] = listProducts.get(i).getName();
+				row[2] = listProducts.get(i).getCategory();
+				row[3] = listProducts.get(i).getQuantity();
+				row[4] = listProducts.get(i).getPrice();
+	
+				modelProducts.addRow(row);
+			}
+	        
+	        
+			rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+			
+			numberOfRepresentatives = 0;
+	        while(rs.next())
+	        {  	
+	        	
+	        	Representative r = new Representative.Builder().id(rs.getInt("id_rep"))
+	        												   .name(rs.getString("name"))
+	        												   .username(rs.getString("username"))
+	        												   .category(rs.getString("category"))
+	        												   .numberOfSales(rs.getInt("numberofsales"))
+	        												   .profit(rs.getDouble("profit"))
+	        												   .build();
+	        	
+	        	listRepresentatives.add(r);
+	        	numberOfRepresentatives++;
+	        }
+	        
+			Object[] row2 = new Object[6];
+	        
+	        for (int i = 0; i < listRepresentatives.size(); i++) {
+				row2[0] = listRepresentatives.get(i).getId();
+				row2[1] = listRepresentatives.get(i).getName();
+				row2[2] = listRepresentatives.get(i).getUsername();
+				row2[3] = listRepresentatives.get(i).getCategory();
+				row2[4] = listRepresentatives.get(i).getNumberOfSales();
+				row2[5] = listRepresentatives.get(i).getProfit();
+	
+				modelRepresentatives.addRow(row2);
+			}   
+	        
+	        rs = DBConnection.getData("SELECT * FROM allsales");
+			
+	        numberOfSales = 0;
+	        while(rs.next())
+	        {  	
+	        	
+	        	OrderControl o = new OrderControl.Builder().id(rs.getInt("id_sale"))
+						   								   .email(rs.getString("email"))
+						   								   .representativeUsername(rs.getString("representative_username"))
+						   								   .product(rs.getString("product"))
+						   								   .category(rs.getString("category"))
+						   								   .quantity(rs.getInt("quantity"))
+						   								   .price(rs.getDouble("price"))
+						   								   .date(rs.getDate("date"))
+						   								   .build();	
+	        	
+	        	listAllSales.add(o);
+	        	numberOfSales++;
+	        }
+	        
+			Object[] row3 = new Object[8];
+	        
+	        for (int i = 0; i < listAllSales.size(); i++) {
+				row3[0] = listAllSales.get(i).getId();
+				row3[1] = listAllSales.get(i).getEmail();
+				row3[2] = listAllSales.get(i).getRepresentativeUsername();
+				row3[3] = listAllSales.get(i).getCategory();
+				row3[4] = listAllSales.get(i).getProduct();
+				row3[5] = listAllSales.get(i).getQuantity();
+				row3[6] = listAllSales.get(i).getPrice();
+				row3[7] = listAllSales.get(i).getDate();
+	
+				modelAllSales.addRow(row3);
+			}   
+	        
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	
 	}
 	
 	public static void loadTableFiltered(ArrayList<OrderControl> filteredList)
@@ -913,117 +1135,6 @@ public class AdminWindow extends JFrame {
 			modelAllSales.addRow(row);
 		}   
         
-	}
-	
-	public static void loadTablesAdmin()
-	{
-		try
-		{
-			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel(); 
-			DefaultTableModel modelRepresentatives = (DefaultTableModel)tableRepresentatives.getModel(); 
-			DefaultTableModel modelAllSales = (DefaultTableModel)tableAllSales.getModel();
-			
-			modelProducts.setRowCount(0);		
-			modelRepresentatives.setRowCount(0);
-			modelAllSales.setRowCount(0);
-			listProducts.clear();
-			listRepresentatives.clear();
-			listAllSales.clear();
-			
-			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
-			
-	        while(rs.next())
-	        {  	
-	        	
-	        	Product p = new Product.Builder().id(rs.getInt("id_prod"))
-	        									 .name(rs.getString("name"))
-	        									 .category(rs.getString("category"))
-	        									 .quantity(rs.getInt("quantity"))
-	        									 .price(rs.getDouble("price"))
-	        									 .build();
-	        	
-	        	listProducts.add(p);
-	        }
-	        
-			Object[] row = new Object[5];
-	        
-	        for (int i = 0; i < listProducts.size(); i++) {
-				row[0] = listProducts.get(i).getId();
-				row[1] = listProducts.get(i).getName();
-				row[2] = listProducts.get(i).getCategory();
-				row[3] = listProducts.get(i).getQuantity();
-				row[4] = listProducts.get(i).getPrice();
-	
-				modelProducts.addRow(row);
-			}
-	        
-	        
-			rs = DBConnection.getData("SELECT * FROM allrepresentatives");
-			
-	        while(rs.next())
-	        {  	
-	        	
-	        	Representative r = new Representative.Builder().id(rs.getInt("id_rep"))
-	        												   .name(rs.getString("name"))
-	        												   .username(rs.getString("username"))
-	        												   .category(rs.getString("category"))
-	        												   .numberOfSales(rs.getInt("numberofsales"))
-	        												   .profit(rs.getDouble("profit"))
-	        												   .build();
-	        	
-	        	listRepresentatives.add(r);
-	        }
-	        
-			Object[] row2 = new Object[6];
-	        
-	        for (int i = 0; i < listRepresentatives.size(); i++) {
-				row2[0] = listRepresentatives.get(i).getId();
-				row2[1] = listRepresentatives.get(i).getName();
-				row2[2] = listRepresentatives.get(i).getUsername();
-				row2[3] = listRepresentatives.get(i).getCategory();
-				row2[4] = listRepresentatives.get(i).getNumberOfSales();
-				row2[5] = listRepresentatives.get(i).getProfit();
-	
-				modelRepresentatives.addRow(row2);
-			}   
-	        
-	        rs = DBConnection.getData("SELECT * FROM allsales");
-			
-	        while(rs.next())
-	        {  	
-	        	
-	        	OrderControl o = new OrderControl.Builder().id(rs.getInt("id_sale"))
-						   								   .email(rs.getString("email"))
-						   								   .representativeUsername(rs.getString("representative_username"))
-						   								   .product(rs.getString("product"))
-						   								   .category(rs.getString("category"))
-						   								   .quantity(rs.getInt("quantity"))
-						   								   .price(rs.getDouble("price"))
-						   								   .date(rs.getDate("date"))
-						   								   .build();	
-	        	
-	        	listAllSales.add(o);
-	        }
-	        
-			Object[] row3 = new Object[8];
-	        
-	        for (int i = 0; i < listAllSales.size(); i++) {
-				row3[0] = listAllSales.get(i).getId();
-				row3[1] = listAllSales.get(i).getEmail();
-				row3[2] = listAllSales.get(i).getRepresentativeUsername();
-				row3[3] = listAllSales.get(i).getCategory();
-				row3[4] = listAllSales.get(i).getProduct();
-				row3[5] = listAllSales.get(i).getQuantity();
-				row3[6] = listAllSales.get(i).getPrice();
-				row3[7] = listAllSales.get(i).getDate();
-	
-				modelAllSales.addRow(row3);
-			}   
-	        
-		}catch(SQLException e){
-			e.printStackTrace();
-		}
-	
 	}
 	
 	public static void getAllCategories(JComboBox<String>  comboBoxCategory)
@@ -1105,7 +1216,11 @@ public class AdminWindow extends JFrame {
 			
 			while(rs.next())
 			{
-				categoriesWithRepresentative.add(rs.getString("category"));
+				if(!categoriesWithRepresentative.contains(rs.getString("category")) && !rs.getString("category").equals("all"))
+				{
+					categoriesWithRepresentative.add(rs.getString("category"));
+				}
+				
 			}			
 			
 			for(Product p : listProducts)
