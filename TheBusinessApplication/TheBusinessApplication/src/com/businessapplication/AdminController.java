@@ -1,5 +1,6 @@
 package com.businessapplication;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import twitter4j.TwitterException;
 
 public abstract class AdminController {	
 	public static int idUser = 1;
@@ -38,19 +41,26 @@ public abstract class AdminController {
 		return 0;
 	}
 	
-	public void addProduct(Product newProduct) {
+	public void addProduct(Product newProduct, boolean postOnSocial) {
 		try {		
+			
+			String name = newProduct.getName();
 			PreparedStatement pstmt = DBConnection.insertData
 									(" INSERT INTO allproducts (id_prod, name, category, price, quantity)" + " VALUES (?, ?, ?, ?, ?)");
 			pstmt.setInt(1, newProduct.getId());
-			pstmt.setString(2, newProduct.getName());
+			pstmt.setString(2, name);
 			pstmt.setString(3, newProduct.getCategory());
 			pstmt.setDouble(4, newProduct.getPrice());
 			pstmt.setInt(5, newProduct.getQuantity());
 				
 			pstmt.execute();
+			
+			if(postOnSocial) {
+				TwitterDriver.tweetOut("" + name + " now available in our stores! #newoffer #" + name.replaceAll("\\s", "").toLowerCase(), "newProduct");
+			}
+			
 	        
-		} catch (SQLException e) {
+		} catch (SQLException | IOException | TwitterException e) {
 			e.printStackTrace();
 		}	
 
