@@ -38,8 +38,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
 import com.toedter.calendar.JDateChooser;
+import javax.swing.JCheckBox;
 
 public class AdminWindow extends JFrame {
 
@@ -144,72 +144,72 @@ public class AdminWindow extends JFrame {
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "Add product", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(23, 150, 270, 272);
+		panel.setBounds(12, 150, 281, 272);
 		panelProducts.add(panel);
 		panel.setLayout(null);
 		
 		JLabel lblProductName = new JLabel("Product name:");
 		lblProductName.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblProductName.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblProductName.setBounds(0, 15, 122, 30);
+		lblProductName.setBounds(11, 15, 122, 30);
 		panel.add(lblProductName);
 		
 		textFieldProductName = new JTextField();
 		textFieldProductName.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textFieldProductName.setColumns(10);
-		textFieldProductName.setBounds(122, 17, 133, 26);
+		textFieldProductName.setBounds(134, 15, 133, 26);
 		panel.add(textFieldProductName);
 		
 		JLabel lblCategory = new JLabel("Category:");
 		lblCategory.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCategory.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblCategory.setBounds(10, 58, 112, 30);
+		lblCategory.setBounds(21, 58, 112, 30);
 		panel.add(lblCategory);
 		
 		JButton btnAddProduct = new JButton("Add");
 		btnAddProduct.setFont(new Font("Arial", Font.PLAIN, 20));
-		btnAddProduct.setBounds(55, 221, 133, 38);
+		btnAddProduct.setBounds(134, 221, 133, 38);
 		panel.add(btnAddProduct);
 		
-		JLabel lblNewCategory = new JLabel("New category:");
+		JLabel lblNewCategory = new JLabel("\"new category\":");
 		lblNewCategory.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewCategory.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblNewCategory.setBounds(0, 100, 122, 30);
+		lblNewCategory.setBounds(0, 100, 133, 30);
 		panel.add(lblNewCategory);
 		
 		textFieldNewCategory = new JTextField();
 		textFieldNewCategory.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textFieldNewCategory.setColumns(10);
-		textFieldNewCategory.setBounds(122, 100, 133, 26);
+		textFieldNewCategory.setBounds(134, 98, 133, 26);
 		panel.add(textFieldNewCategory);
 		
 		JComboBox comboBoxCategory = new JComboBox();
 		comboBoxCategory.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxCategory.setBounds(122, 58, 133, 26);
+		comboBoxCategory.setBounds(134, 56, 133, 26);
 		panel.add(comboBoxCategory);
 		
 		JLabel lblQuantity = new JLabel("Quantity:");
 		lblQuantity.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblQuantity.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblQuantity.setBounds(0, 139, 122, 30);
+		lblQuantity.setBounds(11, 139, 122, 30);
 		panel.add(lblQuantity);
 		
 		textFieldQuantity = new JTextField();
 		textFieldQuantity.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textFieldQuantity.setColumns(10);
-		textFieldQuantity.setBounds(122, 139, 133, 26);
+		textFieldQuantity.setBounds(134, 137, 133, 26);
 		panel.add(textFieldQuantity);
 		
 		textFieldPrice = new JTextField();
 		textFieldPrice.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textFieldPrice.setColumns(10);
-		textFieldPrice.setBounds(122, 178, 133, 26);
+		textFieldPrice.setBounds(134, 176, 133, 26);
 		panel.add(textFieldPrice);
 		
 		JLabel lblPrice = new JLabel("Price:");
 		lblPrice.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPrice.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblPrice.setBounds(0, 178, 122, 30);
+		lblPrice.setBounds(11, 178, 122, 30);
 		panel.add(lblPrice);
 		
 		JPanel panel_3 = new JPanel();
@@ -599,6 +599,17 @@ public class AdminWindow extends JFrame {
 				lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
 				lblMostProfitableCategory, lblNumberOfClients);
 		
+		JLabel lblTweet = new JLabel("Tweet:");
+		lblTweet.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblTweet.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblTweet.setBounds(0, 226, 71, 30);
+		panel.add(lblTweet);
+		
+		JCheckBox checkBoxTweet = new JCheckBox("");
+		checkBoxTweet.setFont(new Font("Sylfaen", Font.PLAIN, 46));
+		checkBoxTweet.setBounds(71, 226, 29, 33);
+		panel.add(checkBoxTweet);
+		
 		lblNumberOfProducts.setHorizontalAlignment(SwingConstants.LEFT);
 		lblNumberOfProducts.setFont(new Font("Arial", Font.PLAIN, 20));
 		lblNumberOfProducts.setBounds(48, 13, 323, 30);
@@ -704,7 +715,14 @@ public class AdminWindow extends JFrame {
 													      .price(Double.parseDouble((String) textFieldPrice.getText()))
 													      .build();
 					}
-					thisAdmin.addProduct(newProduct);
+					
+					if(checkBoxTweet.isSelected()) {
+						thisAdmin.addProduct(newProduct, true);
+					}
+					else {
+						thisAdmin.addProduct(newProduct, false);
+					}
+						
 					
 					JOptionPane.showMessageDialog(null, "Added [" + newProduct.getName() + ", x" + newProduct.getQuantity() + "]");
 					
