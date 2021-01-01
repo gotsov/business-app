@@ -1,6 +1,7 @@
 package com.twitterconnection;
 
 import java.io.File;
+
 import java.io.IOException;
 
 import twitter4j.*;

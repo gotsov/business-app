@@ -4,12 +4,18 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
 import com.businessapplication.Client;
 import com.businessapplication.Sale;
+import com.businessapplication.Client.Builder;
 import com.databaseconnection.DBConnection;
+
 import java.util.ArrayList;
+import java.util.Locale;
 
 public abstract class RepresentativeController {
 	
