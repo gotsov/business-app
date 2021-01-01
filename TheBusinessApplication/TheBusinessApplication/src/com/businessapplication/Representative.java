@@ -9,6 +9,8 @@ import java.text.ParseException;
 import java.util.Locale;
 
 import com.businessapplication.Representative.Builder;
+import com.databaseconnection.DBConnection;
+import com.rolecontrollers.RepresentativeController;
 
 public class Representative extends RepresentativeController{
 	

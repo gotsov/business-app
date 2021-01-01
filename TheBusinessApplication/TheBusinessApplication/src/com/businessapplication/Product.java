@@ -1,10 +1,10 @@
 package com.businessapplication;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Scanner;
 
-import com.businessapplication.OrderControl.Builder;
+import java.sql.SQLException;
+
+import com.databaseconnection.DBConnection;
 
 public class Product {
 	
@@ -85,21 +85,6 @@ public class Product {
 	public int getId() {
 		return id;
 	}
-	
-//	public static int getIdProductOfLast()
-//	{
-//		try {		
-//			ResultSet rs = DBConnection.getData(" SELECT id_prod FROM allproducts");
-//			while(rs.next())
-//			{
-//				idProduct = rs.getInt("id_prod");
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return idProduct;
-//	}
 
 	public void setId() {		
 		try {

@@ -1,6 +1,6 @@
 package com.businessapplication;
 
-import com.businessapplication.Admin.Builder;
+import com.rolecontrollers.AdminController;
 
 public class Admin extends AdminController{
 	private int id;
