@@ -85,6 +85,24 @@ public class Product {
 	public int getId() {
 		return id;
 	}
+<<<<<<< HEAD
+=======
+	
+//	public static int getIdProductOfLast()
+//	{
+//		try {		
+//			ResultSet rs = DBConnection.getData(" SELECT id_prod FROM allproducts");
+//			while(rs.next())
+//			{
+//				idProduct = rs.getInt("id_prod");
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return idProduct;
+//	}
+>>>>>>> b34b0072d621633b360bfa41a214ce1009287cca
 
 	public void setId() {		
 		try {
