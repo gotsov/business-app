@@ -1,10 +1,10 @@
 package com.businessapplication;
 
 import java.sql.ResultSet;
-
 import java.sql.SQLException;
+import java.util.Scanner;
 
-import com.databaseconnection.DBConnection;
+import com.businessapplication.OrderControl.Builder;
 
 public class Product {
 	
@@ -85,8 +85,6 @@ public class Product {
 	public int getId() {
 		return id;
 	}
-<<<<<<< HEAD
-=======
 	
 //	public static int getIdProductOfLast()
 //	{
@@ -102,7 +100,6 @@ public class Product {
 //		
 //		return idProduct;
 //	}
->>>>>>> b34b0072d621633b360bfa41a214ce1009287cca
 
 	public void setId() {		
 		try {
