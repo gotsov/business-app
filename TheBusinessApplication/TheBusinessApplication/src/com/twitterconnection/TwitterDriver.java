@@ -14,8 +14,7 @@ public class TwitterDriver {
 	{		
 		StatusUpdate status = new StatusUpdate(message);
 		
-		status.setMedia(new File("D:\\businessAppPhotos\\" + picToPost + ".jpg"));// BY SPECIFYING FILE PATH 
-		
+		status.setMedia(new File("D:\\businessAppPhotos\\" + picToPost + ".jpg"));
 		Status updateStatus = twitter.updateStatus(status);
 		
 		System.out.println("Successful: " + updateStatus.getText());

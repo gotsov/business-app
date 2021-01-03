@@ -75,6 +75,7 @@ public class AdminWindow extends JFrame {
 	private static int numberOfProducts;
 	private static int numberOfRepresentatives;
 	private static int numberOfSales;
+	private JTextField textFieldCategoryFilter;
 	
 	
 	/**
@@ -436,6 +437,9 @@ public class AdminWindow extends JFrame {
 			}
 		));
 		
+		tableProducts.setAutoCreateRowSorter(true);
+		tableProducts.getTableHeader().setReorderingAllowed(false);
+		
 		tableRepresentatives = new JTable();
 		scrollPane_1.setViewportView(tableRepresentatives);
 		tableRepresentatives.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -446,6 +450,9 @@ public class AdminWindow extends JFrame {
 				"id", "name", "username", "category", "sales", "profit (lv.)"
 			}
 		));
+		
+		tableRepresentatives.setAutoCreateRowSorter(true);
+		tableRepresentatives.getTableHeader().setReorderingAllowed(false);
 
 		tableAllSales = new JTable();
 		scrollPane_3.setViewportView(tableAllSales);
@@ -457,6 +464,9 @@ public class AdminWindow extends JFrame {
 				"id_sale", "email_client", "username_rep", "category", "product", "quantity", "price(lv.)", "date"
 			}
 		));
+		
+		tableAllSales.setAutoCreateRowSorter(true);
+		tableAllSales.getTableHeader().setReorderingAllowed(false);
 		
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
@@ -548,34 +558,34 @@ public class AdminWindow extends JFrame {
 		JPanel panel_9 = new JPanel();
 		panel_9.setLayout(null);
 		panel_9.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Filter by representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_9.setBounds(309, 258, 548, 129);
+		panel_9.setBounds(309, 223, 548, 84);
 		panel_2.add(panel_9);
 		
-		JLabel lblUsernameOfRepresentative = new JLabel("Username of representative to see sales:");
+		JLabel lblUsernameOfRepresentative = new JLabel("Usename:");
 		lblUsernameOfRepresentative.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblUsernameOfRepresentative.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblUsernameOfRepresentative.setBounds(0, 13, 350, 30);
+		lblUsernameOfRepresentative.setBounds(41, 13, 126, 30);
 		panel_9.add(lblUsernameOfRepresentative);
 		
 		JComboBox<String> comboBoxUsernames = new JComboBox();
 		comboBoxUsernames.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxUsernames.setBounds(353, 15, 139, 26);
+		comboBoxUsernames.setBounds(175, 15, 139, 26);
 		panel_9.add(comboBoxUsernames);
 		
-		JLabel lblEnterNameif = new JLabel("Enter name (select \"other\"):");
+		JLabel lblEnterNameif = new JLabel("If selected \"other\":");
 		lblEnterNameif.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEnterNameif.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblEnterNameif.setBounds(0, 47, 350, 30);
+		lblEnterNameif.setBounds(-27, 47, 194, 30);
 		panel_9.add(lblEnterNameif);
 		
 		textFieldRepUsername = new JTextField();
 		textFieldRepUsername.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textFieldRepUsername.setColumns(10);
-		textFieldRepUsername.setBounds(353, 49, 133, 26);
+		textFieldRepUsername.setBounds(175, 49, 133, 26);
 		panel_9.add(textFieldRepUsername);
 		
 		JButton btnFilterByRepresentative = new JButton("Filter");
-		btnFilterByRepresentative.setBounds(205, 84, 133, 38);
+		btnFilterByRepresentative.setBounds(371, 27, 133, 38);
 		panel_9.add(btnFilterByRepresentative);
 		btnFilterByRepresentative.setFont(new Font("Arial", Font.PLAIN, 20));
 		
@@ -595,15 +605,41 @@ public class AdminWindow extends JFrame {
 		JLabel lblMostSalesByProduct = new JLabel("Most sales by product: ");
 		JLabel lblRepresentativeWithMostSales = new JLabel("Representative with most sales: ");
 		JLabel lblTotalEarnings = new JLabel("Total earnings: ");
-		JLabel lblMostProfitableCategory = new JLabel("Most profitable category: ");
 		JLabel lblNumberOfClients = new JLabel("Number of clients: ");
 		
+		JPanel panel_11 = new JPanel();
+		panel_11.setLayout(null);
+		panel_11.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Filter by representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_11.setBounds(309, 338, 548, 84);
+		panel_2.add(panel_11);
 		
-		updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-				comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
-				lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-				lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-				lblMostProfitableCategory, lblNumberOfClients);
+		JLabel lblCategory_2 = new JLabel("Category:");
+		lblCategory_2.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblCategory_2.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblCategory_2.setBounds(41, 13, 126, 30);
+		panel_11.add(lblCategory_2);
+		
+		JComboBox<String> comboBoxCategoryFilter = new JComboBox();
+		comboBoxCategoryFilter.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		comboBoxCategoryFilter.setBounds(175, 15, 139, 26);
+		panel_11.add(comboBoxCategoryFilter);
+		
+		JLabel label_1 = new JLabel("If selected \"other\":");
+		label_1.setHorizontalAlignment(SwingConstants.RIGHT);
+		label_1.setFont(new Font("Arial", Font.PLAIN, 18));
+		label_1.setBounds(-27, 47, 194, 30);
+		panel_11.add(label_1);
+		
+		textFieldCategoryFilter = new JTextField();
+		textFieldCategoryFilter.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldCategoryFilter.setColumns(10);
+		textFieldCategoryFilter.setBounds(175, 49, 133, 26);
+		panel_11.add(textFieldCategoryFilter);
+		
+		JButton btnFilterByCategory = new JButton("Filter");
+		btnFilterByCategory.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnFilterByCategory.setBounds(371, 27, 133, 38);
+		panel_11.add(btnFilterByCategory);
 		
 		JLabel lblTweet = new JLabel("Tweet:");
 		lblTweet.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -630,52 +666,50 @@ public class AdminWindow extends JFrame {
 		
 		lblTotalNumberOfSales.setHorizontalAlignment(SwingConstants.LEFT);
 		lblTotalNumberOfSales.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblTotalNumberOfSales.setBounds(48, 85, 286, 30);
+		lblTotalNumberOfSales.setBounds(48, 171, 286, 30);
 		panel_10.add(lblTotalNumberOfSales);
 		
 		
 		lblMostSalesByCategory.setHorizontalAlignment(SwingConstants.LEFT);
 		lblMostSalesByCategory.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblMostSalesByCategory.setBounds(48, 186, 459, 30);
+		lblMostSalesByCategory.setBounds(48, 255, 459, 30);
 		panel_10.add(lblMostSalesByCategory);
 		
 		
 		lblMostSalesByProduct.setHorizontalAlignment(SwingConstants.LEFT);
 		lblMostSalesByProduct.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblMostSalesByProduct.setBounds(48, 225, 514, 30);
+		lblMostSalesByProduct.setBounds(48, 294, 514, 30);
 		panel_10.add(lblMostSalesByProduct);
 		
 		
 		lblRepresentativeWithMostSales.setHorizontalAlignment(SwingConstants.LEFT);
 		lblRepresentativeWithMostSales.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblRepresentativeWithMostSales.setBounds(48, 268, 418, 30);
+		lblRepresentativeWithMostSales.setBounds(48, 337, 418, 30);
 		panel_10.add(lblRepresentativeWithMostSales);
 		
 		
 		lblTotalEarnings.setHorizontalAlignment(SwingConstants.LEFT);
 		lblTotalEarnings.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblTotalEarnings.setBounds(48, 380, 374, 30);
-		panel_10.add(lblTotalEarnings);
-		
-		
-		lblMostProfitableCategory.setHorizontalAlignment(SwingConstants.LEFT);
-		lblMostProfitableCategory.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblMostProfitableCategory.setBounds(48, 342, 400, 30);
-		panel_10.add(lblMostProfitableCategory);
-		
+		lblTotalEarnings.setBounds(48, 128, 374, 30);
+		panel_10.add(lblTotalEarnings);	
 		
 		lblNumberOfClients.setHorizontalAlignment(SwingConstants.LEFT);
 		lblNumberOfClients.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblNumberOfClients.setBounds(48, 117, 459, 30);
+		lblNumberOfClients.setBounds(48, 90, 459, 30);
 		panel_10.add(lblNumberOfClients);
 		
 		
 		lblNumberOfCategories.setHorizontalAlignment(SwingConstants.LEFT);
 		lblNumberOfCategories.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblNumberOfCategories.setBounds(48, 149, 459, 30);
+		lblNumberOfCategories.setBounds(48, 218, 459, 30);
 		panel_10.add(lblNumberOfCategories);
 
 		
+		updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+				comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
+				lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+				lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+				lblNumberOfClients);
 		
 		mnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -742,10 +776,10 @@ public class AdminWindow extends JFrame {
 				textFieldPrice.setText("");
 						
 				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
 						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
 						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblMostProfitableCategory, lblNumberOfClients);
+						lblNumberOfClients);
 			}
 		});
 		
@@ -791,24 +825,18 @@ public class AdminWindow extends JFrame {
 				}
 				
 				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
 						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
 						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblMostProfitableCategory, lblNumberOfClients);
+						lblNumberOfClients);
 				
 			}
-		});
-		
+		});	
 
 		btnDeleteClient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				int id = Integer.parseInt((String)comboBoxIdProductToDelete.getSelectedItem());
-				
-				//throws null pointer exception when using builder
-				
-//				Product productToDelete = new Product.Builder().id(id)
-//															   .build();
 				
 				Product productToDelete = new Product(id);
 				
@@ -817,10 +845,10 @@ public class AdminWindow extends JFrame {
 				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
 				
 				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
 						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
 						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblMostProfitableCategory, lblNumberOfClients);
+						lblNumberOfClients);
 			}
 		});
 		
@@ -856,10 +884,10 @@ public class AdminWindow extends JFrame {
 																							+ "category: " + represenatativeToAdd.getCategory() + ".");
 				
 				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
 						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
 						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblMostProfitableCategory, lblNumberOfClients);
+						lblNumberOfClients);
 			}
 			
 		});
@@ -877,10 +905,10 @@ public class AdminWindow extends JFrame {
 				JOptionPane.showMessageDialog(null, "Representative with [id = " + represenatativeToDelete.getId() + "] has been deleted");
 				
 				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
 						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
 						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblMostProfitableCategory, lblNumberOfClients);
+						lblNumberOfClients);
 				
 			}
 		});
@@ -924,10 +952,10 @@ public class AdminWindow extends JFrame {
 				}
 				
 				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
 						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
 						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblMostProfitableCategory, lblNumberOfClients);
+						lblNumberOfClients);
 			}
 		});
 		
@@ -940,25 +968,13 @@ public class AdminWindow extends JFrame {
 	            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
 	            
 	            String dateStart = dateFormat.format(selectedStartDate);   
-	            String dateEnd = dateFormat.format(selectedEndDate);
+	            String dateEnd = dateFormat.format(selectedEndDate);	
 				
-				ArrayList<Sale> filteredByDateList = thisAdmin.filterSalesByDate(dateStart, dateEnd, listAllSales);
+	            listAllSales = thisAdmin.filterSalesByDate(dateStart, dateEnd, listAllSales);	         
 				
-				loadTableFiltered(filteredByDateList);
+				loadTableFiltered(listAllSales);
 			}
 		});
-		
-
-		btnRefresh.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames,
-						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblMostProfitableCategory, lblNumberOfClients);
-			}
-		});
-		
 		
 		btnFilterByRepresentative.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -972,22 +988,48 @@ public class AdminWindow extends JFrame {
 					username = (String)comboBoxUsernames.getSelectedItem();
 				}
 				
-				ArrayList<Sale> filteredByUsernameList = thisAdmin.filterSalesByRepresentativeUsername(listAllSales, username);
+				listAllSales = thisAdmin.filterSalesByCriteria(listAllSales, "username", username);
 				
-				loadTableFiltered(filteredByUsernameList);
+				loadTableFiltered(listAllSales);
 			}
 		});
 		
+		btnFilterByCategory.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				String category;
+			
+				if(comboBoxCategoryFilter.getSelectedItem().equals("other")) {
+					category = textFieldCategoryFilter.getText();
+				}
+				else {			
+					category = (String)comboBoxCategoryFilter.getSelectedItem();
+				}
+				
+				listAllSales = thisAdmin.filterSalesByCriteria(listAllSales, "category", category);
+				
+				loadTableFiltered(listAllSales);
+			}
+		});
+		
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
+						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+						lblNumberOfClients);
+			}
+		});
 		
 	}
 	
 	public static void updateTablesAndComboboxes(Admin thisAdmin, JComboBox<String> comboBoxIdProduct, JComboBox<String> comboBoxIdProductToDelete, 
 											JComboBox<String> comboBoxIdRepresentative, JComboBox<String> comboBoxIdRepresentativeToDelete,
-											JComboBox<String> comboBoxCategory, DefaultListModel<String> model, JComboBox<String> comboBoxUsernames,
-											JLabel lblNumberOfProducts, JLabel lblNumberOfRepresentatives,JLabel lblTotalNumberOfSales,
+											JComboBox<String> comboBoxCategory, DefaultListModel<String> model, JComboBox<String> comboBoxUsernamesFilter,
+											JComboBox<String> comboBoxCategoryFilter, JLabel lblNumberOfProducts, JLabel lblNumberOfRepresentatives,JLabel lblTotalNumberOfSales,
 											JLabel lblMostSalesByCategory, JLabel lblMostSalesByProduct, JLabel lblRepresentativeWithMostSales,
-											JLabel lblTotalEarnings, JLabel lblMostProfitableCategory, JLabel lblNumberOfClients, 
-											JLabel lblNumberOfCategories)
+											JLabel lblTotalEarnings, JLabel lblNumberOfClients, JLabel lblNumberOfCategories)
 	{
 		loadTablesAdmin();
 		fillComboBoxProductsId(comboBoxIdProduct);
@@ -997,7 +1039,7 @@ public class AdminWindow extends JFrame {
 		getAllCategories(comboBoxCategory);
 		findCategoriesWithNoRepresentative(model);
 		
-		fillComboBoxUsernames(comboBoxUsernames);
+		fillComboBoxFilters(comboBoxUsernamesFilter, comboBoxCategoryFilter);
 		
 		int numberOfCategories = categoriesWithRepresentative.size() + categoriesWithoutRepresentative.size();
 		String mostSalesByCategory = thisAdmin.getMostSalesByCriteria("category");
@@ -1014,7 +1056,6 @@ public class AdminWindow extends JFrame {
 		lblMostSalesByProduct.setText("Most sales by product: " + mostSalesByProduct);
 		lblRepresentativeWithMostSales.setText("Representative with most sales: " + mostSalesByRepresentative);
 		lblTotalEarnings.setText("Total profit: " + totalProfit + "lv.");
-		lblMostProfitableCategory.setText("Most profitable category: ");
 		lblNumberOfClients.setText("Number of clients: " + numberOfClients);
 		
 	}
@@ -1196,14 +1237,22 @@ public class AdminWindow extends JFrame {
 		
 	}
 	
-	public static void fillComboBoxUsernames(JComboBox<String> comboBoxUsernames)
+	public static void fillComboBoxFilters(JComboBox<String> comboBoxUsernamesFilter, JComboBox<String> comboBoxCategoriesFilter)
 	{
-		comboBoxUsernames.removeAllItems();
-		comboBoxUsernames.addItem("other");
+		comboBoxUsernamesFilter.removeAllItems();
+		comboBoxUsernamesFilter.addItem("other");
+		
+		comboBoxCategoriesFilter.removeAllItems();
+		comboBoxCategoriesFilter.addItem("other");
 		
 		for(Representative rep : listRepresentatives)
 		{
-			comboBoxUsernames.addItem(""+rep.getUsername());
+			comboBoxUsernamesFilter.addItem(""+rep.getUsername());
+		}
+		
+		for(String category : allCategories)
+		{
+			comboBoxCategoriesFilter.addItem(""+category);
 		}
 	}
 	

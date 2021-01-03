@@ -10,6 +10,7 @@ import java.util.Locale;
 
 import com.businessapplication.Representative.Builder;
 import com.databaseconnection.DBConnection;
+import com.emailconnection.EmailDriver;
 import com.rolecontrollers.RepresentativeController;
 
 public class Representative extends RepresentativeController{
@@ -170,8 +171,10 @@ public class Representative extends RepresentativeController{
 		System.out.println("What was the order (choose product by id)");
 		int ch;
 		
-		try{	        
-	        ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + newClient.getProductBought() + "'");
+		try{	    
+			String productName = newClient.getProductBought();
+			
+	        ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + productName + "'");
 			
 			int quantityOfProduct = 0;
 			int newQuantity;
@@ -189,7 +192,6 @@ public class Representative extends RepresentativeController{
 			NumberFormat formatter = new DecimalFormat("#0.00");
 			String formatedFullPrice = formatter.format(fullPriceOfSale);
 			
-			//using FRANCE because when using ROOT or getDefault the results are incorrect
 			NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
 			Number number = format.parse(formatedFullPrice);
 			fullPriceOfSale = number.doubleValue();
@@ -200,15 +202,22 @@ public class Representative extends RepresentativeController{
 			{
 				if(newClient.getQuantityBought() == quantityOfProduct)
 				{		
-					DBConnection.updateData( "DELETE FROM allproducts WHERE name = '" + newClient.getProductBought() + "'");
+					DBConnection.updateData( "DELETE FROM allproducts WHERE name = '" + productName + "'");
 					
 					System.out.println("This client bougth the last copy (product has been deleted).");
+					
+					EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product out of stock!", "'" + productName + "' is out of stock!\n\nThe last amounts where bought on "
+																		+ newClient.getDateOfSale() + ".\nYou might consider restocking.\n\nTheBusinessApp2021");
 				}
 				else
 				{
 					newQuantity = quantityOfProduct - newClient.getQuantityBought();
 					
-					DBConnection.updateData("UPDATE allproducts SET quantity = "+ newQuantity +" WHERE name = '"+ newClient.getProductBought() + "'");
+					DBConnection.updateData("UPDATE allproducts SET quantity = "+ newQuantity +" WHERE name = '"+ productName + "'");
+					
+					if(newQuantity <= 10) {
+						EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product running low!", "'" + productName + "' is running out of stock!\n\nYou might consider restocking.\n\nTheBusinessApp2021");
+					}
 					
 				}
 				

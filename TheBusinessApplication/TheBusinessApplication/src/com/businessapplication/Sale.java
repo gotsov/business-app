@@ -138,4 +138,13 @@ public class Sale {
 		return this.date;
 	}
 
+	@Override
+	public String toString() {
+		return "Sale [id=" + id + ", name=" + name + ", email=" + email + ", product=" + product + ", quantity="
+				+ quantity + ", price=" + price + ", date=" + date + ", representativeUsername="
+				+ representativeUsername + ", category=" + category + "]";
+	}
+	
+	
+
 }

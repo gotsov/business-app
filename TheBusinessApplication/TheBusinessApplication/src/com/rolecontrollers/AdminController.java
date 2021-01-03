@@ -183,99 +183,55 @@ public abstract class AdminController {
 	}
 	
 	public ArrayList<Sale> filterSalesByDate(String startDate, String endDate, ArrayList<Sale> listAllSales)
-	{
-		
+	{	
 		ArrayList<Sale> filteredByDateList = new ArrayList<>();
 		
-		try {			
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
-			
-			java.util.Date utilStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
-			
-			java.util.Date utilEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
-			
+		try {					
+			java.util.Date utilStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);			
+			java.util.Date utilEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);			
 	        Date dateToCompare;
-	        
-	        String name, email, product, representativeUsername, category;
-	        int id, quantity;
-	        double price;
-	        
-	        while(rs.next())
-	        {     	
-	        	id = rs.getInt("id_sale");
-	        	email = rs.getString("email");
-	        	product = rs.getString("product");
-	        	category = rs.getString("category");
-	        	quantity = rs.getInt("quantity");
-	        	price = rs.getDouble("price");
-	        	representativeUsername = rs.getString("representative_username");
-	        	dateToCompare = rs.getDate("date");
 	        	
-	        	if(dateToCompare.compareTo(utilStartDate) >= 0 && dateToCompare.compareTo(utilEndDate) <= 0)
-	        	{
-	        		Sale sale = new Sale.Builder().id(id)
-	        													  .email(email)
-	        													  .representativeUsername(representativeUsername)
-	        													  .category(category)
-	        													  .product(product)
-	        													  .quantity(quantity)
-	        													  .price(price)
-	        													  .date(dateToCompare)
-	        													  .build();
-	        		filteredByDateList.add(sale);
-	        	}
-	        }
-     
-		} catch (SQLException | ParseException e) {
+			for(Sale sale : listAllSales)
+			{
+				dateToCompare = sale.getDate();
+						
+				if(dateToCompare.compareTo(utilStartDate) >= 0 && dateToCompare.compareTo(utilEndDate) <= 0) {
+					filteredByDateList.add(sale);    
+				}
+			}
+		} catch ( ParseException e) {
 			e.printStackTrace();
 		}
 		
 		return filteredByDateList;
 	}
 
-	public ArrayList<Sale> filterSalesByRepresentativeUsername(ArrayList<Sale> listAllSales, String username)
+	public ArrayList<Sale> filterSalesByCriteria(ArrayList<Sale> listAllSales, String criteria, String variable)
 	{
-		ArrayList<Sale> filteredByUsernameList = new ArrayList<>();
+		System.out.println("im in filter");
+		System.out.println("criteria = " + criteria);
+		ArrayList<Sale> filteredList = new ArrayList<>();
 		
-		try {			
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
-					
-	        Date date;
-	        String name, email, product, representativeUsername, category;
-	        int id, quantity;
-	        double price;
-	        
-			while(rs.next())
-	        {     	
-	        	id = rs.getInt("id_sale");
-	        	email = rs.getString("email");
-	        	product = rs.getString("product");
-	        	category = rs.getString("category");
-	        	quantity = rs.getInt("quantity");
-	        	price = rs.getDouble("price");
-	        	representativeUsername = rs.getString("representative_username");
-	        	date = rs.getDate("date");
-	        	
-	        	if(representativeUsername.equals(username))
-	        	{
-	        		Sale sale = new Sale.Builder().id(id)
-	        													  .email(email)
-	        													  .representativeUsername(representativeUsername)
-	        													  .category(category)
-	        													  .product(product)
-	        													  .quantity(quantity)
-	        													  .price(price)
-	        													  .date(date)
-	        													  .build();
-	        		filteredByUsernameList.add(sale);
+		if(criteria.equals("username")) {
+			for(Sale sale : listAllSales)
+			{
+				if(sale.getRepresentativeUsername().equals(variable)) {
+	        		filteredList.add(sale);
 	        	}
-	        }
- 
-		} catch (SQLException e) {
-			e.printStackTrace();
+			}
+		}
+		else if(criteria.equals("category")) {
+			System.out.println("equals category");
+			for(Sale sale : listAllSales)
+			{
+				if(sale.getCategory().equals(variable)) {
+					System.out.println("added");
+	        		filteredList.add(sale);
+	        	}
+			}
 		}
 		
-		return filteredByUsernameList;
+		return filteredList;
 	}
 	
 	

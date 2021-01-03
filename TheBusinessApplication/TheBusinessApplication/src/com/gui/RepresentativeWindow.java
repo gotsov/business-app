@@ -88,9 +88,20 @@ public class RepresentativeWindow extends JFrame {
 		userMenu.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		menuBar.add(userMenu);
 		
+		JMenuItem mnChangePassword = new JMenuItem("Change password");
+		mnChangePassword.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		userMenu.add(mnChangePassword);
+		
 		JMenuItem mnLogout = new JMenuItem("Log out");
 		mnLogout.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		userMenu.add(mnLogout);
+		
+				
+				mnLogout.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						setVisible(false);
+					}
+				});
 		getContentPane().setLayout(null);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -114,6 +125,10 @@ public class RepresentativeWindow extends JFrame {
 				return columnTypes[columnIndex];
 			}
 		});
+		
+		tableCatalog.setAutoCreateRowSorter(true);
+		tableCatalog.getTableHeader().setReorderingAllowed(false);
+		
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
 		tableCatalog.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
@@ -155,6 +170,9 @@ public class RepresentativeWindow extends JFrame {
 				return columnTypes[columnIndex];
 			}
 		});
+		
+		tableClients.setAutoCreateRowSorter(true);
+		tableClients.getTableHeader().setReorderingAllowed(false);
 		
 		TableColumnModel columnModel2 = tableClients.getColumnModel();
 		
@@ -352,13 +370,6 @@ public class RepresentativeWindow extends JFrame {
 		btnAddClient.setFont(new Font("Arial", Font.PLAIN, 20));
 		btnAddClient.setBounds(119, 166, 144, 48);
 		panel_2.add(btnAddClient);
-
-		
-		mnLogout.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				setVisible(false);
-			}
-		});
 		
 		updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 		
@@ -399,19 +410,45 @@ public class RepresentativeWindow extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				java.util.Date selectedDate = dateChooser.getDate();
 	            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
-	            String date = dateFormat.format(selectedDate);      
+	            String date = dateFormat.format(selectedDate); 
+	            
+	            String boughtProduct = (String)comboBoxBoughtProduct.getSelectedItem();
+	            int quantityBought = Integer.parseInt((String) comboBoxQuantity.getSelectedItem());
+				Client newClient = null;
 				
-	            Client newClient = new Client.Builder().name(txtFieldClientName.getText())
-	            									   .email(txtFieldClientEmail.getText())
-	            									   .productBought((String)comboBoxBoughtProduct.getSelectedItem())
-	            									   .categoryOfProductBought(category)
-	            									   .quantityBought(Integer.parseInt((String) comboBoxQuantity.getSelectedItem()))
-	            									   .dateOfSale(date)
-	            									   .build();
-	
-	             
-	            thisRepresentative.addSale(newClient);		
-				
+	            if(category.equals("all")) {
+	            	
+	            	try {
+	            		ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + boughtProduct + "'");
+		            	rs.next();
+		            	
+		            	newClient = new Client.Builder().name(txtFieldClientName.getText())
+								   .email(txtFieldClientEmail.getText())
+								   .productBought(boughtProduct)
+								   .categoryOfProductBought(rs.getString("category"))
+								   .quantityBought(quantityBought)
+								   .dateOfSale(date)
+								   .build();
+		            	
+		            	thisRepresentative.addSale(newClient);	
+		            	
+	            	} catch(SQLException e) {
+	            		e.printStackTrace();
+	            	}
+	            	
+	            	
+	            } else {
+	            	newClient = new Client.Builder().name(txtFieldClientName.getText())
+							   .email(txtFieldClientEmail.getText())
+							   .productBought(boughtProduct)
+							   .categoryOfProductBought(category)
+							   .quantityBought(quantityBought)
+							   .dateOfSale(date)
+							   .build();
+	            	
+	            	thisRepresentative.addSale(newClient);	
+	            }
+
 				if(newClient.isFirstTimeClient())
 				{
 					JOptionPane.showMessageDialog(null, "Client [" + newClient.getName() + ", " + newClient.getEmail() 
@@ -645,8 +682,6 @@ public class RepresentativeWindow extends JFrame {
 	
 	public void fillComboBoxProducts(JComboBox<String> comboBoxBoughtProduct)
 	{
-		
-		// clears comboBox before updating it
 		comboBoxBoughtProduct.removeAllItems();
 		try
 		{     
@@ -749,7 +784,6 @@ public class RepresentativeWindow extends JFrame {
 			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.username + "'");
 			rs.next();
 			
-			System.out.println("rs.getDouble(\"profit\") = " + rs.getDouble("profit"));
 			return rs.getDouble("profit");
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -757,5 +791,4 @@ public class RepresentativeWindow extends JFrame {
 		
 		return 0;
 	}
-
 }

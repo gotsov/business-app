@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import com.databaseconnection.DBConnection;
+import com.emailconnection.EmailDriver;
 
 import twitter4j.TwitterException;
 
@@ -35,7 +36,7 @@ public class LoginWindow extends JFrame {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
-			public void run() {
+			public void run() {				
 				try {
 					JPanel panel = new JPanel();
 					LoginWindow frame = new LoginWindow();
