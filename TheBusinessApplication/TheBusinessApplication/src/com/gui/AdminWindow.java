@@ -1,15 +1,18 @@
 package com.gui;
 
 import java.awt.BorderLayout;
+import java.lang.Object;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -20,6 +23,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+
+import org.jfree.data.general.DefaultPieDataset;
 
 import javax.swing.JScrollPane;
 import javax.swing.JMenuBar;
@@ -46,6 +51,16 @@ import com.businessapplication.Product.Builder;
 import com.databaseconnection.DBConnection;
 import com.toedter.calendar.JDateChooser;
 import javax.swing.JCheckBox;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import net.miginfocom.swing.MigLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormSpecs;
+import com.jgoodies.forms.layout.RowSpec;
 
 public class AdminWindow extends JFrame {
 
@@ -595,21 +610,10 @@ public class AdminWindow extends JFrame {
 		
 		JPanel panel_10 = new JPanel();
 		tabbedPane.addTab("Stats", null, panel_10, null);
-		panel_10.setLayout(null);
-		
-		JLabel lblNumberOfProducts = new JLabel("Number of products: ");
-		JLabel lblNumberOfRepresentatives = new JLabel("Number of representatives: ");
-		JLabel lblTotalNumberOfSales = new JLabel("Total number of sales: ");
-		JLabel lblMostSalesByCategory = new JLabel("Most sales by category: ");
-		JLabel lblNumberOfCategories = new JLabel("Number of categories: ");
-		JLabel lblMostSalesByProduct = new JLabel("Most sales by product: ");
-		JLabel lblRepresentativeWithMostSales = new JLabel("Representative with most sales: ");
-		JLabel lblTotalEarnings = new JLabel("Total earnings: ");
-		JLabel lblNumberOfClients = new JLabel("Number of clients: ");
 		
 		JPanel panel_11 = new JPanel();
 		panel_11.setLayout(null);
-		panel_11.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Filter by representative", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_11.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Filter by category", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel_11.setBounds(309, 338, 548, 84);
 		panel_2.add(panel_11);
 		
@@ -651,69 +655,155 @@ public class AdminWindow extends JFrame {
 		checkBoxTweet.setFont(new Font("Sylfaen", Font.PLAIN, 46));
 		checkBoxTweet.setBounds(71, 226, 29, 33);
 		panel.add(checkBoxTweet);
-		
-		lblNumberOfProducts.setHorizontalAlignment(SwingConstants.LEFT);
-		lblNumberOfProducts.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblNumberOfProducts.setBounds(48, 13, 323, 30);
-		panel_10.add(lblNumberOfProducts);
-		
-		
-		lblNumberOfRepresentatives.setHorizontalAlignment(SwingConstants.LEFT);
-		lblNumberOfRepresentatives.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblNumberOfRepresentatives.setBounds(48, 47, 374, 30);
-		panel_10.add(lblNumberOfRepresentatives);
-		
-		
-		lblTotalNumberOfSales.setHorizontalAlignment(SwingConstants.LEFT);
-		lblTotalNumberOfSales.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblTotalNumberOfSales.setBounds(48, 171, 286, 30);
-		panel_10.add(lblTotalNumberOfSales);
-		
-		
-		lblMostSalesByCategory.setHorizontalAlignment(SwingConstants.LEFT);
-		lblMostSalesByCategory.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblMostSalesByCategory.setBounds(48, 255, 459, 30);
-		panel_10.add(lblMostSalesByCategory);
-		
-		
-		lblMostSalesByProduct.setHorizontalAlignment(SwingConstants.LEFT);
-		lblMostSalesByProduct.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblMostSalesByProduct.setBounds(48, 294, 514, 30);
-		panel_10.add(lblMostSalesByProduct);
-		
-		
-		lblRepresentativeWithMostSales.setHorizontalAlignment(SwingConstants.LEFT);
-		lblRepresentativeWithMostSales.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblRepresentativeWithMostSales.setBounds(48, 337, 418, 30);
-		panel_10.add(lblRepresentativeWithMostSales);
-		
-		
-		lblTotalEarnings.setHorizontalAlignment(SwingConstants.LEFT);
-		lblTotalEarnings.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblTotalEarnings.setBounds(48, 128, 374, 30);
-		panel_10.add(lblTotalEarnings);	
-		
-		lblNumberOfClients.setHorizontalAlignment(SwingConstants.LEFT);
-		lblNumberOfClients.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblNumberOfClients.setBounds(48, 90, 459, 30);
-		panel_10.add(lblNumberOfClients);
-		
-		
-		lblNumberOfCategories.setHorizontalAlignment(SwingConstants.LEFT);
-		lblNumberOfCategories.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblNumberOfCategories.setBounds(48, 218, 459, 30);
-		panel_10.add(lblNumberOfCategories);
-
-		
-		updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-				comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-				lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-				lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-				lblNumberOfClients);
-		
+				GridBagLayout gbl_panel_10 = new GridBagLayout();
+				gbl_panel_10.columnWidths = new int[]{42, 553, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+				gbl_panel_10.rowHeights = new int[]{20, 40, 40, 40, 40, 40, 40, 40, 40, 72, 0};
+				gbl_panel_10.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+				gbl_panel_10.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+				panel_10.setLayout(gbl_panel_10);
+								
+								JLabel lblNumberOfProducts = new JLabel("Number of products: ");
+								
+								lblNumberOfProducts.setHorizontalAlignment(SwingConstants.LEFT);
+								lblNumberOfProducts.setFont(new Font("Arial", Font.PLAIN, 20));
+								GridBagConstraints gbc_lblNumberOfProducts = new GridBagConstraints();
+								gbc_lblNumberOfProducts.anchor = GridBagConstraints.WEST;
+								gbc_lblNumberOfProducts.fill = GridBagConstraints.VERTICAL;
+								gbc_lblNumberOfProducts.insets = new Insets(0, 0, 5, 5);
+								gbc_lblNumberOfProducts.gridx = 1;
+								gbc_lblNumberOfProducts.gridy = 1;
+								panel_10.add(lblNumberOfProducts, gbc_lblNumberOfProducts);
+						JLabel lblNumberOfRepresentatives = new JLabel("Number of representatives: ");
+						
+						
+						lblNumberOfRepresentatives.setHorizontalAlignment(SwingConstants.LEFT);
+						lblNumberOfRepresentatives.setFont(new Font("Arial", Font.PLAIN, 20));
+						GridBagConstraints gbc_lblNumberOfRepresentatives = new GridBagConstraints();
+						gbc_lblNumberOfRepresentatives.anchor = GridBagConstraints.WEST;
+						gbc_lblNumberOfRepresentatives.fill = GridBagConstraints.VERTICAL;
+						gbc_lblNumberOfRepresentatives.insets = new Insets(0, 0, 5, 5);
+						gbc_lblNumberOfRepresentatives.gridx = 1;
+						gbc_lblNumberOfRepresentatives.gridy = 2;
+						panel_10.add(lblNumberOfRepresentatives, gbc_lblNumberOfRepresentatives);
+				JLabel lblNumberOfClients = new JLabel("Number of clients: ");
+				
+				lblNumberOfClients.setHorizontalAlignment(SwingConstants.LEFT);
+				lblNumberOfClients.setFont(new Font("Arial", Font.PLAIN, 20));
+				GridBagConstraints gbc_lblNumberOfClients = new GridBagConstraints();
+				gbc_lblNumberOfClients.fill = GridBagConstraints.BOTH;
+				gbc_lblNumberOfClients.insets = new Insets(0, 0, 5, 5);
+				gbc_lblNumberOfClients.gridx = 1;
+				gbc_lblNumberOfClients.gridy = 3;
+				panel_10.add(lblNumberOfClients, gbc_lblNumberOfClients);
+								JLabel lblTotalEarnings = new JLabel("Total earnings: ");
+								
+								
+								lblTotalEarnings.setHorizontalAlignment(SwingConstants.LEFT);
+								lblTotalEarnings.setFont(new Font("Arial", Font.PLAIN, 20));
+								GridBagConstraints gbc_lblTotalEarnings = new GridBagConstraints();
+								gbc_lblTotalEarnings.fill = GridBagConstraints.BOTH;
+								gbc_lblTotalEarnings.insets = new Insets(0, 0, 5, 5);
+								gbc_lblTotalEarnings.gridx = 1;
+								gbc_lblTotalEarnings.gridy = 4;
+								panel_10.add(lblTotalEarnings, gbc_lblTotalEarnings);
+						JLabel lblTotalNumberOfSales = new JLabel("Total number of sales: ");
+						
+								
+								
+								
+								lblTotalNumberOfSales.setHorizontalAlignment(SwingConstants.LEFT);
+								lblTotalNumberOfSales.setFont(new Font("Arial", Font.PLAIN, 20));
+								GridBagConstraints gbc_lblTotalNumberOfSales = new GridBagConstraints();
+								gbc_lblTotalNumberOfSales.anchor = GridBagConstraints.WEST;
+								gbc_lblTotalNumberOfSales.fill = GridBagConstraints.VERTICAL;
+								gbc_lblTotalNumberOfSales.insets = new Insets(0, 0, 5, 5);
+								gbc_lblTotalNumberOfSales.gridx = 1;
+								gbc_lblTotalNumberOfSales.gridy = 5;
+								panel_10.add(lblTotalNumberOfSales, gbc_lblTotalNumberOfSales);
+						JLabel lblNumberOfCategories = new JLabel("Number of categories: ");
+						
+						
+						lblNumberOfCategories.setHorizontalAlignment(SwingConstants.LEFT);
+						lblNumberOfCategories.setFont(new Font("Arial", Font.PLAIN, 20));
+						GridBagConstraints gbc_lblNumberOfCategories = new GridBagConstraints();
+						gbc_lblNumberOfCategories.fill = GridBagConstraints.BOTH;
+						gbc_lblNumberOfCategories.insets = new Insets(0, 0, 5, 5);
+						gbc_lblNumberOfCategories.gridx = 1;
+						gbc_lblNumberOfCategories.gridy = 6;
+						panel_10.add(lblNumberOfCategories, gbc_lblNumberOfCategories);
+						JLabel lblMostSalesByCategory = new JLabel("Most sales by category: ");
+						
+						
+						lblMostSalesByCategory.setHorizontalAlignment(SwingConstants.LEFT);
+						lblMostSalesByCategory.setFont(new Font("Arial", Font.PLAIN, 20));
+						GridBagConstraints gbc_lblMostSalesByCategory = new GridBagConstraints();
+						gbc_lblMostSalesByCategory.fill = GridBagConstraints.BOTH;
+						gbc_lblMostSalesByCategory.insets = new Insets(0, 0, 5, 5);
+						gbc_lblMostSalesByCategory.gridx = 1;
+						gbc_lblMostSalesByCategory.gridy = 7;
+						panel_10.add(lblMostSalesByCategory, gbc_lblMostSalesByCategory);
+						JLabel lblMostSalesByProduct = new JLabel("Most sales by product: ");
+						
+						
+						lblMostSalesByProduct.setHorizontalAlignment(SwingConstants.LEFT);
+						lblMostSalesByProduct.setFont(new Font("Arial", Font.PLAIN, 20));
+						GridBagConstraints gbc_lblMostSalesByProduct = new GridBagConstraints();
+						gbc_lblMostSalesByProduct.fill = GridBagConstraints.BOTH;
+						gbc_lblMostSalesByProduct.insets = new Insets(0, 0, 5, 5);
+						gbc_lblMostSalesByProduct.gridx = 1;
+						gbc_lblMostSalesByProduct.gridy = 8;
+						panel_10.add(lblMostSalesByProduct, gbc_lblMostSalesByProduct);
+				
+						
+						
+						JLabel lblRepresentativeWithMostSales = new JLabel("Representative with most sales: ");
+						
+						
+						lblRepresentativeWithMostSales.setHorizontalAlignment(SwingConstants.LEFT);
+						lblRepresentativeWithMostSales.setFont(new Font("Arial", Font.PLAIN, 20));
+						GridBagConstraints gbc_lblRepresentativeWithMostSales = new GridBagConstraints();
+						gbc_lblRepresentativeWithMostSales.insets = new Insets(0, 0, 0, 5);
+						gbc_lblRepresentativeWithMostSales.fill = GridBagConstraints.BOTH;
+						gbc_lblRepresentativeWithMostSales.gridx = 1;
+						gbc_lblRepresentativeWithMostSales.gridy = 9;
+						panel_10.add(lblRepresentativeWithMostSales, gbc_lblRepresentativeWithMostSales);
+						
+						updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
+								comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
+								lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
+								lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
+								lblNumberOfClients);
+						
+						JButton btnPieChart = new JButton("Pie chart");
+						btnPieChart.setFont(new Font("Arial", Font.PLAIN, 26));
+						GridBagConstraints gbc_btnPieChart = new GridBagConstraints();
+						gbc_btnPieChart.insets = new Insets(0, 0, 0, 5);
+						gbc_btnPieChart.gridx = 2;
+						gbc_btnPieChart.gridy = 9;
+						panel_10.add(btnPieChart, gbc_btnPieChart);
+						
+						JPanel panel_12 = new JPanel();
+						tabbedPane.addTab("New tab", null, panel_12, null);
+						panel_12.setLayout(null);
+				
 		mnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				setVisible(false);
+			}
+		});
+		
+		btnPieChart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				DefaultPieDataset pieDataset = new DefaultPieDataset();
+				
+				HashMap<String, Integer> data = thisAdmin.getHashMapSalesByCategory();
+				
+				for (HashMap.Entry<String, Integer> entry : data.entrySet()) {
+					//pieDataset.setValue(entry.getKey(), entry.getValue());
+					
+					System.out.println(entry.getKey() + " - " + entry.getValue());
+				}
+				
 			}
 		});
 		
@@ -1014,6 +1104,7 @@ public class AdminWindow extends JFrame {
 		
 		btnRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
 				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
 						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
 						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
@@ -1064,8 +1155,7 @@ public class AdminWindow extends JFrame {
 	
 	public static void loadTablesAdmin()
 	{
-		try
-		{
+		try(Connection con = DBConnection.getCon()){
 			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel(); 
 			DefaultTableModel modelRepresentatives = (DefaultTableModel)tableRepresentatives.getModel(); 
 			DefaultTableModel modelAllSales = (DefaultTableModel)tableAllSales.getModel();
@@ -1204,7 +1294,7 @@ public class AdminWindow extends JFrame {
 	
 	public static void getAllCategories(JComboBox<String>  comboBoxCategory)
 	{
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
 				
 			String category;
@@ -1270,12 +1360,13 @@ public class AdminWindow extends JFrame {
 	public static void fillComboBoxCategory(JComboBox<String> comboBoxCategory)
 	{	
 		comboBoxCategory.removeAllItems();
+		
+		comboBoxCategory.addItem("new category");
+		
 		for(String category : allCategories)
 		{
 			comboBoxCategory.addItem(category);
 		}
-		
-		comboBoxCategory.addItem("new category");
 		
 	}
 	
@@ -1284,7 +1375,7 @@ public class AdminWindow extends JFrame {
 		model.clear();
 		categoriesWithoutRepresentative.clear();
 		categoriesWithRepresentative.clear();
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
 			
 			while(rs.next())
@@ -1313,6 +1404,5 @@ public class AdminWindow extends JFrame {
 			e.printStackTrace();
 		}
 		
-
 	}
 }

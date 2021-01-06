@@ -206,8 +206,16 @@ public class Representative extends RepresentativeController{
 					
 					System.out.println("This client bougth the last copy (product has been deleted).");
 					
-					EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product out of stock!", "'" + productName + "' is out of stock!\n\nThe last amounts where bought on "
-																		+ newClient.getDateOfSale() + ".\nYou might consider restocking.\n\nTheBusinessApp2021");
+					Thread th = new Thread( new Runnable(){
+
+						public void run() {
+							EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product out of stock!", "'" + productName + "' is out of stock!\n\nThe last amounts where bought on "
+									+ newClient.getDateOfSale() + ".\nYou might consider restocking.\n\nTheBusinessApp2021");
+						}	
+					});
+					
+					th.start();
+
 				}
 				else
 				{
@@ -216,7 +224,16 @@ public class Representative extends RepresentativeController{
 					DBConnection.updateData("UPDATE allproducts SET quantity = "+ newQuantity +" WHERE name = '"+ productName + "'");
 					
 					if(newQuantity <= 10) {
-						EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product running low!", "'" + productName + "' is running out of stock!\n\nYou might consider restocking.\n\nTheBusinessApp2021");
+						
+						Thread th = new Thread( new Runnable(){
+
+							public void run() {
+								EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product running low!", "'" + productName + "' is running out of stock!\n\nYou might consider restocking.\n\nTheBusinessApp2021");
+							}	
+						});
+						
+						th.start();
+							
 					}
 					
 				}

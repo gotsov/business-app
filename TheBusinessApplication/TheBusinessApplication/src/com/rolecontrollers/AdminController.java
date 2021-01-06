@@ -1,6 +1,7 @@
 package com.rolecontrollers;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,16 +18,20 @@ import com.businessapplication.Representative;
 import com.businessapplication.Sale;
 import com.twitterconnection.TwitterDriver;
 import com.databaseconnection.DBConnection;
+import com.emailconnection.EmailDriver;
+import com.login.UserController;
 
 import twitter4j.TwitterException;
 
 public abstract class AdminController {	
 	public static int idUser = 1;
 	
+	public HashMap<String, Integer> categoriesHash = new HashMap<>();
+	
 	//will be used when adding new admins to users table
 	public int getIdUser()
 	{
-		try {	
+		try(Connection con = DBConnection.getCon()) {	
 			ResultSet rs = DBConnection.getData(" SELECT id_user FROM users");
 					
 			while(rs.next())
@@ -48,7 +53,7 @@ public abstract class AdminController {
 	}
 	
 	public void addProduct(Product newProduct, boolean postOnSocial) {
-		try {		
+		try (Connection con = DBConnection.getCon()){		
 			
 			String name = newProduct.getName();
 			PreparedStatement pstmt = DBConnection.insertData
@@ -62,11 +67,23 @@ public abstract class AdminController {
 			pstmt.execute();
 			
 			if(postOnSocial) {
-				TwitterDriver.tweetOut("" + name + " now available in our stores! #newoffer #" + name.replaceAll("\\s", "").toLowerCase(), "newProduct");
-			}
+				Thread th = new Thread( new Runnable(){
+
+					public void run() {
+						try {
+							TwitterDriver.tweetOut("" + name + " now available in our stores! #newoffer #" + name.replaceAll("\\s", "").toLowerCase(), "newProduct");
+						} catch (IOException | TwitterException e) {
+							e.printStackTrace();
+						}
+	
+					}	
+				});
+				
+				th.start();
 			
-	        
-		} catch (SQLException | IOException | TwitterException e) {
+			}
+			       
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}	
 
@@ -75,7 +92,7 @@ public abstract class AdminController {
 	
 	public void deleteProduct(Product productToDelete)
 	{
-		try {		
+		try (Connection con = DBConnection.getCon()){		
 			DBConnection.updateData("DELETE FROM allproducts WHERE id_prod = " + productToDelete.getId());
 	        
 		} catch (SQLException e) {
@@ -87,7 +104,7 @@ public abstract class AdminController {
 	
 	public void editFieldProduct(Product productToEdit, String fieldToEdit) {
 		
-		try {			
+		try (Connection con = DBConnection.getCon()){			
 			if(fieldToEdit.equals("name")) {
 				DBConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = '" + productToEdit.getName() + "' WHERE id_prod = " + productToEdit.getId());
 			}
@@ -110,7 +127,7 @@ public abstract class AdminController {
 	
 	public void addRepresentative(Representative representativeToAdd)
 	{
-		try {		
+		try(Connection con = DBConnection.getCon()) {		
 			PreparedStatement pstmt = DBConnection.insertData
 									(" INSERT INTO allrepresentatives (id_rep, name, username, category, numberofsales, profit) VALUES (?, ?, ?, ?, ?, ?)");
 			pstmt.setInt(1, representativeToAdd.getId());
@@ -122,17 +139,8 @@ public abstract class AdminController {
 				
 			pstmt.execute();
 			
-			pstmt = DBConnection.insertData
-					(" INSERT INTO users (id_user, usertype, name, username, password, category) VALUES (?, ?, ?, ?, ?, ?)");
-			
-			pstmt.setInt(1, representativeToAdd.getId());
-			pstmt.setString(2, "representative");
-			pstmt.setString(3, representativeToAdd.getName());
-			pstmt.setString(4, representativeToAdd.getUsername());
-			pstmt.setString(5, "1234");                                     //sets default password to 1234
-			pstmt.setString(6, representativeToAdd.getCategory());
-			
-			pstmt.execute();
+			UserController.addUser(representativeToAdd.getId(), "representative", representativeToAdd.getName(), representativeToAdd.getUsername(),
+									"1234", representativeToAdd.getCategory());
 	        
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -143,7 +151,7 @@ public abstract class AdminController {
 	
 	public void deleteRepresentative(Representative representativeToDelete)
 	{
-		try {		
+		try(Connection con = DBConnection.getCon()) {		
 			DBConnection.updateData("DELETE FROM allrepresentatives WHERE id_rep = " + representativeToDelete.getId());
 			DBConnection.updateData("DELETE FROM users WHERE id_user = " + representativeToDelete.getId());
 	        
@@ -159,7 +167,7 @@ public abstract class AdminController {
 		System.out.println("representativeToEdit = " + representativeToEdit);
 		System.out.println("fieldToEdit = " + fieldToEdit);
 		
-		try {			
+		try(Connection con = DBConnection.getCon()) {			
 			if(fieldToEdit.equals("name")) {
 				DBConnection.updateData("UPDATE allrepresentatives SET " + fieldToEdit + " = '" + representativeToEdit.getName() + "' WHERE id_rep = " + representativeToEdit.getId());
 				DBConnection.updateData("UPDATE users SET " + fieldToEdit + " = '" + representativeToEdit.getName() + "' WHERE id_user = " + representativeToEdit.getId());
@@ -234,15 +242,53 @@ public abstract class AdminController {
 		return filteredList;
 	}
 	
+	public HashMap<String, Integer> getHashMapSalesByCategory()
+	{
+		categoriesHash.clear();
+		String mostFrequentCriteria = "";
+		int numSales = 0;
+
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
+			String result;
+			while(rs.next())
+			{
+				result = rs.getString("category");
+				
+				if(categoriesHash.containsKey(result)) {
+					categoriesHash.put(result, categoriesHash.get(result) + 1);
+				}
+				else {
+					categoriesHash.put(result, 1);
+				}
+			}
+			
+			Set<Map.Entry<String, Integer> > set = categoriesHash.entrySet();
+			
+			
+			for(Map.Entry<String, Integer> me : set)
+			{
+				if(me.getValue() > numSales)	{
+					numSales = me.getValue();
+					mostFrequentCriteria = me.getKey();
+				}
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return this.categoriesHash;
+	}
 	
 	public String getMostSalesByCriteria(String criteria)
 	{
+		categoriesHash.clear();
 		String mostFrequentCriteria = "";
 		int numSales = 0;
-		
-		HashMap<String, Integer> categoriesHash = new HashMap<>();
-		
-		try {
+
+		try(Connection con = DBConnection.getCon()) {
 			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
 			String result;
 			while(rs.next())
@@ -280,7 +326,7 @@ public abstract class AdminController {
 	{
 		int numOfClients = 0;
 		
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			ResultSet rs = DBConnection.getData("SELECT COUNT(*) from allclients");
 			rs.next();
 			
@@ -297,7 +343,7 @@ public abstract class AdminController {
 	{
 		double totalProfit = 0;
 		
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			ResultSet rs = DBConnection.getData("SELECT * from allsales");
 			
 			while(rs.next())

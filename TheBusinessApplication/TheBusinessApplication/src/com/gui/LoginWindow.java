@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.databaseconnection.DBConnection;
 import com.emailconnection.EmailDriver;
+import com.login.Hasher;
 
 import twitter4j.TwitterException;
 
@@ -21,8 +22,10 @@ import javax.swing.JButton;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.awt.event.ActionEvent;
 
 public class LoginWindow extends JFrame {
@@ -35,6 +38,7 @@ public class LoginWindow extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {				
 				try {
@@ -92,8 +96,11 @@ public class LoginWindow extends JFrame {
 		
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				
 		
-				loginCheck();					
+				loginCheckWithHash();	
+				//loginCheck();
 			}	
 		});
 			
@@ -101,7 +108,7 @@ public class LoginWindow extends JFrame {
 	
 	public void loginCheck()
 	{
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			
 			ResultSet rs = DBConnection.getData("SELECT * FROM users");
 			
@@ -133,6 +140,69 @@ public class LoginWindow extends JFrame {
 	        			else
 	        			{
 		        			AdminWindow adminWin = new AdminWindow(id, name, username, password);
+							adminWin.setVisible(true);
+							adminWin.setTitle("Admin - " + name + " (" + username + ")");
+	        			}
+						
+	        		}
+	        	}
+	        	
+	        }
+	        
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loginCheckWithHash()
+	{
+		try (Connection con = DBConnection.getCon()){
+			
+			ResultSet rs = DBConnection.getData("SELECT * FROM users");
+			
+	        String username, name, password, usertype, category;
+	        int id;
+	        
+	        String passwordEnteredByUser = new String(passwordField.getPassword());
+	        
+	        while(rs.next())
+	        {
+	        	username = rs.getString("username");
+	        	
+	        	if(username.equals(userNameTxtField.getText())) {
+	        		
+	        		String[] passwordFiled = rs.getString("password").split(" ");
+	        		
+	     	        String saltedHashStringDB = passwordFiled[0];
+	     	        String saltStringDB = passwordFiled[1];	       
+	     	        
+	     	        System.out.println("passwordEnteredByUser = " + passwordEnteredByUser);
+	     	        System.out.println("saltStringDB = " + saltStringDB);
+	     	        
+	     	        String saltedHashBytesToCheck = Hasher.getSaltedHash(passwordEnteredByUser, saltStringDB);
+	     	        
+	     			System.out.println("saltedHashBytesToCheck = " + saltedHashBytesToCheck);
+	     			System.out.println("saltedHash(in db)= " + saltedHashStringDB);
+	     	        	
+	        		if(saltedHashStringDB.equals(saltedHashBytesToCheck))
+	        		{
+	        			System.out.println("im after passwordToCheck.equals(saltedHashToCheck)");
+	        			
+	        			id = rs.getInt("id_user");
+		        		usertype = rs.getString("usertype");
+		        		name = rs.getString("name");
+		        		category = rs.getString("category");
+		        		
+	        			if(usertype.equals("representative"))
+	        			{
+	        				RepresentativeWindow repWin = new RepresentativeWindow(id, name, username, saltedHashStringDB, category);
+							repWin.setVisible(true);
+							repWin.setTitle("Sales Representative - " + name + " (" + username + ") / " + category);
+							setVisible(false);
+	        			}
+	        			else
+	        			{
+		        			AdminWindow adminWin = new AdminWindow(id, name, username, saltedHashStringDB);
 							adminWin.setVisible(true);
 							adminWin.setTitle("Admin - " + name + " (" + username + ")");
 	        			}

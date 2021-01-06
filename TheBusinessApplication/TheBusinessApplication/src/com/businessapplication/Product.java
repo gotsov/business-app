@@ -1,5 +1,6 @@
 package com.businessapplication;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -86,7 +87,7 @@ public class Product {
 	}
 
 	public void setId() {		
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			ResultSet rs = DBConnection.getData(" SELECT id_prod FROM allproducts ORDER BY id_prod DESC LIMIT 1");
 					
 			rs.next();

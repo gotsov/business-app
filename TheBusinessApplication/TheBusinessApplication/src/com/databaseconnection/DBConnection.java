@@ -16,10 +16,10 @@ public class DBConnection {
 	public static Connection getCon()
 	{
 		try {
-			if(con == null) {
-				Class.forName("com.mysql.jdbc.Driver");		
-				con = DriverManager.getConnection(url, username, password);
-			}
+			
+			Class.forName("com.mysql.jdbc.Driver");		
+			con = DriverManager.getConnection(url, username, password);
+			
 			return con;
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();

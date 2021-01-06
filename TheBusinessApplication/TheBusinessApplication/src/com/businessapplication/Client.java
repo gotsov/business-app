@@ -32,9 +32,6 @@ public class Client {
 		
 		checkForUniqueEmail();
 		
-		//check if a field that's not idOfClient, name or email is null, 
-		//because when editing a sale only these three are used with the builder, 
-		//therefore it shouldn't execute SetIdSale(), setIdClient(), setSqlDate()
 		if(this.categoryOfProductBought != null)   
 		{
 			setIdSale();

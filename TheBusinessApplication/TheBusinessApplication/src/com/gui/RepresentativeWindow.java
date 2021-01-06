@@ -24,18 +24,21 @@ import com.businessapplication.Client;
 import com.businessapplication.Representative;
 import com.businessapplication.Sale;
 import com.businessapplication.Client.Builder;
+import com.businessapplication.Product;
 import com.databaseconnection.DBConnection;
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 
+import java.sql.Connection;
 import java.sql.Date;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextField;
+import java.awt.BorderLayout;
 
 public class RepresentativeWindow extends JFrame {
 	
@@ -55,7 +58,10 @@ public class RepresentativeWindow extends JFrame {
 	private String password;
 	private int id;
 	private ArrayList<Sale> clientsFromCatalog  = new ArrayList<>();
+	private ArrayList<Product> yourProducts = new ArrayList<>();
+	private ArrayList<Sale> catalog = new ArrayList<>();
 	private Representative thisRepresentative;
+	private JTable tableProducts;
 	/**
 	 * Create the frame.
 	 */
@@ -104,85 +110,10 @@ public class RepresentativeWindow extends JFrame {
 				});
 		getContentPane().setLayout(null);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(53, 49, 776, 162);
-		getContentPane().add(scrollPane);
-		
-		tableCatalog = new JTable();
-		scrollPane.setViewportView(tableCatalog);
-		tableCatalog.setFont(new Font("Arial", Font.PLAIN, 16));
-		tableCatalog.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"id_sale", "name", "e-mail", "bought product", "quantity", "price (lv.)", "date"
-			}
-		) {
-			Class[] columnTypes = new Class[] {
-				Integer.class, String.class, String.class, String.class, Integer.class, Double.class, Object.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-		});
-		
-		tableCatalog.setAutoCreateRowSorter(true);
-		tableCatalog.getTableHeader().setReorderingAllowed(false);
-		
-		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-		tableCatalog.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-		tableCatalog.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
-		
-		TableColumnModel columnModel = tableCatalog.getColumnModel();
-		columnModel.getColumn(0).setPreferredWidth(40);
-		columnModel.getColumn(1).setPreferredWidth(120);
-		columnModel.getColumn(2).setPreferredWidth(200);
-		columnModel.getColumn(3).setPreferredWidth(80);
-		columnModel.getColumn(4).setPreferredWidth(40);
-		columnModel.getColumn(5).setPreferredWidth(60);
-		columnModel.getColumn(6).setPreferredWidth(100);
-		tableCatalog.setRowHeight(30);
-		
-		JLabel lblCatalog = new JLabel("Your catalog (" + category + "):");
-		lblCatalog.setFont(new Font("Arial", Font.PLAIN, 22));
-		lblCatalog.setBounds(53, 13, 381, 23);
-		getContentPane().add(lblCatalog);
-		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(53, 260, 406, 271);
 		getContentPane().add(scrollPane_1);
-		
-		tableClients = new JTable();
-		scrollPane_1.setViewportView(tableClients);
-		tableClients.setFont(new Font("Arial", Font.PLAIN, 16));
-		tableClients.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"id_client", "name", "e-mail"
-			}
-		) {
-			Class[] columnTypes = new Class[] {
-				Integer.class, String.class, String.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-		});
-		
-		tableClients.setAutoCreateRowSorter(true);
-		tableClients.getTableHeader().setReorderingAllowed(false);
-		
-		TableColumnModel columnModel2 = tableClients.getColumnModel();
-		
-		tableClients.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-		columnModel2 = tableClients.getColumnModel();
-		columnModel2.getColumn(0).setPreferredWidth(40);
-		columnModel2.getColumn(1).setPreferredWidth(120);
-		columnModel2.getColumn(2).setPreferredWidth(200);
-		tableClients.setRowHeight(30);
-		
+			
 		JLabel lblClients = new JLabel("Your clients (" + category + "):");
 		lblClients.setFont(new Font("Arial", Font.PLAIN, 22));
 		lblClients.setBounds(53, 224, 381, 23);
@@ -194,7 +125,7 @@ public class RepresentativeWindow extends JFrame {
 		getContentPane().add(tabbedPane);
 		
 		JPanel panel3 = new JPanel();
-		tabbedPane.addTab("Add order", null, panel3, null);
+		tabbedPane.addTab("Add sale", null, panel3, null);
 		panel3.setLayout(null);
 		
 		JLabel label = new JLabel("Client name:");
@@ -371,7 +302,120 @@ public class RepresentativeWindow extends JFrame {
 		btnAddClient.setBounds(119, 166, 144, 48);
 		panel_2.add(btnAddClient);
 		
-		updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+		JTabbedPane tabYourCatalog = new JTabbedPane(JTabbedPane.TOP);
+		tabYourCatalog.setBounds(12, 13, 817, 191);
+		getContentPane().add(tabYourCatalog);
+		
+		JPanel panel_3 = new JPanel();
+		tabYourCatalog.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		tabYourCatalog.addTab("Your Catalog", null, panel_3, null);
+		panel_3.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPane = new JScrollPane();
+		panel_3.add(scrollPane, BorderLayout.CENTER);
+		
+		JPanel panel_4 = new JPanel();
+		tabYourCatalog.addTab("Your Products", null, panel_4, null);
+		panel_4.setLayout(null);
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(0, 0, 812, 152);
+		panel_4.add(scrollPane_2);
+		
+		//TABLES
+		
+		tableCatalog = new JTable();
+		scrollPane.setViewportView(tableCatalog);
+		tableCatalog.setFont(new Font("Arial", Font.PLAIN, 16));
+		tableCatalog.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"id_sale", "name", "e-mail", "bought product", "quantity", "price (lv.)", "date"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				Integer.class, String.class, String.class, String.class, Integer.class, Double.class, Object.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+		});
+		
+		tableClients = new JTable();
+		scrollPane_1.setViewportView(tableClients);
+		tableClients.setFont(new Font("Arial", Font.PLAIN, 16));
+		tableClients.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"id_client", "name", "e-mail"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				Integer.class, String.class, String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+		});
+		
+		tableProducts = new JTable();
+		scrollPane_2.setViewportView(tableProducts);
+		tableProducts.setFont(new Font("Arial", Font.PLAIN, 16));
+		tableProducts.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"id_product", "name", "category", "quantity", "price (lv.)"
+			}
+		) );
+		
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		
+		tableClients.setAutoCreateRowSorter(true);
+		tableClients.getTableHeader().setReorderingAllowed(false);
+		
+		tableCatalog.setAutoCreateRowSorter(true);
+		tableCatalog.getTableHeader().setReorderingAllowed(false);
+		
+		tableProducts.setAutoCreateRowSorter(true);
+		tableProducts.getTableHeader().setReorderingAllowed(false);
+		
+		TableColumnModel columnModelCatalog = tableCatalog.getColumnModel();
+		tableCatalog.setRowHeight(30);
+	
+		columnModelCatalog.getColumn(0).setPreferredWidth(40);
+		columnModelCatalog.getColumn(1).setPreferredWidth(120);
+		columnModelCatalog.getColumn(2).setPreferredWidth(200);
+		columnModelCatalog.getColumn(3).setPreferredWidth(80);
+		columnModelCatalog.getColumn(4).setPreferredWidth(40);
+		columnModelCatalog.getColumn(5).setPreferredWidth(60);
+		columnModelCatalog.getColumn(6).setPreferredWidth(100);
+		
+		tableCatalog.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		tableCatalog.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
+		
+		
+		TableColumnModel columnModelClients = tableClients.getColumnModel();
+		tableClients.setRowHeight(30);
+		
+		tableClients.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		columnModelClients = tableClients.getColumnModel();
+		columnModelClients.getColumn(0).setPreferredWidth(40);
+		columnModelClients.getColumn(1).setPreferredWidth(120);
+		columnModelClients.getColumn(2).setPreferredWidth(200);
+		
+		
+		TableColumnModel columnModelProducts = tableProducts.getColumnModel();
+		tableProducts.setRowHeight(30);
+		
+		columnModelProducts.getColumn(0).setPreferredWidth(40);
+		columnModelProducts.getColumn(0).setCellRenderer(centerRenderer);
+		
+		updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct, comboBoxQuantity);		
+		
 		
 		comboBoxChange.addActionListener(new ActionListener() {		
 			@Override
@@ -418,7 +462,7 @@ public class RepresentativeWindow extends JFrame {
 				
 	            if(category.equals("all")) {
 	            	
-	            	try {
+	            	try(Connection con = DBConnection.getCon()) {
 	            		ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + boughtProduct + "'");
 		            	rs.next();
 		            	
@@ -462,7 +506,7 @@ public class RepresentativeWindow extends JFrame {
 				}
 			}
 		});
-		//
+		
 		
 		btnEditClient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {	
@@ -585,7 +629,7 @@ public class RepresentativeWindow extends JFrame {
 	public String getInfoOfClientById(String toChange, int id)
 	{
 		
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			ResultSet rs = DBConnection.getData("SELECT " + toChange + " FROM allclients WHERE id_client = " + id);
 			
 			while(rs.next())
@@ -602,14 +646,14 @@ public class RepresentativeWindow extends JFrame {
 	
 	public void loadTables()
 	{
-		try
-		{
-			DefaultTableModel model = (DefaultTableModel)tableCatalog.getModel(); 
-			DefaultTableModel modelClients = (DefaultTableModel)tableClients.getModel(); 
+		try(Connection con = DBConnection.getCon()){
+			DefaultTableModel modelCatalog = (DefaultTableModel)tableCatalog.getModel(); 
+			DefaultTableModel modelClients = (DefaultTableModel)tableClients.getModel();
+			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel();
 			
-			if(model.getRowCount() > 0)
+			if(modelCatalog.getRowCount() > 0)
 			{
-				model.setRowCount(0);
+				modelCatalog.setRowCount(0);
 			}
 			
 			if(modelClients.getRowCount() > 0)
@@ -617,13 +661,16 @@ public class RepresentativeWindow extends JFrame {
 				modelClients.setRowCount(0);
 			}
 			
-			ArrayList<Sale> catalog = new ArrayList<>();
+			if(modelProducts.getRowCount() > 0)
+			{
+				modelProducts.setRowCount(0);
+			}
 			
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + this.username + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + thisRepresentative.getUsername() + "'");
 			
 	        while(rs.next())
 	        {  	      	
-	        	Sale o = new Sale.Builder().id(rs.getInt("id_sale"))
+	        	Sale s = new Sale.Builder().id(rs.getInt("id_sale"))
 	        											   .name(rs.getString("name"))
 	        											   .email(rs.getString("email"))
 	        											   .product(rs.getString("product"))
@@ -631,7 +678,7 @@ public class RepresentativeWindow extends JFrame {
 	        											   .price(rs.getDouble("price"))
 	        											   .date(rs.getDate("date"))
 	        											   .build();	
-	        	catalog.add(o);
+	        	catalog.add(s);
 	        }
 	        
 			Object[] row = new Object[7];
@@ -644,13 +691,14 @@ public class RepresentativeWindow extends JFrame {
 				row[4] = catalog.get(i).getQuantity();
 				row[5] = catalog.get(i).getPrice();
 				row[6] = catalog.get(i).getDate();
-				model.addRow(row);
+				modelCatalog.addRow(row);
 			}
 	        
 	        clientsFromCatalog = thisRepresentative.removeRepeatingClients(catalog);
 	        
-	        int id;
+	        int id, quantity;
 	        String name, email;
+	        double price;
 	        
 	        for (int i = 0; i < clientsFromCatalog.size(); i++) {
 				id = clientsFromCatalog.get(i).getId();
@@ -661,6 +709,36 @@ public class RepresentativeWindow extends JFrame {
 				
 				modelClients.addRow(data);
 			}
+	        
+	        rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + thisRepresentative.getCategory() + "'");
+	        
+	        if(thisRepresentative.getCategory().equals("all")) {
+	        	rs = DBConnection.getData("SELECT * FROM allproducts");
+	        }
+			
+	        while(rs.next())
+	        {  	      	
+	        	Product p = new Product.Builder().id(rs.getInt("id_prod"))
+	        									 .name(rs.getString("name"))
+	        									 .category(rs.getString("category"))
+	        									 .quantity(rs.getInt("quantity"))
+	        									 .price(rs.getDouble("price"))
+	        									 .build();
+	        	yourProducts.add(p);
+	        }
+	        
+	        for (int i = 0; i < yourProducts.size(); i++) {
+				id = yourProducts.get(i).getId();
+				name = yourProducts.get(i).getName();
+				category = yourProducts.get(i).getCategory();
+				quantity = yourProducts.get(i).getQuantity();
+				price = yourProducts.get(i).getPrice();
+				
+				Object[] data = {id, name, category, quantity, price};
+				
+				modelProducts.addRow(data);
+			}
+	        
 	        
 	        
 		} catch(SQLException e) {
@@ -683,8 +761,7 @@ public class RepresentativeWindow extends JFrame {
 	public void fillComboBoxProducts(JComboBox<String> comboBoxBoughtProduct)
 	{
 		comboBoxBoughtProduct.removeAllItems();
-		try
-		{     
+		try(Connection con = DBConnection.getCon()){     
 			if(this.category.equals("all")) {
 				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
 				
@@ -715,8 +792,7 @@ public class RepresentativeWindow extends JFrame {
 		// clears comboBox before updating it
 		comboBoxQuantity.removeAllItems();
 		
-		try
-		{
+		try(Connection con = DBConnection.getCon()){
 			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + comboBoxBoughtProduct.getSelectedItem() + "'");
 	        
 	        int quantity = 0;
@@ -738,7 +814,7 @@ public class RepresentativeWindow extends JFrame {
 	
 	public int getIdOfRepresentative()
 	{
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.username + "'");
 			rs.next();
 			
@@ -752,7 +828,7 @@ public class RepresentativeWindow extends JFrame {
 	
 	public int getIdOfSale()
 	{
-		try {
+		try (Connection con = DBConnection.getCon()){
 			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + this.username + "'");
 			rs.next();
 			

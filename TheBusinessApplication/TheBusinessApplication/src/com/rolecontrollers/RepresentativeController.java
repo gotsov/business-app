@@ -1,5 +1,6 @@
 package com.rolecontrollers;
 
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,7 +33,7 @@ public abstract class RepresentativeController {
 	
 	public static void checkIfFirstTimeClient(Client clientToCheck) 
 	{
-		try {		
+		try (Connection con = DBConnection.getCon()){		
 			ResultSet rs = DBConnection.getData("SELECT * FROM allclients WHERE email = '" + clientToCheck.getEmail() + "'");
 			
 			boolean newEmail = true;
@@ -55,7 +56,7 @@ public abstract class RepresentativeController {
 	
 	public static void setIdClient(Client clientToSetId)
 	{
-		try {		
+		try (Connection con = DBConnection.getCon()){		
 			ResultSet rs = DBConnection.getData(" SELECT id_client FROM allclients ORDER BY id_client DESC LIMIT 1");
 					
 			rs.next();
@@ -74,7 +75,7 @@ public abstract class RepresentativeController {
 	
 	public static void setIdSale(Client clientToSetId)
 	{
-		try {
+		try (Connection con = DBConnection.getCon()){
 			ResultSet rs = DBConnection.getData(" SELECT id_sale FROM allsales ORDER BY id_sale DESC LIMIT 1");
 			
 			rs.next();
@@ -100,7 +101,7 @@ public abstract class RepresentativeController {
 	
 	public void editClient(Client clientToEdit, String fieldToEdit, int idClient, int idSale)
 	{
-		try{     
+		try(Connection con = DBConnection.getCon()) {     
 				if(fieldToEdit.equals("name")) {
 					DBConnection.updateData("UPDATE allclients SET " + fieldToEdit + " = '" + clientToEdit.getName() + "'" +"WHERE id_client = " + idClient);
 					DBConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" +  clientToEdit.getName() + "'" +"WHERE id_sale = " + idSale);
@@ -142,7 +143,7 @@ public abstract class RepresentativeController {
 	
 	public void deleteClient(Client clientToDelete)
 	{
-		try {		
+		try(Connection con = DBConnection.getCon()) {		
 			DBConnection.updateData("DELETE FROM allclients WHERE id_client = " + clientToDelete.getIdOfClient());
 			DBConnection.updateData("DELETE FROM allsales WHERE email = '" + clientToDelete.getEmail() + "'");
 			
@@ -155,7 +156,7 @@ public abstract class RepresentativeController {
 		
 	public void addClient(Client clientToAdd)
 	{
-		try {		
+		try(Connection con = DBConnection.getCon()) {		
 			PreparedStatement pstmt = DBConnection.insertData
 					(" INSERT INTO allclients (id_client, name, email)" + " VALUES (?, ?, ?)");
 			pstmt.setInt(1, clientToAdd.getIdOfClient());
@@ -172,7 +173,7 @@ public abstract class RepresentativeController {
 	
 	public ArrayList<Sale> removeRepeatingClients(ArrayList<Sale> catalog) {
 		
-		try {
+		try(Connection con = DBConnection.getCon()) {
 			for (int i = 0; i < catalog.size(); i++) {
 				for (int j = i+1; j < catalog.size(); j++) {
 					
