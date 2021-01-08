@@ -15,45 +15,11 @@ import javax.crypto.spec.PBEKeySpec;
 public class Hasher {
 	
 	private static String algorithm = "PBKDF2WithHmacSHA1";
-
-//	public static byte[] createHash(String password)  {
-//		SecureRandom random = new SecureRandom();
-//		byte[] salt = new byte[16];
-//		random.nextBytes(salt);
-//
-//		KeySpec spec = new PBEKeySpec(password.toCharArray(), salt , 65536, 128); 
-//
-//		try {
-//			
-//			SecretKeyFactory factory  = SecretKeyFactory.getInstance(algorithm);
-//			byte[] hash = factory .generateSecret(spec).getEncoded();
-//			return hash;
-//			
-//		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		
-//		return null;
-//	}
 	
 	public static int createHash(String password)  {
 	
 		return password.hashCode();
 	}
-	
-//	public static String getSaltedHash(String password, byte[] salt) {
-//		try {
-//			KeySpec spec = new PBEKeySpec(password.toCharArray(), salt , 20000, 128); 
-//			SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm);
-//			byte[] hash = factory.generateSecret(spec).getEncoded();
-//			return Base64.getEncoder().encodeToString(hash);
-//		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} 
-//		return null;
-//	}
 	
 	protected static String createHashedPass(String password) {
 		byte[] salt =  createSalt();
@@ -94,7 +60,5 @@ public class Hasher {
 		random.nextBytes(salt);
 		return salt;
 	}
-	
-	
 	
 }

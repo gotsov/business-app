@@ -7,7 +7,7 @@ import java.util.Base64;
 
 import com.databaseconnection.DBConnection;
 
-public class UserController {
+public abstract class UserController {
 																					  //1234 by default
 	public static void addUser(int id, String usertype, String name, String username, String password, String category) {
 		
@@ -45,9 +45,10 @@ public class UserController {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
+		}	
 
 	}
+	
+	public abstract void changePassword(String password);
 
 }

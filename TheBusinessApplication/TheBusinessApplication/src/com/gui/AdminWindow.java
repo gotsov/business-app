@@ -61,6 +61,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
+import com.rolecontrollers.AdminController;
 
 public class AdminWindow extends JFrame {
 
@@ -79,6 +80,27 @@ public class AdminWindow extends JFrame {
 	private JTextField textFieldUsernameRep;
 	private JTextField textFieldEditRep;
 	private JTextField textFieldRepUsername;
+	
+	static JComboBox comboBoxIdProductToDelete = new JComboBox();
+	static JComboBox comboBoxCategory = new JComboBox();
+	static JComboBox comboBoxIdProduct = new JComboBox();
+	static JComboBox comboBoxEdit = new JComboBox();
+	static JComboBox<String> comboBoxIdRepresentativeToDelete = new JComboBox();
+	static JComboBox<String> comboBoxIdRepresentative = new JComboBox();
+	static JComboBox<String> comboBoxEditRepresentative = new JComboBox();
+	static JComboBox<String> comboBoxUsernames = new JComboBox();
+	static JComboBox<String> comboBoxCategoryFilter = new JComboBox();
+	
+	static DefaultListModel<String> model = new DefaultListModel<>();
+	static JLabel lblNumberOfRepresentatives = new JLabel("Number of representatives: ");
+	static JLabel lblNumberOfProducts = new JLabel("Number of products: ");
+	static JLabel lblNumberOfClients = new JLabel("Number of clients: ");
+	static JLabel lblTotalNumberOfSales = new JLabel("Total number of sales: ");
+	static JLabel lblMostSalesByProduct = new JLabel("Most sales by product: ");
+	static JLabel lblMostSalesByCategory = new JLabel("Most sales by category: ");
+	static JLabel lblRepresentativeWithMostSales = new JLabel("Representative with most sales: ");
+	static JLabel lblTotalEarnings = new JLabel("Total earnings: ");
+	static JLabel lblNumberOfCategories = new JLabel("Number of categories: ");
 	
 	static ArrayList<Product> listProducts = new ArrayList<>();
 	static ArrayList<Representative> listRepresentatives = new ArrayList<>();
@@ -104,6 +126,8 @@ public class AdminWindow extends JFrame {
 											 .password(password)
 											 .build();
 		
+		AdminController adminController  = new AdminController();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 902, 558);
 		
@@ -117,6 +141,14 @@ public class AdminWindow extends JFrame {
 		JMenuItem mnLogout = new JMenuItem("Log out");
 		mnLogout.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		mnNewMenu.add(mnLogout);
+		
+		JMenuItem mnAddAdmin = new JMenuItem("Add admin");
+		mnAddAdmin.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		mnNewMenu.add(mnAddAdmin);
+		
+		JMenuItem mnChangePassword = new JMenuItem("Change password");
+		mnChangePassword.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		mnNewMenu.add(mnChangePassword);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -157,8 +189,6 @@ public class AdminWindow extends JFrame {
 		JScrollPane scrollPane_3 = new JScrollPane();
 		scrollPane_3.setBounds(12, 49, 845, 161);
 		panel_2.add(scrollPane_3);
-		
-		DefaultListModel<String> model = new DefaultListModel<>();
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(128, 13, 587, 124);
@@ -204,8 +234,7 @@ public class AdminWindow extends JFrame {
 		textFieldNewCategory.setColumns(10);
 		textFieldNewCategory.setBounds(134, 98, 133, 26);
 		panel.add(textFieldNewCategory);
-		
-		JComboBox comboBoxCategory = new JComboBox();
+			
 		comboBoxCategory.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxCategory.setBounds(134, 56, 133, 26);
 		panel.add(comboBoxCategory);
@@ -251,7 +280,6 @@ public class AdminWindow extends JFrame {
 		lblIdOfProduct.setBounds(9, 104, 200, 26);
 		panel_3.add(lblIdOfProduct);
 		
-		JComboBox comboBoxIdProductToDelete = new JComboBox();
 		comboBoxIdProductToDelete.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxIdProductToDelete.setBounds(203, 105, 55, 26);
 		panel_3.add(comboBoxIdProductToDelete);
@@ -273,7 +301,6 @@ public class AdminWindow extends JFrame {
 		lblIdOfProduct_1.setBounds(0, 27, 200, 26);
 		panel_4.add(lblIdOfProduct_1);
 		
-		JComboBox comboBoxIdProduct = new JComboBox();
 		comboBoxIdProduct.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxIdProduct.setBounds(194, 28, 55, 26);
 		panel_4.add(comboBoxIdProduct);
@@ -284,7 +311,6 @@ public class AdminWindow extends JFrame {
 		lblEdit.setBounds(44, 66, 61, 26);
 		panel_4.add(lblEdit);
 		
-		JComboBox comboBoxEdit = new JComboBox();
 		comboBoxEdit.setModel(new DefaultComboBoxModel(new String[] {"name", "category", "quantity", "price"}));
 		comboBoxEdit.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxEdit.setBounds(112, 67, 111, 26);
@@ -362,7 +388,7 @@ public class AdminWindow extends JFrame {
 		lblIdOfRep_1.setBounds(0, 64, 200, 26);
 		panel_6.add(lblIdOfRep_1);
 		
-		JComboBox<String> comboBoxIdRepresentativeToDelete = new JComboBox();
+		
 		comboBoxIdRepresentativeToDelete.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxIdRepresentativeToDelete.setBounds(196, 65, 55, 26);
 		panel_6.add(comboBoxIdRepresentativeToDelete);
@@ -384,7 +410,7 @@ public class AdminWindow extends JFrame {
 		lblIdOfRep.setBounds(0, 27, 200, 26);
 		panel_7.add(lblIdOfRep);
 		
-		JComboBox<String> comboBoxIdRepresentative = new JComboBox();
+		
 		comboBoxIdRepresentative.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxIdRepresentative.setBounds(194, 28, 55, 26);
 		panel_7.add(comboBoxIdRepresentative);
@@ -395,7 +421,7 @@ public class AdminWindow extends JFrame {
 		label_7.setBounds(44, 66, 61, 26);
 		panel_7.add(label_7);
 		
-		JComboBox<String> comboBoxEditRepresentative = new JComboBox();
+		
 		comboBoxEditRepresentative.setModel(new DefaultComboBoxModel(new String[] {"name", "username", "category"}));
 		comboBoxEditRepresentative.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxEditRepresentative.setBounds(112, 67, 111, 26);
@@ -582,7 +608,7 @@ public class AdminWindow extends JFrame {
 		lblUsernameOfRepresentative.setBounds(41, 13, 126, 30);
 		panel_9.add(lblUsernameOfRepresentative);
 		
-		JComboBox<String> comboBoxUsernames = new JComboBox();
+		
 		comboBoxUsernames.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxUsernames.setBounds(175, 15, 139, 26);
 		panel_9.add(comboBoxUsernames);
@@ -623,7 +649,7 @@ public class AdminWindow extends JFrame {
 		lblCategory_2.setBounds(41, 13, 126, 30);
 		panel_11.add(lblCategory_2);
 		
-		JComboBox<String> comboBoxCategoryFilter = new JComboBox();
+		
 		comboBoxCategoryFilter.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxCategoryFilter.setBounds(175, 15, 139, 26);
 		panel_11.add(comboBoxCategoryFilter);
@@ -655,136 +681,119 @@ public class AdminWindow extends JFrame {
 		checkBoxTweet.setFont(new Font("Sylfaen", Font.PLAIN, 46));
 		checkBoxTweet.setBounds(71, 226, 29, 33);
 		panel.add(checkBoxTweet);
-				GridBagLayout gbl_panel_10 = new GridBagLayout();
-				gbl_panel_10.columnWidths = new int[]{42, 553, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-				gbl_panel_10.rowHeights = new int[]{20, 40, 40, 40, 40, 40, 40, 40, 40, 72, 0};
-				gbl_panel_10.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-				gbl_panel_10.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-				panel_10.setLayout(gbl_panel_10);
+		GridBagLayout gbl_panel_10 = new GridBagLayout();
+		gbl_panel_10.columnWidths = new int[]{42, 553, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_10.rowHeights = new int[]{20, 40, 40, 40, 40, 40, 40, 40, 40, 72, 0};
+		gbl_panel_10.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_10.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panel_10.setLayout(gbl_panel_10);
 								
-								JLabel lblNumberOfProducts = new JLabel("Number of products: ");
-								
-								lblNumberOfProducts.setHorizontalAlignment(SwingConstants.LEFT);
-								lblNumberOfProducts.setFont(new Font("Arial", Font.PLAIN, 20));
-								GridBagConstraints gbc_lblNumberOfProducts = new GridBagConstraints();
-								gbc_lblNumberOfProducts.anchor = GridBagConstraints.WEST;
-								gbc_lblNumberOfProducts.fill = GridBagConstraints.VERTICAL;
-								gbc_lblNumberOfProducts.insets = new Insets(0, 0, 5, 5);
-								gbc_lblNumberOfProducts.gridx = 1;
-								gbc_lblNumberOfProducts.gridy = 1;
-								panel_10.add(lblNumberOfProducts, gbc_lblNumberOfProducts);
-						JLabel lblNumberOfRepresentatives = new JLabel("Number of representatives: ");
+													
+		lblNumberOfProducts.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNumberOfProducts.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblNumberOfProducts = new GridBagConstraints();
+		gbc_lblNumberOfProducts.anchor = GridBagConstraints.WEST;
+		gbc_lblNumberOfProducts.fill = GridBagConstraints.VERTICAL;
+		gbc_lblNumberOfProducts.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNumberOfProducts.gridx = 1;
+		gbc_lblNumberOfProducts.gridy = 1;
+		panel_10.add(lblNumberOfProducts, gbc_lblNumberOfProducts);
 						
 						
-						lblNumberOfRepresentatives.setHorizontalAlignment(SwingConstants.LEFT);
-						lblNumberOfRepresentatives.setFont(new Font("Arial", Font.PLAIN, 20));
-						GridBagConstraints gbc_lblNumberOfRepresentatives = new GridBagConstraints();
-						gbc_lblNumberOfRepresentatives.anchor = GridBagConstraints.WEST;
-						gbc_lblNumberOfRepresentatives.fill = GridBagConstraints.VERTICAL;
-						gbc_lblNumberOfRepresentatives.insets = new Insets(0, 0, 5, 5);
-						gbc_lblNumberOfRepresentatives.gridx = 1;
-						gbc_lblNumberOfRepresentatives.gridy = 2;
-						panel_10.add(lblNumberOfRepresentatives, gbc_lblNumberOfRepresentatives);
-				JLabel lblNumberOfClients = new JLabel("Number of clients: ");
+		lblNumberOfRepresentatives.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNumberOfRepresentatives.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblNumberOfRepresentatives = new GridBagConstraints();
+		gbc_lblNumberOfRepresentatives.anchor = GridBagConstraints.WEST;
+		gbc_lblNumberOfRepresentatives.fill = GridBagConstraints.VERTICAL;
+		gbc_lblNumberOfRepresentatives.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNumberOfRepresentatives.gridx = 1;
+		gbc_lblNumberOfRepresentatives.gridy = 2;
+		panel_10.add(lblNumberOfRepresentatives, gbc_lblNumberOfRepresentatives);
 				
-				lblNumberOfClients.setHorizontalAlignment(SwingConstants.LEFT);
-				lblNumberOfClients.setFont(new Font("Arial", Font.PLAIN, 20));
-				GridBagConstraints gbc_lblNumberOfClients = new GridBagConstraints();
-				gbc_lblNumberOfClients.fill = GridBagConstraints.BOTH;
-				gbc_lblNumberOfClients.insets = new Insets(0, 0, 5, 5);
-				gbc_lblNumberOfClients.gridx = 1;
-				gbc_lblNumberOfClients.gridy = 3;
-				panel_10.add(lblNumberOfClients, gbc_lblNumberOfClients);
-								JLabel lblTotalEarnings = new JLabel("Total earnings: ");
-								
-								
-								lblTotalEarnings.setHorizontalAlignment(SwingConstants.LEFT);
-								lblTotalEarnings.setFont(new Font("Arial", Font.PLAIN, 20));
-								GridBagConstraints gbc_lblTotalEarnings = new GridBagConstraints();
-								gbc_lblTotalEarnings.fill = GridBagConstraints.BOTH;
-								gbc_lblTotalEarnings.insets = new Insets(0, 0, 5, 5);
-								gbc_lblTotalEarnings.gridx = 1;
-								gbc_lblTotalEarnings.gridy = 4;
-								panel_10.add(lblTotalEarnings, gbc_lblTotalEarnings);
-						JLabel lblTotalNumberOfSales = new JLabel("Total number of sales: ");
-						
-								
-								
-								
-								lblTotalNumberOfSales.setHorizontalAlignment(SwingConstants.LEFT);
-								lblTotalNumberOfSales.setFont(new Font("Arial", Font.PLAIN, 20));
-								GridBagConstraints gbc_lblTotalNumberOfSales = new GridBagConstraints();
-								gbc_lblTotalNumberOfSales.anchor = GridBagConstraints.WEST;
-								gbc_lblTotalNumberOfSales.fill = GridBagConstraints.VERTICAL;
-								gbc_lblTotalNumberOfSales.insets = new Insets(0, 0, 5, 5);
-								gbc_lblTotalNumberOfSales.gridx = 1;
-								gbc_lblTotalNumberOfSales.gridy = 5;
-								panel_10.add(lblTotalNumberOfSales, gbc_lblTotalNumberOfSales);
-						JLabel lblNumberOfCategories = new JLabel("Number of categories: ");
-						
-						
-						lblNumberOfCategories.setHorizontalAlignment(SwingConstants.LEFT);
-						lblNumberOfCategories.setFont(new Font("Arial", Font.PLAIN, 20));
-						GridBagConstraints gbc_lblNumberOfCategories = new GridBagConstraints();
-						gbc_lblNumberOfCategories.fill = GridBagConstraints.BOTH;
-						gbc_lblNumberOfCategories.insets = new Insets(0, 0, 5, 5);
-						gbc_lblNumberOfCategories.gridx = 1;
-						gbc_lblNumberOfCategories.gridy = 6;
-						panel_10.add(lblNumberOfCategories, gbc_lblNumberOfCategories);
-						JLabel lblMostSalesByCategory = new JLabel("Most sales by category: ");
-						
-						
-						lblMostSalesByCategory.setHorizontalAlignment(SwingConstants.LEFT);
-						lblMostSalesByCategory.setFont(new Font("Arial", Font.PLAIN, 20));
-						GridBagConstraints gbc_lblMostSalesByCategory = new GridBagConstraints();
-						gbc_lblMostSalesByCategory.fill = GridBagConstraints.BOTH;
-						gbc_lblMostSalesByCategory.insets = new Insets(0, 0, 5, 5);
-						gbc_lblMostSalesByCategory.gridx = 1;
-						gbc_lblMostSalesByCategory.gridy = 7;
-						panel_10.add(lblMostSalesByCategory, gbc_lblMostSalesByCategory);
-						JLabel lblMostSalesByProduct = new JLabel("Most sales by product: ");
-						
-						
-						lblMostSalesByProduct.setHorizontalAlignment(SwingConstants.LEFT);
-						lblMostSalesByProduct.setFont(new Font("Arial", Font.PLAIN, 20));
-						GridBagConstraints gbc_lblMostSalesByProduct = new GridBagConstraints();
-						gbc_lblMostSalesByProduct.fill = GridBagConstraints.BOTH;
-						gbc_lblMostSalesByProduct.insets = new Insets(0, 0, 5, 5);
-						gbc_lblMostSalesByProduct.gridx = 1;
-						gbc_lblMostSalesByProduct.gridy = 8;
-						panel_10.add(lblMostSalesByProduct, gbc_lblMostSalesByProduct);
 				
+		lblNumberOfClients.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNumberOfClients.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblNumberOfClients = new GridBagConstraints();
+		gbc_lblNumberOfClients.fill = GridBagConstraints.BOTH;
+		gbc_lblNumberOfClients.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNumberOfClients.gridx = 1;
+		gbc_lblNumberOfClients.gridy = 3;
+		panel_10.add(lblNumberOfClients, gbc_lblNumberOfClients);
+										
+
+		lblTotalNumberOfSales.setHorizontalAlignment(SwingConstants.LEFT);
+		lblTotalNumberOfSales.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblTotalNumberOfSales = new GridBagConstraints();
+		gbc_lblTotalNumberOfSales.anchor = GridBagConstraints.WEST;
+		gbc_lblTotalNumberOfSales.fill = GridBagConstraints.VERTICAL;
+		gbc_lblTotalNumberOfSales.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTotalNumberOfSales.gridx = 1;
+		gbc_lblTotalNumberOfSales.gridy = 4;
+		panel_10.add(lblTotalNumberOfSales, gbc_lblTotalNumberOfSales);
+		
 						
+		lblNumberOfCategories.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNumberOfCategories.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblNumberOfCategories = new GridBagConstraints();
+		gbc_lblNumberOfCategories.fill = GridBagConstraints.BOTH;
+		gbc_lblNumberOfCategories.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNumberOfCategories.gridx = 1;
+		gbc_lblNumberOfCategories.gridy = 5;
+		panel_10.add(lblNumberOfCategories, gbc_lblNumberOfCategories);
+								
+								
+		lblRepresentativeWithMostSales.setHorizontalAlignment(SwingConstants.LEFT);
+		lblRepresentativeWithMostSales.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblRepresentativeWithMostSales = new GridBagConstraints();
+		gbc_lblRepresentativeWithMostSales.insets = new Insets(0, 0, 5, 5);
+		gbc_lblRepresentativeWithMostSales.fill = GridBagConstraints.BOTH;
+		gbc_lblRepresentativeWithMostSales.gridx = 1;
+		gbc_lblRepresentativeWithMostSales.gridy = 6;
+		panel_10.add(lblRepresentativeWithMostSales, gbc_lblRepresentativeWithMostSales);
+								
 						
-						JLabel lblRepresentativeWithMostSales = new JLabel("Representative with most sales: ");
+		lblMostSalesByCategory.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMostSalesByCategory.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblMostSalesByCategory = new GridBagConstraints();
+		gbc_lblMostSalesByCategory.fill = GridBagConstraints.BOTH;
+		gbc_lblMostSalesByCategory.insets = new Insets(0, 0, 5, 5);
+		gbc_lblMostSalesByCategory.gridx = 1;
+		gbc_lblMostSalesByCategory.gridy = 7;
+		panel_10.add(lblMostSalesByCategory, gbc_lblMostSalesByCategory);
+		
+		
+		lblMostSalesByProduct.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMostSalesByProduct.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblMostSalesByProduct = new GridBagConstraints();
+		gbc_lblMostSalesByProduct.fill = GridBagConstraints.BOTH;
+		gbc_lblMostSalesByProduct.insets = new Insets(0, 0, 5, 5);
+		gbc_lblMostSalesByProduct.gridx = 1;
+		gbc_lblMostSalesByProduct.gridy = 8;
+		panel_10.add(lblMostSalesByProduct, gbc_lblMostSalesByProduct);
 						
-						
-						lblRepresentativeWithMostSales.setHorizontalAlignment(SwingConstants.LEFT);
-						lblRepresentativeWithMostSales.setFont(new Font("Arial", Font.PLAIN, 20));
-						GridBagConstraints gbc_lblRepresentativeWithMostSales = new GridBagConstraints();
-						gbc_lblRepresentativeWithMostSales.insets = new Insets(0, 0, 0, 5);
-						gbc_lblRepresentativeWithMostSales.fill = GridBagConstraints.BOTH;
-						gbc_lblRepresentativeWithMostSales.gridx = 1;
-						gbc_lblRepresentativeWithMostSales.gridy = 9;
-						panel_10.add(lblRepresentativeWithMostSales, gbc_lblRepresentativeWithMostSales);
-						
-						updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-								comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-								lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-								lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-								lblNumberOfClients);
-						
-						JButton btnPieChart = new JButton("Pie chart");
-						btnPieChart.setFont(new Font("Arial", Font.PLAIN, 26));
-						GridBagConstraints gbc_btnPieChart = new GridBagConstraints();
-						gbc_btnPieChart.insets = new Insets(0, 0, 0, 5);
-						gbc_btnPieChart.gridx = 2;
-						gbc_btnPieChart.gridy = 9;
-						panel_10.add(btnPieChart, gbc_btnPieChart);
-						
-						JPanel panel_12 = new JPanel();
-						tabbedPane.addTab("New tab", null, panel_12, null);
-						panel_12.setLayout(null);
+		
+		lblTotalEarnings.setHorizontalAlignment(SwingConstants.LEFT);
+		lblTotalEarnings.setFont(new Font("Arial", Font.PLAIN, 20));
+		GridBagConstraints gbc_lblTotalEarnings = new GridBagConstraints();
+		gbc_lblTotalEarnings.fill = GridBagConstraints.BOTH;
+		gbc_lblTotalEarnings.insets = new Insets(0, 0, 0, 5);
+		gbc_lblTotalEarnings.gridx = 1;
+		gbc_lblTotalEarnings.gridy = 9;
+		panel_10.add(lblTotalEarnings, gbc_lblTotalEarnings);
+		
+		JButton btnPieChart = new JButton("Pie chart");
+		btnPieChart.setFont(new Font("Arial", Font.PLAIN, 26));
+		GridBagConstraints gbc_btnPieChart = new GridBagConstraints();
+		gbc_btnPieChart.insets = new Insets(0, 0, 0, 5);
+		gbc_btnPieChart.gridx = 2;
+		gbc_btnPieChart.gridy = 9;
+		panel_10.add(btnPieChart, gbc_btnPieChart);
+		
+		JPanel panel_12 = new JPanel();
+		tabbedPane.addTab("New tab", null, panel_12, null);
+		panel_12.setLayout(null);
+		
+		updateTablesAndComboboxes(adminController);
 				
 		mnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -792,11 +801,27 @@ public class AdminWindow extends JFrame {
 			}
 		});
 		
+		mnChangePassword.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ChangePasswordWindow changePassWin = new ChangePasswordWindow(thisAdmin.getId());
+				changePassWin.setVisible(true);
+				changePassWin.setTitle("Password - " + thisAdmin.getName() + "(" + thisAdmin.getUsername() + ")");
+			}
+		});
+		
+		mnAddAdmin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AddAdminWindow addAdminWindow = new AddAdminWindow();
+				addAdminWindow.setVisible(true);
+				addAdminWindow.setTitle("Add admin");
+			}
+		});
+		
 		btnPieChart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultPieDataset pieDataset = new DefaultPieDataset();
 				
-				HashMap<String, Integer> data = thisAdmin.getHashMapSalesByCategory();
+				HashMap<String, Integer> data = adminController.getHashMapSalesByCategory();
 				
 				for (HashMap.Entry<String, Integer> entry : data.entrySet()) {
 					//pieDataset.setValue(entry.getKey(), entry.getValue());
@@ -847,10 +872,10 @@ public class AdminWindow extends JFrame {
 					}
 					
 					if(checkBoxTweet.isSelected()) {
-						thisAdmin.addProduct(newProduct, true);
+						adminController.addProduct(newProduct, true);
 					}
 					else {
-						thisAdmin.addProduct(newProduct, false);
+						adminController.addProduct(newProduct, false);
 					}
 						
 					
@@ -865,11 +890,7 @@ public class AdminWindow extends JFrame {
 				textFieldProductName.setText("");
 				textFieldPrice.setText("");
 						
-				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblNumberOfClients);
+				updateTablesAndComboboxes(adminController);
 			}
 		});
 		
@@ -892,33 +913,29 @@ public class AdminWindow extends JFrame {
 					if(comboBoxEdit.getSelectedItem().equals("name"))
 					{
 						productToEdit.setName(textFieldEdit.getText());
-						thisAdmin.editFieldProduct(productToEdit, "name");
+						adminController.editFieldProduct(productToEdit, "name");
 					}
 					else if(comboBoxEdit.getSelectedItem().equals("category"))
 					{
 						productToEdit.setCategory(textFieldEdit.getText());
-						thisAdmin.editFieldProduct(productToEdit, "category");
+						adminController.editFieldProduct(productToEdit, "category");
 					}
 					else if(comboBoxEdit.getSelectedItem().equals("quantity"))
 					{
 						productToEdit.setQuantity(Integer.parseInt(textFieldEdit.getText()));
-						thisAdmin.editFieldProduct(productToEdit, "quantity");
+						adminController.editFieldProduct(productToEdit, "quantity");
 					}
 					else if(comboBoxEdit.getSelectedItem().equals("price"))
 					{
 						productToEdit.setPrice(Double.parseDouble(textFieldEdit.getText()));
-						thisAdmin.editFieldProduct(productToEdit, "price");
+						adminController.editFieldProduct(productToEdit, "price");
 					}
 					
 				} catch(NumberFormatException e) {
 					JOptionPane.showMessageDialog(null, "Incorrect input");
 				}
 				
-				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblNumberOfClients);
+				updateTablesAndComboboxes(adminController);
 				
 			}
 		});	
@@ -930,15 +947,11 @@ public class AdminWindow extends JFrame {
 				
 				Product productToDelete = new Product(id);
 				
-				thisAdmin.deleteProduct(productToDelete);
+				adminController.deleteProduct(productToDelete);
 				
 				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
 				
-				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblNumberOfClients);
+				updateTablesAndComboboxes(adminController);
 			}
 		});
 		
@@ -968,16 +981,12 @@ public class AdminWindow extends JFrame {
 																				  .profit(0)
 																				  .build();
 				
-				thisAdmin.addRepresentative(represenatativeToAdd);
+				adminController.addRepresentative(represenatativeToAdd);
 				
 				JOptionPane.showMessageDialog(null, "Added [" + represenatativeToAdd.getName() + " (" + represenatativeToAdd.getUsername() + "), "
 																							+ "category: " + represenatativeToAdd.getCategory() + ".");
 				
-				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblNumberOfClients);
+				updateTablesAndComboboxes(adminController);
 			}
 			
 		});
@@ -990,15 +999,11 @@ public class AdminWindow extends JFrame {
 				Representative represenatativeToDelete = new Representative.Builder().id(id)
 																					 .build();
 				
-				thisAdmin.deleteRepresentative(represenatativeToDelete);
+				adminController.deleteRepresentative(represenatativeToDelete);
 				
 				JOptionPane.showMessageDialog(null, "Representative with [id = " + represenatativeToDelete.getId() + "] has been deleted");
 				
-				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblNumberOfClients);
+				updateTablesAndComboboxes(adminController);
 				
 			}
 		});
@@ -1023,17 +1028,17 @@ public class AdminWindow extends JFrame {
 					if(comboBoxEditRepresentative.getSelectedItem().equals("name"))
 					{
 						representativeToEdit.setName(textFieldEditRep.getText());
-						thisAdmin.editFieldRepresentative(representativeToEdit, "name");
+						adminController.editFieldRepresentative(representativeToEdit, "name");
 					}
 					else if(comboBoxEditRepresentative.getSelectedItem().equals("username"))
 					{
 						representativeToEdit.setUsername(textFieldEditRep.getText());
-						thisAdmin.editFieldRepresentative(representativeToEdit, "username");
+						adminController.editFieldRepresentative(representativeToEdit, "username");
 					}
 					else if(comboBoxEditRepresentative.getSelectedItem().equals("category"))
 					{
 						representativeToEdit.setCategory(textFieldEditRep.getText());
-						thisAdmin.editFieldRepresentative(representativeToEdit, "category");
+						adminController.editFieldRepresentative(representativeToEdit, "category");
 					}
 
 					
@@ -1041,11 +1046,7 @@ public class AdminWindow extends JFrame {
 					JOptionPane.showMessageDialog(null, "Incorrect input");
 				}
 				
-				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblNumberOfClients);
+				updateTablesAndComboboxes(adminController);
 			}
 		});
 		
@@ -1060,7 +1061,7 @@ public class AdminWindow extends JFrame {
 	            String dateStart = dateFormat.format(selectedStartDate);   
 	            String dateEnd = dateFormat.format(selectedEndDate);	
 				
-	            listAllSales = thisAdmin.filterSalesByDate(dateStart, dateEnd, listAllSales);	         
+	            listAllSales = adminController.filterSalesByDate(dateStart, dateEnd, listAllSales);	         
 				
 				loadTableFiltered(listAllSales);
 			}
@@ -1078,7 +1079,7 @@ public class AdminWindow extends JFrame {
 					username = (String)comboBoxUsernames.getSelectedItem();
 				}
 				
-				listAllSales = thisAdmin.filterSalesByCriteria(listAllSales, "username", username);
+				listAllSales = adminController.filterSalesByCriteria(listAllSales, "username", username);
 				
 				loadTableFiltered(listAllSales);
 			}
@@ -1096,7 +1097,7 @@ public class AdminWindow extends JFrame {
 					category = (String)comboBoxCategoryFilter.getSelectedItem();
 				}
 				
-				listAllSales = thisAdmin.filterSalesByCriteria(listAllSales, "category", category);
+				listAllSales = adminController.filterSalesByCriteria(listAllSales, "category", category);
 				
 				loadTableFiltered(listAllSales);
 			}
@@ -1105,22 +1106,13 @@ public class AdminWindow extends JFrame {
 		btnRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-				updateTablesAndComboboxes(thisAdmin, comboBoxIdProduct, comboBoxIdProductToDelete, comboBoxIdRepresentative, 
-						comboBoxIdRepresentativeToDelete, comboBoxCategory, model, comboBoxUsernames, comboBoxCategoryFilter,
-						lblNumberOfProducts, lblNumberOfRepresentatives, lblTotalNumberOfSales, lblMostSalesByCategory,
-						lblNumberOfCategories, lblMostSalesByProduct, lblRepresentativeWithMostSales, lblTotalEarnings,
-						lblNumberOfClients);
+				updateTablesAndComboboxes(adminController);
 			}
 		});
 		
 	}
 	
-	public static void updateTablesAndComboboxes(Admin thisAdmin, JComboBox<String> comboBoxIdProduct, JComboBox<String> comboBoxIdProductToDelete, 
-											JComboBox<String> comboBoxIdRepresentative, JComboBox<String> comboBoxIdRepresentativeToDelete,
-											JComboBox<String> comboBoxCategory, DefaultListModel<String> model, JComboBox<String> comboBoxUsernamesFilter,
-											JComboBox<String> comboBoxCategoryFilter, JLabel lblNumberOfProducts, JLabel lblNumberOfRepresentatives,JLabel lblTotalNumberOfSales,
-											JLabel lblMostSalesByCategory, JLabel lblMostSalesByProduct, JLabel lblRepresentativeWithMostSales,
-											JLabel lblTotalEarnings, JLabel lblNumberOfClients, JLabel lblNumberOfCategories)
+	public static void updateTablesAndComboboxes(AdminController adminController)
 	{
 		loadTablesAdmin();
 		fillComboBoxProductsId(comboBoxIdProduct);
@@ -1130,14 +1122,14 @@ public class AdminWindow extends JFrame {
 		getAllCategories(comboBoxCategory);
 		findCategoriesWithNoRepresentative(model);
 		
-		fillComboBoxFilters(comboBoxUsernamesFilter, comboBoxCategoryFilter);
+		fillComboBoxFilters(comboBoxCategoryFilter);
 		
 		int numberOfCategories = categoriesWithRepresentative.size() + categoriesWithoutRepresentative.size();
-		String mostSalesByCategory = thisAdmin.getMostSalesByCriteria("category");
-		String mostSalesByProduct = thisAdmin.getMostSalesByCriteria("product");
-		String mostSalesByRepresentative = thisAdmin.getMostSalesByCriteria("representative_username");
-		int numberOfClients = thisAdmin.getNumberOfClients();
-		double totalProfit = thisAdmin.getTotalProfit();
+		String mostSalesByCategory = adminController.getMostSalesByCriteria("category");
+		String mostSalesByProduct = adminController.getMostSalesByCriteria("product");
+		String mostSalesByRepresentative = adminController.getMostSalesByCriteria("representative_username");
+		int numberOfClients = adminController.getNumberOfClients();
+		double totalProfit = adminController.getTotalProfit();
 		
 		lblNumberOfProducts.setText("Number of products: " + numberOfProducts);
 		lblNumberOfRepresentatives.setText("Number of representatives: " + numberOfRepresentatives);
@@ -1327,19 +1319,11 @@ public class AdminWindow extends JFrame {
 		
 	}
 	
-	public static void fillComboBoxFilters(JComboBox<String> comboBoxUsernamesFilter, JComboBox<String> comboBoxCategoriesFilter)
-	{
-		comboBoxUsernamesFilter.removeAllItems();
-		comboBoxUsernamesFilter.addItem("other");
-		
+	public static void fillComboBoxFilters(JComboBox<String> comboBoxCategoriesFilter)
+	{	
 		comboBoxCategoriesFilter.removeAllItems();
 		comboBoxCategoriesFilter.addItem("other");
-		
-		for(Representative rep : listRepresentatives)
-		{
-			comboBoxUsernamesFilter.addItem(""+rep.getUsername());
-		}
-		
+			
 		for(String category : allCategories)
 		{
 			comboBoxCategoriesFilter.addItem(""+category);

@@ -1,6 +1,7 @@
 package com.businessapplication;
 
 import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -149,7 +150,7 @@ public class Representative extends RepresentativeController{
 		this.numOfSales = newNumOfSales;
 	}	
 	
-	@Override
+	
 	public void setId() {		
 		try {	
 			ResultSet rs = DBConnection.getData(" SELECT id_rep FROM allrepresentatives ORDER BY id_rep DESC LIMIT 1");
@@ -165,119 +166,32 @@ public class Representative extends RepresentativeController{
 		this.id = idRepresentative;
 	}
 	
-	@Override
-	public void addSale(Client newClient)
+	public int getNumberOfSalesFromDB()
 	{
-		System.out.println("What was the order (choose product by id)");
-		int ch;
-		
-		try{	    
-			String productName = newClient.getProductBought();
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + username + "'");
+			rs.next();
 			
-	        ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + productName + "'");
-			
-			int quantityOfProduct = 0;
-			int newQuantity;
-
-			double priceProduct = 0;
-			
-			while(rs.next())
-			{
-				quantityOfProduct = rs.getInt("quantity");
-				priceProduct = rs.getDouble("price");		
-			}
-			
-			double fullPriceOfSale = newClient.getQuantityBought() * priceProduct;
-			
-			NumberFormat formatter = new DecimalFormat("#0.00");
-			String formatedFullPrice = formatter.format(fullPriceOfSale);
-			
-			NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
-			Number number = format.parse(formatedFullPrice);
-			fullPriceOfSale = number.doubleValue();
-			
-			boolean isValid = newClient.isFirstTimeClient() && validateEmail(newClient);
-			
-			if(isValid)
-			{
-				if(newClient.getQuantityBought() == quantityOfProduct)
-				{		
-					DBConnection.updateData( "DELETE FROM allproducts WHERE name = '" + productName + "'");
-					
-					System.out.println("This client bougth the last copy (product has been deleted).");
-					
-					Thread th = new Thread( new Runnable(){
-
-						public void run() {
-							EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product out of stock!", "'" + productName + "' is out of stock!\n\nThe last amounts where bought on "
-									+ newClient.getDateOfSale() + ".\nYou might consider restocking.\n\nTheBusinessApp2021");
-						}	
-					});
-					
-					th.start();
-
-				}
-				else
-				{
-					newQuantity = quantityOfProduct - newClient.getQuantityBought();
-					
-					DBConnection.updateData("UPDATE allproducts SET quantity = "+ newQuantity +" WHERE name = '"+ productName + "'");
-					
-					if(newQuantity <= 10) {
-						
-						Thread th = new Thread( new Runnable(){
-
-							public void run() {
-								EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product running low!", "'" + productName + "' is running out of stock!\n\nYou might consider restocking.\n\nTheBusinessApp2021");
-							}	
-						});
-						
-						th.start();
-							
-					}
-					
-				}
-				
-				PreparedStatement pstmt = DBConnection.insertData
-						(" INSERT INTO allsales (id_sale, name, email, representative_username, category, product, quantity, price, date)" + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-				
-				pstmt.setInt(1, newClient.getIdOfSale());
-				pstmt.setString(2, newClient.getName());
-				pstmt.setString(3, newClient.getEmail());
-				pstmt.setString(4, this.username);
-				pstmt.setString(5, newClient.getCategoryOfProductBought());
-				pstmt.setString(6, newClient.getProductBought());
-				pstmt.setInt(7, newClient.getQuantityBought());
-				pstmt.setDouble(8, fullPriceOfSale);
-				pstmt.setDate(9, newClient.getSqlDateOfSale());
-				pstmt.execute();
-				
-				
-				if(newClient.isFirstTimeClient())
-				{
-					
-					pstmt = DBConnection.insertData
-							(" INSERT INTO allclients (id_client, name, email)" + " VALUES (?, ?, ?)");
-					pstmt.setInt(1, newClient.getIdOfClient());
-					pstmt.setString(2, newClient.getName());
-					pstmt.setString(3, newClient.getEmail());
-
-					pstmt.execute();
-				}
-				
-				int newNumOfSales = this.numOfSales + 1;
-				setNumOfSales(newNumOfSales);
-				
-				DBConnection.updateData("UPDATE allrepresentatives SET numberofsales = " + this.numOfSales + " WHERE id_rep = " + this.id);
-				
-				double newProfit = getProfit() + fullPriceOfSale;
-				setProfit(newProfit);
-				
-				DBConnection.updateData("UPDATE allrepresentatives SET profit = " + this.profit + " WHERE id_rep = " + this.id);
-
-			} 
-		} catch(SQLException | ParseException e) {
+			return rs.getInt("numberofsales");
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		return 0;
 	}
+	
+	public double getProfitFromDB()
+	{
+		try {
+			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + username + "'");
+			rs.next();
+			
+			return rs.getDouble("profit");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+	
 }

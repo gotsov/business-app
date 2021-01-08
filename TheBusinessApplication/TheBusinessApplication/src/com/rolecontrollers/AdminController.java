@@ -23,7 +23,7 @@ import com.login.UserController;
 
 import twitter4j.TwitterException;
 
-public abstract class AdminController {	
+public class AdminController {	
 	public static int idUser = 1;
 	
 	public HashMap<String, Integer> categoriesHash = new HashMap<>();

@@ -13,6 +13,8 @@ import com.login.Hasher;
 import twitter4j.TwitterException;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
@@ -193,22 +195,30 @@ public class LoginWindow extends JFrame {
 		        		name = rs.getString("name");
 		        		category = rs.getString("category");
 		        		
-	        			if(usertype.equals("representative"))
-	        			{
+	        			if(usertype.equals("representative")) {
 	        				RepresentativeWindow repWin = new RepresentativeWindow(id, name, username, saltedHashStringDB, category);
 							repWin.setVisible(true);
 							repWin.setTitle("Sales Representative - " + name + " (" + username + ") / " + category);
 							setVisible(false);
+							break;
 	        			}
-	        			else
-	        			{
+	        			else if(usertype.equals("admin")) {
 		        			AdminWindow adminWin = new AdminWindow(id, name, username, saltedHashStringDB);
 							adminWin.setVisible(true);
 							adminWin.setTitle("Admin - " + name + " (" + username + ")");
+							setVisible(false);
+							break;
 	        			}
-						
+	        				
 	        		}
-	        	}
+//	        		else {
+//        				JOptionPane.showMessageDialog(null, "Invalid password");
+//        				break;
+//        			}
+	        	}//else {
+//    				JOptionPane.showMessageDialog(null, "Invalid username");
+//    				break;
+//    			}
 	        	
 	        }
 	        

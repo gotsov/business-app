@@ -13,22 +13,134 @@ import java.text.SimpleDateFormat;
 import com.businessapplication.Client;
 import com.businessapplication.Sale;
 import com.businessapplication.Client.Builder;
+import com.businessapplication.Representative;
 import com.databaseconnection.DBConnection;
+import com.emailconnection.EmailDriver;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-public abstract class RepresentativeController {
+public class RepresentativeController {
 	
 	public static int idRepresentative = 100;
-
-	public abstract void setId();
 	
-	public abstract void addSale(Client newClient);
+	//public abstract void addSale(Client newClient);
 	
 	public boolean validateEmail(Client clientToVarify)
 	{
 		return clientToVarify.getEmail().matches("^(.+)@(.+)$");
+	}
+	
+	public void addSale(Client newClient, Representative rep)
+	{	
+		try(Connection con = DBConnection.getCon()) {  
+			String productName = newClient.getProductBought();
+			
+	        ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + productName + "'");
+			
+			int quantityOfProduct = 0;
+			int newQuantity;
+
+			double priceProduct = 0;
+			
+			while(rs.next())
+			{
+				quantityOfProduct = rs.getInt("quantity");
+				priceProduct = rs.getDouble("price");		
+			}
+			
+			double fullPriceOfSale = newClient.getQuantityBought() * priceProduct;
+			
+			NumberFormat formatter = new DecimalFormat("#0.00");
+			String formatedFullPrice = formatter.format(fullPriceOfSale);
+			
+			NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
+			Number number = format.parse(formatedFullPrice);
+			fullPriceOfSale = number.doubleValue();
+			
+			boolean isValid = newClient.isFirstTimeClient() && validateEmail(newClient);
+			
+			if(isValid)
+			{
+				if(newClient.getQuantityBought() == quantityOfProduct)
+				{		
+					DBConnection.updateData( "DELETE FROM allproducts WHERE name = '" + productName + "'");
+					
+					System.out.println("This client bougth the last copy (product has been deleted).");
+					
+					Thread th = new Thread( new Runnable(){
+
+						public void run() {
+							EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product out of stock!", "'" + productName + "' is out of stock!\n\nThe last amounts where bought on "
+									+ newClient.getDateOfSale() + ".\nYou might consider restocking.\n\nTheBusinessApp2021");
+						}	
+					});
+					
+					th.start();
+
+				}
+				else
+				{
+					newQuantity = quantityOfProduct - newClient.getQuantityBought();
+					
+					DBConnection.updateData("UPDATE allproducts SET quantity = "+ newQuantity +" WHERE name = '"+ productName + "'");
+					
+					if(newQuantity <= 10) {
+						
+						Thread th = new Thread( new Runnable(){
+
+							public void run() {
+								EmailDriver.sendEmail("thebusinessapp2021@gmail.com", "Product running low!", "'" + productName + "' is running out of stock!\n\nYou might consider restocking.\n\nTheBusinessApp2021");
+							}	
+						});
+						
+						th.start();
+							
+					}
+					
+				}
+				
+				PreparedStatement pstmt = DBConnection.insertData
+						(" INSERT INTO allsales (id_sale, name, email, representative_username, category, product, quantity, price, date)" + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				
+				pstmt.setInt(1, newClient.getIdOfSale());
+				pstmt.setString(2, newClient.getName());
+				pstmt.setString(3, newClient.getEmail());
+				pstmt.setString(4, rep.getUsername());
+				pstmt.setString(5, newClient.getCategoryOfProductBought());
+				pstmt.setString(6, newClient.getProductBought());
+				pstmt.setInt(7, newClient.getQuantityBought());
+				pstmt.setDouble(8, fullPriceOfSale);
+				pstmt.setDate(9, newClient.getSqlDateOfSale());
+				pstmt.execute();
+				
+				
+				if(newClient.isFirstTimeClient())
+				{
+					
+					pstmt = DBConnection.insertData
+							(" INSERT INTO allclients (id_client, name, email)" + " VALUES (?, ?, ?)");
+					pstmt.setInt(1, newClient.getIdOfClient());
+					pstmt.setString(2, newClient.getName());
+					pstmt.setString(3, newClient.getEmail());
+
+					pstmt.execute();
+				}
+				
+				int newNumOfSales = rep.getNumberOfSales() + 1;
+				rep.setNumOfSales(newNumOfSales);
+				
+				DBConnection.updateData("UPDATE allrepresentatives SET numberofsales = " + rep.getNumberOfSales() + " WHERE id_rep = " + rep.getId());
+				
+				double newProfit = rep.getProfit() + fullPriceOfSale;
+				rep.setProfit(newProfit);
+				
+				DBConnection.updateData("UPDATE allrepresentatives SET profit = " + rep.getProfit() + " WHERE id_rep = " + rep.getId());
+
+			} 
+		} catch(SQLException | ParseException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void checkIfFirstTimeClient(Client clientToCheck) 
@@ -111,8 +223,8 @@ public abstract class RepresentativeController {
 				else if(fieldToEdit.equals("email")) {
 					
 					if(validateEmail(clientToEdit)) {
-						DBConnection.updateData("UPDATE allclients SET  " + fieldToEdit + "'" + clientToEdit.getEmail() + "'" +"WHERE id_client = " + idClient);
-						DBConnection.updateData("UPDATE allsales SET " + fieldToEdit + "'" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSale);
+						DBConnection.updateData("UPDATE allclients SET  " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_client = " + idClient);
+						DBConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSale);
 						
 						System.out.println("new email set");
 					}

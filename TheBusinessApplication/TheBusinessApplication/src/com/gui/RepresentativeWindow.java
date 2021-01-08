@@ -26,6 +26,7 @@ import com.businessapplication.Sale;
 import com.businessapplication.Client.Builder;
 import com.businessapplication.Product;
 import com.databaseconnection.DBConnection;
+import com.rolecontrollers.RepresentativeController;
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.JScrollPane;
@@ -42,9 +43,10 @@ import java.awt.BorderLayout;
 
 public class RepresentativeWindow extends JFrame {
 	
-	private JTable tableCatalog;
+	private static JTable tableCatalog;
+	private static JTable tableClients;
+	private static JTable tableProducts;
 	
-	private JTable tableClients;
 	private JTextField txtFieldClientNameEdit;
 	private JTextField txtFieldClientEmailEdit;
 	private JTextField txtFieldClientNameAdd;
@@ -52,37 +54,33 @@ public class RepresentativeWindow extends JFrame {
 	private JTextField txtFieldClientName;
 	private JTextField txtFieldClientEmail;
 	
-	private String name;
-	private String category;
-	private String username;
-	private String password;
-	private int id;
 	private ArrayList<Sale> clientsFromCatalog  = new ArrayList<>();
 	private ArrayList<Product> yourProducts = new ArrayList<>();
 	private ArrayList<Sale> catalog = new ArrayList<>();
 	private Representative thisRepresentative;
-	private JTable tableProducts;
+	private RepresentativeController repController;
+	
 	/**
 	 * Create the frame.
 	 */
 	public RepresentativeWindow(int id, String name, String username, String password, String category) {
 		
 		setResizable(false);
-		this.id = id;
-		this.name  = name;
-		this.category = category;
-		this.username = username;	
-		this.password = password;
 		
 		Representative thisRepresentative = new Representative.Builder().id(id)
 																		.name(name)
 																		.username(username)
 																		.category(category)
 																		.password(password)
-																		.numberOfSales(getNumberOfSales())
-        																.profit(getProfit())
 																		.build();
+		
+		thisRepresentative.setNumOfSales(thisRepresentative.getNumberOfSalesFromDB());
+		thisRepresentative.setProfit(thisRepresentative.getProfitFromDB());
+		
+		RepresentativeController repController = new RepresentativeController();
+		
 		this.thisRepresentative = thisRepresentative;
+		this.repController = repController;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 866, 626);
@@ -94,20 +92,16 @@ public class RepresentativeWindow extends JFrame {
 		userMenu.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		menuBar.add(userMenu);
 		
-		JMenuItem mnChangePassword = new JMenuItem("Change password");
-		mnChangePassword.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-		userMenu.add(mnChangePassword);
-		
 		JMenuItem mnLogout = new JMenuItem("Log out");
 		mnLogout.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		userMenu.add(mnLogout);
 		
+		JMenuItem mnChangePassword = new JMenuItem("Change password");
+		mnChangePassword.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		userMenu.add(mnChangePassword);
+		
 				
-				mnLogout.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						setVisible(false);
-					}
-				});
+				
 		getContentPane().setLayout(null);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
@@ -416,6 +410,19 @@ public class RepresentativeWindow extends JFrame {
 		
 		updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct, comboBoxQuantity);		
 		
+		mnLogout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				setVisible(false);
+			}
+		});
+		
+		mnChangePassword.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ChangePasswordWindow changePassWin = new ChangePasswordWindow(thisRepresentative.getId());
+				changePassWin.setVisible(true);
+				changePassWin.setTitle("Password - " + thisRepresentative.getName() + "(" + thisRepresentative.getUsername() + ")");
+			}
+		});
 		
 		comboBoxChange.addActionListener(new ActionListener() {		
 			@Override
@@ -474,7 +481,7 @@ public class RepresentativeWindow extends JFrame {
 								   .dateOfSale(date)
 								   .build();
 		            	
-		            	thisRepresentative.addSale(newClient);	
+		            	repController.addSale(newClient, thisRepresentative);	
 		            	
 	            	} catch(SQLException e) {
 	            		e.printStackTrace();
@@ -490,7 +497,7 @@ public class RepresentativeWindow extends JFrame {
 							   .dateOfSale(date)
 							   .build();
 	            	
-	            	thisRepresentative.addSale(newClient);	
+	            	repController.addSale(newClient, thisRepresentative);	
 	            }
 
 				if(newClient.isFirstTimeClient())
@@ -526,7 +533,8 @@ public class RepresentativeWindow extends JFrame {
 					idClient = clientToEdit.getIdOfClient();
 					idSale = getIdOfSale();
 					
-					thisRepresentative.editClient(clientToEdit, "name", idClient, idSale);
+					repController.editClient(clientToEdit, "name", idClient, idSale);
+					
 					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 				}
 				
@@ -542,7 +550,8 @@ public class RepresentativeWindow extends JFrame {
 						idClient = clientToEdit.getIdOfClient();
 						idSale = getIdOfSale();
 						
-						thisRepresentative.editClient(clientToEdit, "email", idClient, idSale);
+						repController.editClient(clientToEdit, "email", idClient, idSale);
+						
 						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 					}
 					else {
@@ -562,7 +571,7 @@ public class RepresentativeWindow extends JFrame {
 						idClient = clientToEdit.getIdOfClient();
 						idSale = getIdOfSale();
 						
-						thisRepresentative.editClient(clientToEdit, "name & e-mail", idClient, idSale);
+						repController.editClient(clientToEdit, "name & e-mail", idClient, idSale);
 						
 						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 					}
@@ -587,7 +596,7 @@ public class RepresentativeWindow extends JFrame {
 											.email(email)
 											.build();
 					
-				thisRepresentative.deleteClient(clientToDelete);
+				repController.deleteClient(clientToDelete);
 				JOptionPane.showMessageDialog(null, "Client ["+ clientToDelete.getName() + ", " + clientToDelete.getEmail() + "] has been deleted.");
 				
 				updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
@@ -606,13 +615,13 @@ public class RepresentativeWindow extends JFrame {
 				
 				System.out.println(clientToAdd.isFirstTimeClient());
 				if(clientToAdd.isFirstTimeClient()) {
-					thisRepresentative.addClient(clientToAdd);
+					repController.addClient(clientToAdd);
 					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 				}
 				else {
 					JOptionPane.showMessageDialog(null, "Not unique e-mail");
 				}
-				thisRepresentative.addClient(clientToAdd);
+				repController.addClient(clientToAdd);
 			}
 		});
 	}
@@ -651,20 +660,13 @@ public class RepresentativeWindow extends JFrame {
 			DefaultTableModel modelClients = (DefaultTableModel)tableClients.getModel();
 			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel();
 			
-			if(modelCatalog.getRowCount() > 0)
-			{
-				modelCatalog.setRowCount(0);
-			}
+			modelCatalog.setRowCount(0);		
+			modelClients.setRowCount(0);
+			modelProducts.setRowCount(0);
 			
-			if(modelClients.getRowCount() > 0)
-			{
-				modelClients.setRowCount(0);
-			}
-			
-			if(modelProducts.getRowCount() > 0)
-			{
-				modelProducts.setRowCount(0);
-			}
+			catalog.clear();
+			clientsFromCatalog.clear();
+			yourProducts.clear();
 			
 			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + thisRepresentative.getUsername() + "'");
 			
@@ -694,10 +696,10 @@ public class RepresentativeWindow extends JFrame {
 				modelCatalog.addRow(row);
 			}
 	        
-	        clientsFromCatalog = thisRepresentative.removeRepeatingClients(catalog);
+	        clientsFromCatalog = repController.removeRepeatingClients(catalog);
 	        
 	        int id, quantity;
-	        String name, email;
+	        String name, email, category;
 	        double price;
 	        
 	        for (int i = 0; i < clientsFromCatalog.size(); i++) {
@@ -762,7 +764,7 @@ public class RepresentativeWindow extends JFrame {
 	{
 		comboBoxBoughtProduct.removeAllItems();
 		try(Connection con = DBConnection.getCon()){     
-			if(this.category.equals("all")) {
+			if(thisRepresentative.getCategory().equals("all")) {
 				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
 				
 				 while(rs.next())
@@ -771,7 +773,7 @@ public class RepresentativeWindow extends JFrame {
 				 }
 			}
 			else {
-				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + this.category + "'");
+				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + thisRepresentative.getCategory() + "'");
 				
 				 while(rs.next())
 				 {
@@ -812,24 +814,24 @@ public class RepresentativeWindow extends JFrame {
 		
 	}
 	
-	public int getIdOfRepresentative()
-	{
-		try(Connection con = DBConnection.getCon()) {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.username + "'");
-			rs.next();
-			
-			return rs.getInt("id_rep");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return 0;
-	}
+//	public int getIdOfRepresentative()
+//	{
+//		try(Connection con = DBConnection.getCon()) {
+//			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + thisRepresentative.getUsername() + "'");
+//			rs.next();
+//			
+//			return rs.getInt("id_rep");
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return 0;
+//	}
 	
 	public int getIdOfSale()
 	{
 		try (Connection con = DBConnection.getCon()){
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + this.username + "'");
+			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + thisRepresentative.getUsername() + "'");
 			rs.next();
 			
 			return rs.getInt("id_sale");
@@ -839,32 +841,5 @@ public class RepresentativeWindow extends JFrame {
 		
 		return 0;
 	}
-	
-	public int getNumberOfSales()
-	{
-		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.username + "'");
-			rs.next();
-			
-			return rs.getInt("numberofsales");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		
-		return 0;
-	}
-	
-	public double getProfit()
-	{
-		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + this.username + "'");
-			rs.next();
-			
-			return rs.getDouble("profit");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return 0;
-	}
 }
