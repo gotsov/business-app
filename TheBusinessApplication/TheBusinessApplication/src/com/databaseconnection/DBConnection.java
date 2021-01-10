@@ -8,10 +8,14 @@ import java.sql.SQLException;
 
 public class DBConnection {
 	
-	static private Connection con;
+	private static Connection con;
 	private static final String url = "jdbc:mysql://localhost:3306/businessapp?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	private static final String username = "root";
 	private static final String password = "root";
+	
+	public DBConnection(){
+		
+	}
 	
 	public static Connection getCon()
 	{
@@ -28,24 +32,24 @@ public class DBConnection {
 		return null;
 	}
 	
-	public static void setData(String s) throws SQLException
+	public void setData(String s) throws SQLException
 	{
-		DBConnection.getCon().createStatement().executeQuery(s);
+		con.createStatement().executeQuery(s);
 	}
 	
-	public static ResultSet getData(String s) throws SQLException
+	public ResultSet getData(String s) throws SQLException
 	{
-		return DBConnection.getCon().createStatement().executeQuery(s);
+		return con.createStatement().executeQuery(s);
 	}
 	
-	public static PreparedStatement insertData(String s) throws SQLException
+	public PreparedStatement insertData(String s) throws SQLException
 	{
 		PreparedStatement pstmt = con.prepareStatement(s);
 		
 		return pstmt;
 	}
 	
-	public static void updateData(String s) throws SQLException
+	public void updateData(String s) throws SQLException
 	{
 		PreparedStatement pstmt = con.prepareStatement(s);
 		

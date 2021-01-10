@@ -111,8 +111,9 @@ public class LoginWindow extends JFrame {
 	public void loginCheck()
 	{
 		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
 			
-			ResultSet rs = DBConnection.getData("SELECT * FROM users");
+			ResultSet rs = dbConnection.getData("SELECT * FROM users");
 			
 	        String username, name, password, usertype, category;
 	        int id;
@@ -159,8 +160,9 @@ public class LoginWindow extends JFrame {
 	public void loginCheckWithHash()
 	{
 		try (Connection con = DBConnection.getCon()){
+			DBConnection dbConnection = new DBConnection();
 			
-			ResultSet rs = DBConnection.getData("SELECT * FROM users");
+			ResultSet rs = dbConnection.getData("SELECT * FROM users");
 			
 	        String username, name, password, usertype, category;
 	        int id;

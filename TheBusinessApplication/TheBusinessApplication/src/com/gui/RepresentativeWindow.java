@@ -467,26 +467,18 @@ public class RepresentativeWindow extends JFrame {
 	            int quantityBought = Integer.parseInt((String) comboBoxQuantity.getSelectedItem());
 				Client newClient = null;
 				
-	            if(category.equals("all")) {
+	            if(category.equals("all")) {	            	
+	            	String categoryOfBoughtProduct = repController.getCategoryOfBoughtProduct(boughtProduct);
 	            	
-	            	try(Connection con = DBConnection.getCon()) {
-	            		ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + boughtProduct + "'");
-		            	rs.next();
-		            	
-		            	newClient = new Client.Builder().name(txtFieldClientName.getText())
-								   .email(txtFieldClientEmail.getText())
-								   .productBought(boughtProduct)
-								   .categoryOfProductBought(rs.getString("category"))
-								   .quantityBought(quantityBought)
-								   .dateOfSale(date)
-								   .build();
-		            	
-		            	repController.addSale(newClient, thisRepresentative);	
-		            	
-	            	} catch(SQLException e) {
-	            		e.printStackTrace();
-	            	}
+	            	newClient = new Client.Builder().name(txtFieldClientName.getText())
+							   .email(txtFieldClientEmail.getText())
+							   .productBought(boughtProduct)
+							   .categoryOfProductBought(categoryOfBoughtProduct)
+							   .quantityBought(quantityBought)
+							   .dateOfSale(date)
+							   .build();
 	            	
+	            	repController.addSale(newClient, thisRepresentative);			        	
 	            	
 	            } else {
 	            	newClient = new Client.Builder().name(txtFieldClientName.getText())
@@ -639,7 +631,9 @@ public class RepresentativeWindow extends JFrame {
 	{
 		
 		try(Connection con = DBConnection.getCon()) {
-			ResultSet rs = DBConnection.getData("SELECT " + toChange + " FROM allclients WHERE id_client = " + id);
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT " + toChange + " FROM allclients WHERE id_client = " + id);
 			
 			while(rs.next())
 			{
@@ -654,97 +648,64 @@ public class RepresentativeWindow extends JFrame {
 	}
 	
 	public void loadTables()
-	{
-		try(Connection con = DBConnection.getCon()){
-			DefaultTableModel modelCatalog = (DefaultTableModel)tableCatalog.getModel(); 
-			DefaultTableModel modelClients = (DefaultTableModel)tableClients.getModel();
-			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel();
-			
-			modelCatalog.setRowCount(0);		
-			modelClients.setRowCount(0);
-			modelProducts.setRowCount(0);
-			
-			catalog.clear();
-			clientsFromCatalog.clear();
-			yourProducts.clear();
-			
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + thisRepresentative.getUsername() + "'");
-			
-	        while(rs.next())
-	        {  	      	
-	        	Sale s = new Sale.Builder().id(rs.getInt("id_sale"))
-	        											   .name(rs.getString("name"))
-	        											   .email(rs.getString("email"))
-	        											   .product(rs.getString("product"))
-	        											   .quantity(rs.getInt("quantity"))
-	        											   .price(rs.getDouble("price"))
-	        											   .date(rs.getDate("date"))
-	        											   .build();	
-	        	catalog.add(s);
-	        }
-	        
-			Object[] row = new Object[7];
-	        
-	        for (int i = 0; i < catalog.size(); i++) {
-				row[0] = catalog.get(i).getId();
-				row[1] = catalog.get(i).getName();
-				row[2] = catalog.get(i).getEmail();
-				row[3] = catalog.get(i).getProduct();
-				row[4] = catalog.get(i).getQuantity();
-				row[5] = catalog.get(i).getPrice();
-				row[6] = catalog.get(i).getDate();
-				modelCatalog.addRow(row);
-			}
-	        
-	        clientsFromCatalog = repController.removeRepeatingClients(catalog);
-	        
-	        int id, quantity;
-	        String name, email, category;
-	        double price;
-	        
-	        for (int i = 0; i < clientsFromCatalog.size(); i++) {
-				id = clientsFromCatalog.get(i).getId();
-				name = clientsFromCatalog.get(i).getName();
-				email = clientsFromCatalog.get(i).getEmail();
+	{	
+		DefaultTableModel modelCatalog = (DefaultTableModel)tableCatalog.getModel(); 
+		DefaultTableModel modelClients = (DefaultTableModel)tableClients.getModel();
+		DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel();
+		
+		int id, quantity;
+        String name, email, category, product;
+        double price;
+        Date date;
+		
+		modelCatalog.setRowCount(0);		
+		modelClients.setRowCount(0);
+		modelProducts.setRowCount(0);
+		
+		catalog.clear();
+		clientsFromCatalog.clear();
+		yourProducts.clear();
 				
-				Object[] data = {id, name, email};
-				
-				modelClients.addRow(data);
-			}
-	        
-	        rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + thisRepresentative.getCategory() + "'");
-	        
-	        if(thisRepresentative.getCategory().equals("all")) {
-	        	rs = DBConnection.getData("SELECT * FROM allproducts");
-	        }
+		catalog = repController.getCatalog(thisRepresentative);
+        
+        for (int i = 0; i < catalog.size(); i++) {
+			id = catalog.get(i).getId();
+			name = catalog.get(i).getName();
+			email = catalog.get(i).getEmail();
+			product = catalog.get(i).getProduct();
+			quantity = catalog.get(i).getQuantity();
+			price = catalog.get(i).getPrice();
+			date = catalog.get(i).getDate();
 			
-	        while(rs.next())
-	        {  	      	
-	        	Product p = new Product.Builder().id(rs.getInt("id_prod"))
-	        									 .name(rs.getString("name"))
-	        									 .category(rs.getString("category"))
-	        									 .quantity(rs.getInt("quantity"))
-	        									 .price(rs.getDouble("price"))
-	        									 .build();
-	        	yourProducts.add(p);
-	        }
-	        
-	        for (int i = 0; i < yourProducts.size(); i++) {
-				id = yourProducts.get(i).getId();
-				name = yourProducts.get(i).getName();
-				category = yourProducts.get(i).getCategory();
-				quantity = yourProducts.get(i).getQuantity();
-				price = yourProducts.get(i).getPrice();
-				
-				Object[] data = {id, name, category, quantity, price};
-				
-				modelProducts.addRow(data);
-			}
-	        
-	        
-	        
-		} catch(SQLException e) {
-			e.printStackTrace();
+			Object[] data = {id, name, email, product, quantity, price, date};
+			
+			modelCatalog.addRow(data);
+		}
+        
+        clientsFromCatalog = repController.removeRepeatingClients(catalog);
+        
+        for (int i = 0; i < clientsFromCatalog.size(); i++) {
+			id = clientsFromCatalog.get(i).getId();
+			name = clientsFromCatalog.get(i).getName();
+			email = clientsFromCatalog.get(i).getEmail();
+			
+			Object[] data = {id, name, email};
+			
+			modelClients.addRow(data);
+		}
+        
+        yourProducts = repController.getProductsFromYourCategory(thisRepresentative);
+        
+        for (int i = 0; i < yourProducts.size(); i++) {
+			id = yourProducts.get(i).getId();
+			name = yourProducts.get(i).getName();
+			category = yourProducts.get(i).getCategory();
+			quantity = yourProducts.get(i).getQuantity();
+			price = yourProducts.get(i).getPrice();
+			
+			Object[] data = {id, name, category, quantity, price};
+			
+			modelProducts.addRow(data);
 		}
 	
 	}
@@ -763,29 +724,22 @@ public class RepresentativeWindow extends JFrame {
 	public void fillComboBoxProducts(JComboBox<String> comboBoxBoughtProduct)
 	{
 		comboBoxBoughtProduct.removeAllItems();
-		try(Connection con = DBConnection.getCon()){     
-			if(thisRepresentative.getCategory().equals("all")) {
-				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
-				
-				 while(rs.next())
-				 {
-			        	comboBoxBoughtProduct.addItem(rs.getString("name"));
-				 }
-			}
-			else {
-				ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE category = '" + thisRepresentative.getCategory() + "'");
-				
-				 while(rs.next())
-				 {
-			        	comboBoxBoughtProduct.addItem(rs.getString("name"));
-				 }
-			}
 			
-	       
-		} catch(SQLException e) {
-			e.printStackTrace();
+		if(thisRepresentative.getCategory().equals("all")) {
+			
+			for(Product p : yourProducts)
+			{
+				comboBoxBoughtProduct.addItem(p.getName());
+			}
 		}
-		
+		else {	
+			for(Product p : yourProducts)
+			{
+				if(p.getCategory().equals(thisRepresentative.getCategory()))
+					comboBoxBoughtProduct.addItem(p.getName());
+			}
+				
+		}
 	}
 	
 	public void fillComboBoxQuantity(JComboBox<String> comboBoxBoughtProduct, JComboBox<String> comboBoxQuantity)
@@ -795,7 +749,9 @@ public class RepresentativeWindow extends JFrame {
 		comboBoxQuantity.removeAllItems();
 		
 		try(Connection con = DBConnection.getCon()){
-			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + comboBoxBoughtProduct.getSelectedItem() + "'");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allproducts WHERE name = '" + comboBoxBoughtProduct.getSelectedItem() + "'");
 	        
 	        int quantity = 0;
 	        while(rs.next())
@@ -831,7 +787,9 @@ public class RepresentativeWindow extends JFrame {
 	public int getIdOfSale()
 	{
 		try (Connection con = DBConnection.getCon()){
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + thisRepresentative.getUsername() + "'");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + thisRepresentative.getUsername() + "'");
 			rs.next();
 			
 			return rs.getInt("id_sale");

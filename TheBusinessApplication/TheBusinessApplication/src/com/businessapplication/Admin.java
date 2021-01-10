@@ -1,9 +1,16 @@
 package com.businessapplication;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import com.businessapplication.Admin.Builder;
+import com.databaseconnection.DBConnection;
 import com.rolecontrollers.AdminController;
 
 public class Admin{
+	private static int idAdmin = 1;
+	
 	private int id;
 	private String name;
 	private String username;
@@ -11,10 +18,14 @@ public class Admin{
 	
 	public Admin(Builder builder)
 	{
-		this.name = builder.name;
 		this.id = builder.id;
+		this.name = builder.name;
 		this.username = builder.username;
 		this.password = builder.password;
+		
+		System.out.println("im hereee");
+		System.out.println("id = " + id);
+		setIdForDB();
 
 	}
 	
@@ -54,9 +65,26 @@ public class Admin{
 	public int getId() {
 		return id;
 	}
-
+	
 	public void setId(int id) {
 		this.id = id;
+	}
+	public void setIdForDB() {		
+		try(Connection con = DBConnection.getCon()) {	
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT id_user FROM users WHERE usertype = 'admin' ORDER BY id_user DESC LIMIT 1");
+					
+			rs.next();
+			idAdmin = rs.getInt("id_user");
+
+			this.id = ++idAdmin;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println(idAdmin);
+		this.id = idAdmin;
 	}
 
 	public String getName() {

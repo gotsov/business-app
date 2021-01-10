@@ -12,7 +12,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -23,8 +22,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-
-import org.jfree.data.general.DefaultPieDataset;
 
 import javax.swing.JScrollPane;
 import javax.swing.JMenuBar;
@@ -44,6 +41,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import com.businessapplication.Admin;
+import com.businessapplication.PieChart;
 import com.businessapplication.Product;
 import com.businessapplication.Representative;
 import com.businessapplication.Sale;
@@ -142,9 +140,9 @@ public class AdminWindow extends JFrame {
 		mnLogout.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		mnNewMenu.add(mnLogout);
 		
-		JMenuItem mnAddAdmin = new JMenuItem("Add admin");
-		mnAddAdmin.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-		mnNewMenu.add(mnAddAdmin);
+		JMenuItem mnManageAdmins = new JMenuItem("Manage admins");
+		mnManageAdmins.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		mnNewMenu.add(mnManageAdmins);
 		
 		JMenuItem mnChangePassword = new JMenuItem("Change password");
 		mnChangePassword.setFont(new Font("Segoe UI", Font.PLAIN, 18));
@@ -798,6 +796,14 @@ public class AdminWindow extends JFrame {
 		mnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				setVisible(false);
+				LoginWindow loginWin = new LoginWindow();
+				loginWin.setVisible(true);
+			}
+		});
+		
+		mnManageAdmins.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
 			}
 		});
 		
@@ -809,7 +815,7 @@ public class AdminWindow extends JFrame {
 			}
 		});
 		
-		mnAddAdmin.addActionListener(new ActionListener() {
+		mnManageAdmins.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				AddAdminWindow addAdminWindow = new AddAdminWindow();
 				addAdminWindow.setVisible(true);
@@ -819,15 +825,8 @@ public class AdminWindow extends JFrame {
 		
 		btnPieChart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				DefaultPieDataset pieDataset = new DefaultPieDataset();
-				
-				HashMap<String, Integer> data = adminController.getHashMapSalesByCategory();
-				
-				for (HashMap.Entry<String, Integer> entry : data.entrySet()) {
-					//pieDataset.setValue(entry.getKey(), entry.getValue());
-					
-					System.out.println(entry.getKey() + " - " + entry.getValue());
-				}
+				 PieChart demo = new PieChart("Sales by category");
+				 demo.setVisible(true);
 				
 			}
 		});
@@ -1122,7 +1121,7 @@ public class AdminWindow extends JFrame {
 		getAllCategories(comboBoxCategory);
 		findCategoriesWithNoRepresentative(model);
 		
-		fillComboBoxFilters(comboBoxCategoryFilter);
+		fillComboBoxFilters(comboBoxCategoryFilter, comboBoxUsernames);
 		
 		int numberOfCategories = categoriesWithRepresentative.size() + categoriesWithoutRepresentative.size();
 		String mostSalesByCategory = adminController.getMostSalesByCriteria("category");
@@ -1148,6 +1147,8 @@ public class AdminWindow extends JFrame {
 	public static void loadTablesAdmin()
 	{
 		try(Connection con = DBConnection.getCon()){
+			DBConnection dbConnection = new DBConnection();
+			
 			DefaultTableModel modelProducts = (DefaultTableModel)tableProducts.getModel(); 
 			DefaultTableModel modelRepresentatives = (DefaultTableModel)tableRepresentatives.getModel(); 
 			DefaultTableModel modelAllSales = (DefaultTableModel)tableAllSales.getModel();
@@ -1159,7 +1160,7 @@ public class AdminWindow extends JFrame {
 			listRepresentatives.clear();
 			listAllSales.clear();
 			
-			ResultSet rs = DBConnection.getData("SELECT * FROM allproducts");
+			ResultSet rs = dbConnection.getData("SELECT * FROM allproducts");
 			
 			numberOfProducts = 0;
 	        while(rs.next())
@@ -1189,7 +1190,7 @@ public class AdminWindow extends JFrame {
 			}
 	        
 	        
-			rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+			rs = dbConnection.getData("SELECT * FROM allrepresentatives");
 			
 			numberOfRepresentatives = 0;
 	        while(rs.next())
@@ -1220,7 +1221,7 @@ public class AdminWindow extends JFrame {
 				modelRepresentatives.addRow(row2);
 			}   
 	        
-	        rs = DBConnection.getData("SELECT * FROM allsales");
+	        rs = dbConnection.getData("SELECT * FROM allsales");
 			
 	        numberOfSales = 0;
 	        while(rs.next())
@@ -1287,7 +1288,9 @@ public class AdminWindow extends JFrame {
 	public static void getAllCategories(JComboBox<String>  comboBoxCategory)
 	{
 		try(Connection con = DBConnection.getCon()) {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allrepresentatives");
 				
 			String category;
 			while(rs.next())
@@ -1319,14 +1322,22 @@ public class AdminWindow extends JFrame {
 		
 	}
 	
-	public static void fillComboBoxFilters(JComboBox<String> comboBoxCategoriesFilter)
+	public static void fillComboBoxFilters(JComboBox<String> comboBoxCategoriesFilter, JComboBox<String> comboBoxUsernames)
 	{	
 		comboBoxCategoriesFilter.removeAllItems();
 		comboBoxCategoriesFilter.addItem("other");
+		
+		comboBoxUsernames.removeAllItems();
+		comboBoxUsernames.addItem("other");
 			
 		for(String category : allCategories)
 		{
 			comboBoxCategoriesFilter.addItem(""+category);
+		}
+		
+		for(Representative rep : listRepresentatives)
+		{
+			comboBoxUsernames.addItem(""+rep.getUsername());
 		}
 	}
 	
@@ -1360,7 +1371,9 @@ public class AdminWindow extends JFrame {
 		categoriesWithoutRepresentative.clear();
 		categoriesWithRepresentative.clear();
 		try(Connection con = DBConnection.getCon()) {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allrepresentatives");
 			
 			while(rs.next())
 			{

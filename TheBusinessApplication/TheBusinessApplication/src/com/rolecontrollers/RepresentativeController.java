@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import com.businessapplication.Client;
+import com.businessapplication.Product;
 import com.businessapplication.Sale;
 import com.businessapplication.Client.Builder;
 import com.businessapplication.Representative;
@@ -34,9 +35,11 @@ public class RepresentativeController {
 	public void addSale(Client newClient, Representative rep)
 	{	
 		try(Connection con = DBConnection.getCon()) {  
+			DBConnection dbConnection = new DBConnection();
+			
 			String productName = newClient.getProductBought();
 			
-	        ResultSet rs = DBConnection.getData("SELECT * FROM allproducts WHERE name = '" + productName + "'");
+	        ResultSet rs = dbConnection.getData("SELECT * FROM allproducts WHERE name = '" + productName + "'");
 			
 			int quantityOfProduct = 0;
 			int newQuantity;
@@ -64,7 +67,7 @@ public class RepresentativeController {
 			{
 				if(newClient.getQuantityBought() == quantityOfProduct)
 				{		
-					DBConnection.updateData( "DELETE FROM allproducts WHERE name = '" + productName + "'");
+					dbConnection.updateData( "DELETE FROM allproducts WHERE name = '" + productName + "'");
 					
 					System.out.println("This client bougth the last copy (product has been deleted).");
 					
@@ -83,7 +86,7 @@ public class RepresentativeController {
 				{
 					newQuantity = quantityOfProduct - newClient.getQuantityBought();
 					
-					DBConnection.updateData("UPDATE allproducts SET quantity = "+ newQuantity +" WHERE name = '"+ productName + "'");
+					dbConnection.updateData("UPDATE allproducts SET quantity = "+ newQuantity +" WHERE name = '"+ productName + "'");
 					
 					if(newQuantity <= 10) {
 						
@@ -100,7 +103,7 @@ public class RepresentativeController {
 					
 				}
 				
-				PreparedStatement pstmt = DBConnection.insertData
+				PreparedStatement pstmt = dbConnection.insertData
 						(" INSERT INTO allsales (id_sale, name, email, representative_username, category, product, quantity, price, date)" + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 				
 				pstmt.setInt(1, newClient.getIdOfSale());
@@ -118,7 +121,7 @@ public class RepresentativeController {
 				if(newClient.isFirstTimeClient())
 				{
 					
-					pstmt = DBConnection.insertData
+					pstmt = dbConnection.insertData
 							(" INSERT INTO allclients (id_client, name, email)" + " VALUES (?, ?, ?)");
 					pstmt.setInt(1, newClient.getIdOfClient());
 					pstmt.setString(2, newClient.getName());
@@ -130,12 +133,12 @@ public class RepresentativeController {
 				int newNumOfSales = rep.getNumberOfSales() + 1;
 				rep.setNumOfSales(newNumOfSales);
 				
-				DBConnection.updateData("UPDATE allrepresentatives SET numberofsales = " + rep.getNumberOfSales() + " WHERE id_rep = " + rep.getId());
+				dbConnection.updateData("UPDATE allrepresentatives SET numberofsales = " + rep.getNumberOfSales() + " WHERE id_rep = " + rep.getId());
 				
 				double newProfit = rep.getProfit() + fullPriceOfSale;
 				rep.setProfit(newProfit);
 				
-				DBConnection.updateData("UPDATE allrepresentatives SET profit = " + rep.getProfit() + " WHERE id_rep = " + rep.getId());
+				dbConnection.updateData("UPDATE allrepresentatives SET profit = " + rep.getProfit() + " WHERE id_rep = " + rep.getId());
 
 			} 
 		} catch(SQLException | ParseException e) {
@@ -146,7 +149,9 @@ public class RepresentativeController {
 	public static void checkIfFirstTimeClient(Client clientToCheck) 
 	{
 		try (Connection con = DBConnection.getCon()){		
-			ResultSet rs = DBConnection.getData("SELECT * FROM allclients WHERE email = '" + clientToCheck.getEmail() + "'");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allclients WHERE email = '" + clientToCheck.getEmail() + "'");
 			
 			boolean newEmail = true;
 			
@@ -168,8 +173,10 @@ public class RepresentativeController {
 	
 	public static void setIdClient(Client clientToSetId)
 	{
-		try (Connection con = DBConnection.getCon()){		
-			ResultSet rs = DBConnection.getData(" SELECT id_client FROM allclients ORDER BY id_client DESC LIMIT 1");
+		try (Connection con = DBConnection.getCon()){	
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData(" SELECT id_client FROM allclients ORDER BY id_client DESC LIMIT 1");
 					
 			rs.next();
 			Client.idClient = rs.getInt("id_client");
@@ -188,7 +195,9 @@ public class RepresentativeController {
 	public static void setIdSale(Client clientToSetId)
 	{
 		try (Connection con = DBConnection.getCon()){
-			ResultSet rs = DBConnection.getData(" SELECT id_sale FROM allsales ORDER BY id_sale DESC LIMIT 1");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData(" SELECT id_sale FROM allsales ORDER BY id_sale DESC LIMIT 1");
 			
 			rs.next();
 			Client.idSale = rs.getInt("id_sale");
@@ -214,17 +223,19 @@ public class RepresentativeController {
 	public void editClient(Client clientToEdit, String fieldToEdit, int idClient, int idSale)
 	{
 		try(Connection con = DBConnection.getCon()) {     
+			DBConnection dbConnection = new DBConnection();
+			
 				if(fieldToEdit.equals("name")) {
-					DBConnection.updateData("UPDATE allclients SET " + fieldToEdit + " = '" + clientToEdit.getName() + "'" +"WHERE id_client = " + idClient);
-					DBConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" +  clientToEdit.getName() + "'" +"WHERE id_sale = " + idSale);
+					dbConnection.updateData("UPDATE allclients SET " + fieldToEdit + " = '" + clientToEdit.getName() + "'" +"WHERE id_client = " + idClient);
+					dbConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" +  clientToEdit.getName() + "'" +"WHERE id_sale = " + idSale);
 					
 					System.out.println("new name set");
 				}
 				else if(fieldToEdit.equals("email")) {
 					
 					if(validateEmail(clientToEdit)) {
-						DBConnection.updateData("UPDATE allclients SET  " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_client = " + idClient);
-						DBConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSale);
+						dbConnection.updateData("UPDATE allclients SET  " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_client = " + idClient);
+						dbConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSale);
 						
 						System.out.println("new email set");
 					}
@@ -234,13 +245,13 @@ public class RepresentativeController {
 				else if(fieldToEdit.equals("name & e-mail")) {
 					
 					if(validateEmail(clientToEdit)) {
-						DBConnection.updateData("UPDATE allclients SET name = "+ "'" + clientToEdit.getName() + "'" +"WHERE id_client = " + idClient);
-						DBConnection.updateData("UPDATE allsales SET name = "+ "'" + clientToEdit.getName() + "'" +"WHERE id_sale = " + idSale);
+						dbConnection.updateData("UPDATE allclients SET name = "+ "'" + clientToEdit.getName() + "'" +"WHERE id_client = " + idClient);
+						dbConnection.updateData("UPDATE allsales SET name = "+ "'" + clientToEdit.getName() + "'" +"WHERE id_sale = " + idSale);
 						
 						System.out.println("new name set");
 						
-						DBConnection.updateData("UPDATE allclients SET email = "+ "'" + clientToEdit.getEmail() + "'" +"WHERE id_client = " + idClient);
-						DBConnection.updateData("UPDATE allsales SET email = "+ "'" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSale);
+						dbConnection.updateData("UPDATE allclients SET email = "+ "'" + clientToEdit.getEmail() + "'" +"WHERE id_client = " + idClient);
+						dbConnection.updateData("UPDATE allsales SET email = "+ "'" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSale);
 
 						System.out.println("new email set");
 					}
@@ -255,9 +266,11 @@ public class RepresentativeController {
 	
 	public void deleteClient(Client clientToDelete)
 	{
-		try(Connection con = DBConnection.getCon()) {		
-			DBConnection.updateData("DELETE FROM allclients WHERE id_client = " + clientToDelete.getIdOfClient());
-			DBConnection.updateData("DELETE FROM allsales WHERE email = '" + clientToDelete.getEmail() + "'");
+		try(Connection con = DBConnection.getCon()) {	
+			DBConnection dbConnection = new DBConnection();
+			
+			dbConnection.updateData("DELETE FROM allclients WHERE id_client = " + clientToDelete.getIdOfClient());
+			dbConnection.updateData("DELETE FROM allsales WHERE email = '" + clientToDelete.getEmail() + "'");
 			
 			System.out.println("client deleted");
 		} catch (SQLException e) {
@@ -268,8 +281,10 @@ public class RepresentativeController {
 		
 	public void addClient(Client clientToAdd)
 	{
-		try(Connection con = DBConnection.getCon()) {		
-			PreparedStatement pstmt = DBConnection.insertData
+		try(Connection con = DBConnection.getCon()) {	
+			DBConnection dbConnection = new DBConnection();
+			
+			PreparedStatement pstmt = dbConnection.insertData
 					(" INSERT INTO allclients (id_client, name, email)" + " VALUES (?, ?, ?)");
 			pstmt.setInt(1, clientToAdd.getIdOfClient());
 			pstmt.setString(2, clientToAdd.getName());
@@ -284,8 +299,11 @@ public class RepresentativeController {
 	}
 	
 	public ArrayList<Sale> removeRepeatingClients(ArrayList<Sale> catalog) {
+		ArrayList<Sale> clients = new ArrayList<>();
 		
 		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
+			
 			for (int i = 0; i < catalog.size(); i++) {
 				for (int j = i+1; j < catalog.size(); j++) {
 					
@@ -294,12 +312,9 @@ public class RepresentativeController {
 					}
 				}
 			
-				ResultSet rs = DBConnection.getData("SELECT id_client FROM allclients WHERE email = '" + catalog.get(i).getEmail() + "'");
-				
-				while(rs.next())
-				{
-					catalog.get(i).setId(rs.getInt("id_client"));
-				}
+				ResultSet rs = dbConnection.getData("SELECT * FROM allclients WHERE email = '" + catalog.get(i).getEmail() + "'");	
+				rs.next();
+				catalog.get(i).setId(rs.getInt("id_client"));
 			
 			}
 		} catch (SQLException e) {
@@ -308,4 +323,81 @@ public class RepresentativeController {
 		return catalog;
 
 	}
+	
+	public ArrayList<Product> getProductsFromYourCategory(Representative rep){
+		DBConnection dbConnection = new DBConnection();
+		ArrayList<Product> products = new ArrayList<>();
+		
+		try(Connection con = DBConnection.getCon()) {
+			ResultSet rs = dbConnection.getData("SELECT * FROM allproducts WHERE category = '" + rep.getCategory() + "'");
+			
+			if(rep.getCategory().equals("all")) {
+				rs = dbConnection.getData("SELECT * FROM allproducts");
+			}
+			
+			while(rs.next())
+	        {  	      	
+	        	Product p = new Product.Builder().id(rs.getInt("id_prod"))
+	        									 .name(rs.getString("name"))
+	        									 .category(rs.getString("category"))
+	        									 .quantity(rs.getInt("quantity"))
+	        									 .price(rs.getDouble("price"))
+	        									 .build();
+	        	products.add(p);
+	        }
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return products;
+
+	}
+	
+	public ArrayList<Sale> getCatalog(Representative rep){
+		
+		ArrayList<Sale> catalog = new ArrayList<>();
+		try(Connection con = DBConnection.getCon()){
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + rep.getUsername() + "'");
+			
+	        while(rs.next())
+	        {  	      	
+	        	Sale s = new Sale.Builder().id(rs.getInt("id_sale"))
+	        											   .name(rs.getString("name"))
+	        											   .email(rs.getString("email"))
+	        											   .product(rs.getString("product"))
+	        											   .quantity(rs.getInt("quantity"))
+	        											   .price(rs.getDouble("price"))
+	        											   .date(rs.getDate("date"))
+	        											   .build();	
+	        	catalog.add(s);
+	        }
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+        return catalog;
+	}
+
+	public String getCategoryOfBoughtProduct(String boughtProduct) {
+		
+		try(Connection con = DBConnection.getCon()) {
+    		DBConnection dbConnection = new DBConnection();
+    		
+			ResultSet rs = dbConnection.getData("SELECT * FROM allproducts WHERE name = '" + boughtProduct + "'");
+			rs.next();
+			
+			return rs.getString("category");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+		
+		return null;
+	}
 }
+

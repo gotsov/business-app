@@ -7,9 +7,9 @@ import java.util.Base64;
 
 import com.databaseconnection.DBConnection;
 
-public abstract class UserController {
+public class UserController {
 																					  //1234 by default
-	public static void addUser(int id, String usertype, String name, String username, String password, String category) {
+	public void addUser(int id, String usertype, String name, String username, String password, String category) {
 		
 		byte[] salt =  Hasher.createSalt();
 		String hashedPassword = Hasher.getSaltedHash(password, salt);
@@ -31,7 +31,9 @@ public abstract class UserController {
 		System.out.println("saltEncoded: " + encodedSalt);
 			
 		try(Connection con = DBConnection.getCon()) {
-			PreparedStatement pstmt = DBConnection.insertData
+			DBConnection dbConnection = new DBConnection();
+			
+			PreparedStatement pstmt = dbConnection.insertData
 					(" INSERT INTO users (id_user, usertype, name, username, password, category) VALUES (?, ?, ?, ?, ?, ?)");
 			
 			pstmt.setInt(1, id);
@@ -49,6 +51,6 @@ public abstract class UserController {
 
 	}
 	
-	public abstract void changePassword(String password);
+//	public abstract void changePassword(String password);
 
 }

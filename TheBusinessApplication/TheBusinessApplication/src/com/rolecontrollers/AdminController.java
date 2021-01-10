@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.businessapplication.Admin;
 import com.businessapplication.Product;
 import com.businessapplication.Representative;
 import com.businessapplication.Sale;
@@ -32,7 +33,9 @@ public class AdminController {
 	public int getIdUser()
 	{
 		try(Connection con = DBConnection.getCon()) {	
-			ResultSet rs = DBConnection.getData(" SELECT id_user FROM users");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData(" SELECT id_user FROM users");
 					
 			while(rs.next())
 			{
@@ -55,8 +58,10 @@ public class AdminController {
 	public void addProduct(Product newProduct, boolean postOnSocial) {
 		try (Connection con = DBConnection.getCon()){		
 			
+			DBConnection dbConnection = new DBConnection();
+			
 			String name = newProduct.getName();
-			PreparedStatement pstmt = DBConnection.insertData
+			PreparedStatement pstmt = dbConnection.insertData
 									(" INSERT INTO allproducts (id_prod, name, category, price, quantity)" + " VALUES (?, ?, ?, ?, ?)");
 			pstmt.setInt(1, newProduct.getId());
 			pstmt.setString(2, name);
@@ -93,7 +98,9 @@ public class AdminController {
 	public void deleteProduct(Product productToDelete)
 	{
 		try (Connection con = DBConnection.getCon()){		
-			DBConnection.updateData("DELETE FROM allproducts WHERE id_prod = " + productToDelete.getId());
+			DBConnection dbConnection = new DBConnection();
+			
+			dbConnection.updateData("DELETE FROM allproducts WHERE id_prod = " + productToDelete.getId());
 	        
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -104,21 +111,23 @@ public class AdminController {
 	
 	public void editFieldProduct(Product productToEdit, String fieldToEdit) {
 		
-		try (Connection con = DBConnection.getCon()){			
+		try (Connection con = DBConnection.getCon()){	
+			DBConnection dbConnection = new DBConnection();
+			
 			if(fieldToEdit.equals("name")) {
-				DBConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = '" + productToEdit.getName() + "' WHERE id_prod = " + productToEdit.getId());
+				dbConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = '" + productToEdit.getName() + "' WHERE id_prod = " + productToEdit.getId());
 			}
 			else if(fieldToEdit.equals("category"))
 			{
-				DBConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = '" + productToEdit.getCategory() + "' WHERE id_prod = " + productToEdit.getId());
+				dbConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = '" + productToEdit.getCategory() + "' WHERE id_prod = " + productToEdit.getId());
 			}
 			else if(fieldToEdit.equals("price"))
 			{
-				DBConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = " + productToEdit.getPrice() + " WHERE id_prod = " + productToEdit.getId());
+				dbConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = " + productToEdit.getPrice() + " WHERE id_prod = " + productToEdit.getId());
 			}
 			else if(fieldToEdit.equals("quantity"))
 			{
-				DBConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = " + productToEdit.getQuantity() + " WHERE id_prod = " + productToEdit.getId());
+				dbConnection.updateData("UPDATE allproducts SET " + fieldToEdit + " = " + productToEdit.getQuantity() + " WHERE id_prod = " + productToEdit.getId());
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -128,7 +137,10 @@ public class AdminController {
 	public void addRepresentative(Representative representativeToAdd)
 	{
 		try(Connection con = DBConnection.getCon()) {		
-			PreparedStatement pstmt = DBConnection.insertData
+			DBConnection dbConnection = new DBConnection();
+			UserController userController = new UserController();
+			
+			PreparedStatement pstmt = dbConnection.insertData
 									(" INSERT INTO allrepresentatives (id_rep, name, username, category, numberofsales, profit) VALUES (?, ?, ?, ?, ?, ?)");
 			pstmt.setInt(1, representativeToAdd.getId());
 			pstmt.setString(2, representativeToAdd.getName());
@@ -139,7 +151,7 @@ public class AdminController {
 				
 			pstmt.execute();
 			
-			UserController.addUser(representativeToAdd.getId(), "representative", representativeToAdd.getName(), representativeToAdd.getUsername(),
+			userController.addUser(representativeToAdd.getId(), "representative", representativeToAdd.getName(), representativeToAdd.getUsername(),
 									"1234", representativeToAdd.getCategory());
 	        
 		} catch (SQLException e) {
@@ -151,9 +163,11 @@ public class AdminController {
 	
 	public void deleteRepresentative(Representative representativeToDelete)
 	{
-		try(Connection con = DBConnection.getCon()) {		
-			DBConnection.updateData("DELETE FROM allrepresentatives WHERE id_rep = " + representativeToDelete.getId());
-			DBConnection.updateData("DELETE FROM users WHERE id_user = " + representativeToDelete.getId());
+		try(Connection con = DBConnection.getCon()) {	
+			DBConnection dbConnection = new DBConnection();
+			
+			dbConnection.updateData("DELETE FROM allrepresentatives WHERE id_rep = " + representativeToDelete.getId());
+			dbConnection.updateData("DELETE FROM users WHERE id_user = " + representativeToDelete.getId());
 	        
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -167,21 +181,23 @@ public class AdminController {
 		System.out.println("representativeToEdit = " + representativeToEdit);
 		System.out.println("fieldToEdit = " + fieldToEdit);
 		
-		try(Connection con = DBConnection.getCon()) {			
+		try(Connection con = DBConnection.getCon()) {	
+			DBConnection dbConnection = new DBConnection();
+			
 			if(fieldToEdit.equals("name")) {
-				DBConnection.updateData("UPDATE allrepresentatives SET " + fieldToEdit + " = '" + representativeToEdit.getName() + "' WHERE id_rep = " + representativeToEdit.getId());
-				DBConnection.updateData("UPDATE users SET " + fieldToEdit + " = '" + representativeToEdit.getName() + "' WHERE id_user = " + representativeToEdit.getId());
+				dbConnection.updateData("UPDATE allrepresentatives SET " + fieldToEdit + " = '" + representativeToEdit.getName() + "' WHERE id_rep = " + representativeToEdit.getId());
+				dbConnection.updateData("UPDATE users SET " + fieldToEdit + " = '" + representativeToEdit.getName() + "' WHERE id_user = " + representativeToEdit.getId());
 			}
 			else if(fieldToEdit.equals("username"))
 			{
-				DBConnection.updateData("UPDATE allrepresentatives SET " + fieldToEdit + " = '" + representativeToEdit.getUsername() + "' WHERE id_rep = " + representativeToEdit.getId());
-				DBConnection.updateData("UPDATE users SET " + fieldToEdit + " = '" + representativeToEdit.getUsername() + "' WHERE id_user = " + representativeToEdit.getId());
+				dbConnection.updateData("UPDATE allrepresentatives SET " + fieldToEdit + " = '" + representativeToEdit.getUsername() + "' WHERE id_rep = " + representativeToEdit.getId());
+				dbConnection.updateData("UPDATE users SET " + fieldToEdit + " = '" + representativeToEdit.getUsername() + "' WHERE id_user = " + representativeToEdit.getId());
 
 			}
 			else if(fieldToEdit.equals("category"))
 			{
-				DBConnection.updateData("UPDATE allrepresentatives SET " + fieldToEdit + " = '" + representativeToEdit.getCategory() + "' WHERE id_rep = " + representativeToEdit.getId());
-				DBConnection.updateData("UPDATE users SET " + fieldToEdit + " = '" + representativeToEdit.getCategory() + "' WHERE id_user = " + representativeToEdit.getId());
+				dbConnection.updateData("UPDATE allrepresentatives SET " + fieldToEdit + " = '" + representativeToEdit.getCategory() + "' WHERE id_rep = " + representativeToEdit.getId());
+				dbConnection.updateData("UPDATE users SET " + fieldToEdit + " = '" + representativeToEdit.getCategory() + "' WHERE id_user = " + representativeToEdit.getId());
 
 			}
 
@@ -248,8 +264,10 @@ public class AdminController {
 		String mostFrequentCriteria = "";
 		int numSales = 0;
 
-		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
+		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allsales");
 			String result;
 			while(rs.next())
 			{
@@ -289,7 +307,9 @@ public class AdminController {
 		int numSales = 0;
 
 		try(Connection con = DBConnection.getCon()) {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allsales");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allsales");
 			String result;
 			while(rs.next())
 			{
@@ -327,7 +347,9 @@ public class AdminController {
 		int numOfClients = 0;
 		
 		try(Connection con = DBConnection.getCon()) {
-			ResultSet rs = DBConnection.getData("SELECT COUNT(*) from allclients");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT COUNT(*) from allclients");
 			rs.next();
 			
 			numOfClients = rs.getInt(1);
@@ -344,7 +366,9 @@ public class AdminController {
 		double totalProfit = 0;
 		
 		try(Connection con = DBConnection.getCon()) {
-			ResultSet rs = DBConnection.getData("SELECT * from allsales");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * from allsales");
 			
 			while(rs.next())
 			{
@@ -357,6 +381,52 @@ public class AdminController {
 		}
 		
 		return totalProfit;
+	}
+	
+	public void addAdmin(Admin adminToAdd) {
+		
+		UserController userController = new UserController();
+		userController.addUser(adminToAdd.getId(), "admin", adminToAdd.getName(), adminToAdd.getUsername(), "1234", "");
+		
+	}
+	
+	public ArrayList<String> getListOfAdminUsernames(){
+		ArrayList<String> listAdminUsernames = new ArrayList<>();
+		
+		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * from users WHERE id_user < 100");
+			
+			while(rs.next())
+			{
+				listAdminUsernames.add(rs.getString("username"));
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return listAdminUsernames;
+	}
+	
+	public void deleteAdmin(Admin adminToDelete)
+	{
+		try(Connection con = DBConnection.getCon()) {	
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM users WHERE username = '" + adminToDelete.getUsername() + "'");
+			rs.next();
+			adminToDelete.setId(rs.getInt("id_user"));
+			
+			dbConnection.updateData("DELETE FROM users WHERE id_user = " + adminToDelete.getId());
+	        
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}	
+
+		System.out.println("admin deleted");
 	}
 }
 

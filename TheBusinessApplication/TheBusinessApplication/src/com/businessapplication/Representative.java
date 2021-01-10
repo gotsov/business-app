@@ -1,5 +1,6 @@
 package com.businessapplication;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
@@ -152,8 +153,10 @@ public class Representative extends RepresentativeController{
 	
 	
 	public void setId() {		
-		try {	
-			ResultSet rs = DBConnection.getData(" SELECT id_rep FROM allrepresentatives ORDER BY id_rep DESC LIMIT 1");
+		try(Connection con = DBConnection.getCon()) {	
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData(" SELECT id_rep FROM allrepresentatives ORDER BY id_rep DESC LIMIT 1");
 					
 			rs.next();
 			idRepresentative = rs.getInt("id_rep");
@@ -168,8 +171,10 @@ public class Representative extends RepresentativeController{
 	
 	public int getNumberOfSalesFromDB()
 	{
-		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + username + "'");
+		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + username + "'");
 			rs.next();
 			
 			return rs.getInt("numberofsales");
@@ -182,8 +187,10 @@ public class Representative extends RepresentativeController{
 	
 	public double getProfitFromDB()
 	{
-		try {
-			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + username + "'");
+		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + username + "'");
 			rs.next();
 			
 			return rs.getDouble("profit");

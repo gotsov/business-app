@@ -88,7 +88,9 @@ public class Product {
 
 	public void setId() {		
 		try(Connection con = DBConnection.getCon()) {
-			ResultSet rs = DBConnection.getData(" SELECT id_prod FROM allproducts ORDER BY id_prod DESC LIMIT 1");
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData(" SELECT id_prod FROM allproducts ORDER BY id_prod DESC LIMIT 1");
 					
 			rs.next();
 

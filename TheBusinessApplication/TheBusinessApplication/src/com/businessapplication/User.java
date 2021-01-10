@@ -8,7 +8,7 @@ import com.databaseconnection.DBConnection;
 import com.login.Hasher;
 import com.login.UserController;
 
-public class User extends UserController{
+public class User{
 	
 	private int id;
 	
@@ -40,7 +40,9 @@ public class User extends UserController{
 	    }
 		
 		try(Connection con = DBConnection.getCon()) {
-			DBConnection.updateData("UPDATE users SET password = '" + hashedPassword + " " + encodedSalt + "' WHERE id_user = " + this.id);
+			DBConnection dbConnection = new DBConnection();
+			
+			dbConnection.updateData("UPDATE users SET password = '" + hashedPassword + " " + encodedSalt + "' WHERE id_user = " + this.id);
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
