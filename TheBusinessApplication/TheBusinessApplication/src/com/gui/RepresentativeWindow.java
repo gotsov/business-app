@@ -467,41 +467,46 @@ public class RepresentativeWindow extends JFrame {
 	            int quantityBought = Integer.parseInt((String) comboBoxQuantity.getSelectedItem());
 				Client newClient = null;
 				
-	            if(category.equals("all")) {	            	
-	            	String categoryOfBoughtProduct = repController.getCategoryOfBoughtProduct(boughtProduct);
-	            	
-	            	newClient = new Client.Builder().name(txtFieldClientName.getText())
-							   .email(txtFieldClientEmail.getText())
-							   .productBought(boughtProduct)
-							   .categoryOfProductBought(categoryOfBoughtProduct)
-							   .quantityBought(quantityBought)
-							   .dateOfSale(date)
-							   .build();
-	            	
-	            	repController.addSale(newClient, thisRepresentative);			        	
-	            	
-	            } else {
-	            	newClient = new Client.Builder().name(txtFieldClientName.getText())
-							   .email(txtFieldClientEmail.getText())
-							   .productBought(boughtProduct)
-							   .categoryOfProductBought(category)
-							   .quantityBought(quantityBought)
-							   .dateOfSale(date)
-							   .build();
-	            	
-	            	repController.addSale(newClient, thisRepresentative);	
-	            }
-
-				if(newClient.isFirstTimeClient())
-				{
-					JOptionPane.showMessageDialog(null, "Client [" + newClient.getName() + ", " + newClient.getEmail() 
-					                                   + "] bought [" + newClient.getQuantityBought() + "x " + newClient.getProductBought() + "].");
-					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
-
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(null, "Invalid information");
+				try {
+		            if(category.equals("all")) {	            	
+		            	String categoryOfBoughtProduct = repController.getCategoryOfBoughtProduct(boughtProduct);
+		            	
+		            	newClient = new Client.Builder().name(txtFieldClientName.getText())
+								   .email(txtFieldClientEmail.getText())
+								   .productBought(boughtProduct)
+								   .categoryOfProductBought(categoryOfBoughtProduct)
+								   .quantityBought(quantityBought)
+								   .dateOfSale(date)
+								   .build();
+		            	
+		            	repController.addSale(newClient, thisRepresentative);			        	
+		            	
+		            } else {
+		            	newClient = new Client.Builder().name(txtFieldClientName.getText())
+								   .email(txtFieldClientEmail.getText())
+								   .productBought(boughtProduct)
+								   .categoryOfProductBought(category)
+								   .quantityBought(quantityBought)
+								   .dateOfSale(date)
+								   .build();
+		            	
+		            	repController.addSale(newClient, thisRepresentative);	
+		            }
+	
+					if(newClient.isFirstTimeClient())
+					{
+						JOptionPane.showMessageDialog(null, "Client [" + newClient.getName() + ", " + newClient.getEmail() 
+						                                   + "] bought [" + newClient.getQuantityBought() + "x " + newClient.getProductBought() + "].");
+						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+	
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(null, "Invalid information");
+					}
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, "Error with database");
+					e.printStackTrace();
 				}
 			}
 		});
@@ -513,64 +518,70 @@ public class RepresentativeWindow extends JFrame {
 				Client clientToEdit;
 				int idClient, idSale;
 				
-				if(comboBoxChange.getSelectedItem().equals("name")) {
-					clientToEdit = new Client.Builder()
-							.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))
-							.name(txtFieldClientNameEdit.getText())
-							.email(null)
-							.build();
+				try {
+					if(comboBoxChange.getSelectedItem().equals("name")) {
+						clientToEdit = new Client.Builder()
+								.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))
+								.name(txtFieldClientNameEdit.getText())
+								.email(null)
+								.build();
+						
+						System.out.println("Integer.parseInt((String) comboBoxIdClient.getSelectedItem()) = " + Integer.parseInt((String) comboBoxIdClient.getSelectedItem()));
+						
+						
+						idClient = clientToEdit.getIdOfClient();
+						idSale = repController.getIdOfSale(thisRepresentative);
+						
+						repController.editClient(clientToEdit, "name", idClient, idSale);
+						
+						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+					}
 					
-					System.out.println("Integer.parseInt((String) comboBoxIdClient.getSelectedItem()) = " + Integer.parseInt((String) comboBoxIdClient.getSelectedItem()));
-					
-					idClient = clientToEdit.getIdOfClient();
-					idSale = getIdOfSale();
-					
-					repController.editClient(clientToEdit, "name", idClient, idSale);
-					
-					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
-				}
+					else if(comboBoxChange.getSelectedItem().equals("email")) {
+						clientToEdit = new Client.Builder()
+								.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))
+								.name(null)
+								.email(txtFieldClientEmailEdit.getText())
+								.build();
+						
+						
+						if(clientToEdit.isFirstTimeClient()) {
+							idClient = clientToEdit.getIdOfClient();
+							idSale = repController.getIdOfSale(thisRepresentative);
+							
+							repController.editClient(clientToEdit, "email", idClient, idSale);
+							
+							updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+						}
+						else {
+							JOptionPane.showMessageDialog(getContentPane(), "Not unique e-mail");
+						}
 				
-				else if(comboBoxChange.getSelectedItem().equals("email")) {
-					clientToEdit = new Client.Builder()
-							.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))
-							.name(null)
-							.email(txtFieldClientEmailEdit.getText())
-							.build();
-					
-					
-					if(clientToEdit.isFirstTimeClient()) {
-						idClient = clientToEdit.getIdOfClient();
-						idSale = getIdOfSale();
-						
-						repController.editClient(clientToEdit, "email", idClient, idSale);
-						
-						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 					}
-					else {
-						JOptionPane.showMessageDialog(getContentPane(), "Not unique e-mail");
-					}
-			
-				}
-				else if(comboBoxChange.getSelectedItem().equals("name & e-mail")) {
-					clientToEdit = new Client.Builder()
-							.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))
-							.name(txtFieldClientNameEdit.getText())
-							.email(txtFieldClientEmailEdit.getText())
-							.build();
-					
-					System.out.println(clientToEdit.isFirstTimeClient());
-					if(clientToEdit.isFirstTimeClient()) {
-						idClient = clientToEdit.getIdOfClient();
-						idSale = getIdOfSale();
+					else if(comboBoxChange.getSelectedItem().equals("name & e-mail")) {
+						clientToEdit = new Client.Builder()
+								.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))
+								.name(txtFieldClientNameEdit.getText())
+								.email(txtFieldClientEmailEdit.getText())
+								.build();
 						
-						repController.editClient(clientToEdit, "name & e-mail", idClient, idSale);
-						
-						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+						System.out.println(clientToEdit.isFirstTimeClient());
+						if(clientToEdit.isFirstTimeClient()) {
+							idClient = clientToEdit.getIdOfClient();
+							idSale = repController.getIdOfSale(thisRepresentative);
+							
+							repController.editClient(clientToEdit, "name & e-mail", idClient, idSale);
+							
+							updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+						}
+						else {
+							JOptionPane.showMessageDialog(null, "Not unique e-mail");
+						}
+	
 					}
-					else {
-						JOptionPane.showMessageDialog(null, "Not unique e-mail");
-					}
-
+				}catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, "Error with database");
+					e.printStackTrace();
 				}
 				
 			}
@@ -579,18 +590,24 @@ public class RepresentativeWindow extends JFrame {
 		btnDeleteClient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int id = Integer.parseInt((String) comboBoxIdClientToDelete.getSelectedItem());	
-				String email = getInfoOfClientById("email", id);
-				String name = getInfoOfClientById("name", id);
-				
-				Client clientToDelete = new Client.Builder()
-											.idOfClient(id)
-											.name(name)
-											.email(email)
-											.build();
+				try {
+					String email = repController.getInfoOfClientById("email", id);
+					String name = repController.getInfoOfClientById("name", id);
 					
-				repController.deleteClient(clientToDelete);
+					Client clientToDelete = new Client.Builder()
+												.idOfClient(id)
+												.name(name)
+												.email(email)
+												.build();
+					
+					repController.deleteClient(clientToDelete);
+				
 				JOptionPane.showMessageDialog(null, "Client ["+ clientToDelete.getName() + ", " + clientToDelete.getEmail() + "] has been deleted.");
 				
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, "Error with database");
+					e.printStackTrace();
+				}
 				updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 			}
 		});
@@ -606,14 +623,20 @@ public class RepresentativeWindow extends JFrame {
 											.build();
 				
 				System.out.println(clientToAdd.isFirstTimeClient());
-				if(clientToAdd.isFirstTimeClient()) {
+				try {
+					if(clientToAdd.isFirstTimeClient()) {
+						repController.addClient(clientToAdd);
+						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "Not unique e-mail");
+					}
+					
 					repController.addClient(clientToAdd);
-					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, "Error with database");
+					e.printStackTrace();
 				}
-				else {
-					JOptionPane.showMessageDialog(null, "Not unique e-mail");
-				}
-				repController.addClient(clientToAdd);
 			}
 		});
 	}
@@ -627,25 +650,7 @@ public class RepresentativeWindow extends JFrame {
 		fillComboBoxQuantity(comboBoxBoughtProduct, comboBoxQuantity);
 	}
 	
-	public String getInfoOfClientById(String toChange, int id)
-	{
-		
-		try(Connection con = DBConnection.getCon()) {
-			DBConnection dbConnection = new DBConnection();
-			
-			ResultSet rs = dbConnection.getData("SELECT " + toChange + " FROM allclients WHERE id_client = " + id);
-			
-			while(rs.next())
-			{
-				String info =  rs.getString(toChange);
-				return info;
-			}
-					
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;	
-	}
+	
 	
 	public void loadTables()
 	{	
@@ -666,46 +671,53 @@ public class RepresentativeWindow extends JFrame {
 		clientsFromCatalog.clear();
 		yourProducts.clear();
 				
-		catalog = repController.getCatalog(thisRepresentative);
+		try {
+			catalog = repController.getCatalog(thisRepresentative);
+		
         
-        for (int i = 0; i < catalog.size(); i++) {
-			id = catalog.get(i).getId();
-			name = catalog.get(i).getName();
-			email = catalog.get(i).getEmail();
-			product = catalog.get(i).getProduct();
-			quantity = catalog.get(i).getQuantity();
-			price = catalog.get(i).getPrice();
-			date = catalog.get(i).getDate();
-			
-			Object[] data = {id, name, email, product, quantity, price, date};
-			
-			modelCatalog.addRow(data);
-		}
+	        for (int i = 0; i < catalog.size(); i++) {
+				id = catalog.get(i).getId();
+				name = catalog.get(i).getName();
+				email = catalog.get(i).getEmail();
+				product = catalog.get(i).getProduct();
+				quantity = catalog.get(i).getQuantity();
+				price = catalog.get(i).getPrice();
+				date = catalog.get(i).getDate();
+				
+				Object[] data = {id, name, email, product, quantity, price, date};
+				
+				modelCatalog.addRow(data);
+			}
+	        
+	        clientsFromCatalog = repController.removeRepeatingClients(catalog);
+	        
+	        for (int i = 0; i < clientsFromCatalog.size(); i++) {
+				id = clientsFromCatalog.get(i).getId();
+				name = clientsFromCatalog.get(i).getName();
+				email = clientsFromCatalog.get(i).getEmail();
+				
+				Object[] data = {id, name, email};
+				
+				modelClients.addRow(data);
+			}
+	        
+	        yourProducts = repController.getProductsFromYourCategory(thisRepresentative);
+	        
+	        for (int i = 0; i < yourProducts.size(); i++) {
+				id = yourProducts.get(i).getId();
+				name = yourProducts.get(i).getName();
+				category = yourProducts.get(i).getCategory();
+				quantity = yourProducts.get(i).getQuantity();
+				price = yourProducts.get(i).getPrice();
+				
+				Object[] data = {id, name, category, quantity, price};
+				
+				modelProducts.addRow(data);
+			}
         
-        clientsFromCatalog = repController.removeRepeatingClients(catalog);
-        
-        for (int i = 0; i < clientsFromCatalog.size(); i++) {
-			id = clientsFromCatalog.get(i).getId();
-			name = clientsFromCatalog.get(i).getName();
-			email = clientsFromCatalog.get(i).getEmail();
-			
-			Object[] data = {id, name, email};
-			
-			modelClients.addRow(data);
-		}
-        
-        yourProducts = repController.getProductsFromYourCategory(thisRepresentative);
-        
-        for (int i = 0; i < yourProducts.size(); i++) {
-			id = yourProducts.get(i).getId();
-			name = yourProducts.get(i).getName();
-			category = yourProducts.get(i).getCategory();
-			quantity = yourProducts.get(i).getQuantity();
-			price = yourProducts.get(i).getPrice();
-			
-			Object[] data = {id, name, category, quantity, price};
-			
-			modelProducts.addRow(data);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	
 	}
@@ -745,59 +757,14 @@ public class RepresentativeWindow extends JFrame {
 	public void fillComboBoxQuantity(JComboBox<String> comboBoxBoughtProduct, JComboBox<String> comboBoxQuantity)
 	{
 		
-		// clears comboBox before updating it
 		comboBoxQuantity.removeAllItems();
 		
-		try(Connection con = DBConnection.getCon()){
-			DBConnection dbConnection = new DBConnection();
-			
-			ResultSet rs = dbConnection.getData("SELECT * FROM allproducts WHERE name = '" + comboBoxBoughtProduct.getSelectedItem() + "'");
-	        
-	        int quantity = 0;
-	        while(rs.next())
-	        {
-	        	quantity = rs.getInt("quantity");
-	        }
-	        
-	        for(int i = 1; i <= quantity; i++)
-	        {
-	        	comboBoxQuantity.addItem(""+i);
-	        }
-	        
-		} catch(SQLException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-//	public int getIdOfRepresentative()
-//	{
-//		try(Connection con = DBConnection.getCon()) {
-//			ResultSet rs = DBConnection.getData("SELECT * FROM allrepresentatives WHERE username = '" + thisRepresentative.getUsername() + "'");
-//			rs.next();
-//			
-//			return rs.getInt("id_rep");
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return 0;
-//	}
-	
-	public int getIdOfSale()
-	{
-		try (Connection con = DBConnection.getCon()){
-			DBConnection dbConnection = new DBConnection();
-			
-			ResultSet rs = dbConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + thisRepresentative.getUsername() + "'");
-			rs.next();
-			
-			return rs.getInt("id_sale");
+		try {
+			repController.fillWithQuantity(comboBoxBoughtProduct, comboBoxQuantity);
 		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, "Error with database");
 			e.printStackTrace();
-		}
-		
-		return 0;
+		}	
 	}
-		
+	
 }

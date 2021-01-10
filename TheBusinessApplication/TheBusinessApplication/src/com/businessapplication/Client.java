@@ -1,7 +1,7 @@
 package com.businessapplication;
 
 import java.sql.Date;
-
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -94,11 +94,21 @@ public class Client {
 	}
 	
 	public void setIdSale() {
-		Representative.setIdSale(this);
+		try {
+			Representative.setIdSale(this);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void setIdClient() {
-		Representative.setIdClient(this);
+		try {
+			Representative.setIdClient(this);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void setSqlDate()
@@ -116,7 +126,12 @@ public class Client {
 	
 	public void checkForUniqueEmail()
 	{
-		Representative.checkIfFirstTimeClient(this);
+		try {
+			Representative.checkIfFirstTimeClient(this);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean isFirstTimeClient() {

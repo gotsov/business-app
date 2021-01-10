@@ -41,7 +41,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import com.businessapplication.Admin;
-import com.businessapplication.PieChart;
 import com.businessapplication.Product;
 import com.businessapplication.Representative;
 import com.businessapplication.Sale;
@@ -60,6 +59,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
 import com.rolecontrollers.AdminController;
+import com.rolecontrollers.SalesAnalizerController;
 
 public class AdminWindow extends JFrame {
 
@@ -112,6 +112,9 @@ public class AdminWindow extends JFrame {
 	private static int numberOfSales;
 	private JTextField textFieldCategoryFilter;
 	
+	private AdminController adminController  = new AdminController();
+	private static SalesAnalizerController analizer = new SalesAnalizerController();
+	
 	
 	/**
 	 * Create the frame.
@@ -124,7 +127,7 @@ public class AdminWindow extends JFrame {
 											 .password(password)
 											 .build();
 		
-		AdminController adminController  = new AdminController();
+		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 902, 558);
@@ -825,7 +828,7 @@ public class AdminWindow extends JFrame {
 		
 		btnPieChart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				 PieChart demo = new PieChart("Sales by category");
+				 PieChartWindow demo = new PieChartWindow("Sales by category");
 				 demo.setVisible(true);
 				
 			}
@@ -876,12 +879,14 @@ public class AdminWindow extends JFrame {
 					else {
 						adminController.addProduct(newProduct, false);
 					}
-						
-					
+									
 					JOptionPane.showMessageDialog(null, "Added [" + newProduct.getName() + ", x" + newProduct.getQuantity() + "]");
 					
 				} catch(NumberFormatException e) {
 					JOptionPane.showMessageDialog(null, "Incorrect input");
+				} catch(SQLException e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Error with database");
 				}
 
 				textFieldNewCategory.setText("");
@@ -932,6 +937,9 @@ public class AdminWindow extends JFrame {
 					
 				} catch(NumberFormatException e) {
 					JOptionPane.showMessageDialog(null, "Incorrect input");
+				} catch(SQLException e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Error with database");
 				}
 				
 				updateTablesAndComboboxes(adminController);
@@ -946,7 +954,12 @@ public class AdminWindow extends JFrame {
 				
 				Product productToDelete = new Product(id);
 				
-				adminController.deleteProduct(productToDelete);
+				try {
+					adminController.deleteProduct(productToDelete);
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, "Error with database.");
+					e.printStackTrace();
+				}
 				
 				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
 				
@@ -980,7 +993,12 @@ public class AdminWindow extends JFrame {
 																				  .profit(0)
 																				  .build();
 				
-				adminController.addRepresentative(represenatativeToAdd);
+				try {
+					adminController.addRepresentative(represenatativeToAdd);
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, "Error with database.");
+					e.printStackTrace();
+				}
 				
 				JOptionPane.showMessageDialog(null, "Added [" + represenatativeToAdd.getName() + " (" + represenatativeToAdd.getUsername() + "), "
 																							+ "category: " + represenatativeToAdd.getCategory() + ".");
@@ -998,7 +1016,12 @@ public class AdminWindow extends JFrame {
 				Representative represenatativeToDelete = new Representative.Builder().id(id)
 																					 .build();
 				
-				adminController.deleteRepresentative(represenatativeToDelete);
+				try {
+					adminController.deleteRepresentative(represenatativeToDelete);
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, "Error with database.");
+					e.printStackTrace();
+				}
 				
 				JOptionPane.showMessageDialog(null, "Representative with [id = " + represenatativeToDelete.getId() + "] has been deleted");
 				
@@ -1027,7 +1050,8 @@ public class AdminWindow extends JFrame {
 					if(comboBoxEditRepresentative.getSelectedItem().equals("name"))
 					{
 						representativeToEdit.setName(textFieldEditRep.getText());
-						adminController.editFieldRepresentative(representativeToEdit, "name");
+						
+							adminController.editFieldRepresentative(representativeToEdit, "name");
 					}
 					else if(comboBoxEditRepresentative.getSelectedItem().equals("username"))
 					{
@@ -1043,6 +1067,9 @@ public class AdminWindow extends JFrame {
 					
 				} catch(NumberFormatException e) {
 					JOptionPane.showMessageDialog(null, "Incorrect input");
+				} catch (SQLException e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Error with database");
 				}
 				
 				updateTablesAndComboboxes(adminController);
@@ -1060,7 +1087,7 @@ public class AdminWindow extends JFrame {
 	            String dateStart = dateFormat.format(selectedStartDate);   
 	            String dateEnd = dateFormat.format(selectedEndDate);	
 				
-	            listAllSales = adminController.filterSalesByDate(dateStart, dateEnd, listAllSales);	         
+	            listAllSales = analizer.filterSalesByDate(dateStart, dateEnd, listAllSales);	         
 				
 				loadTableFiltered(listAllSales);
 			}
@@ -1078,7 +1105,7 @@ public class AdminWindow extends JFrame {
 					username = (String)comboBoxUsernames.getSelectedItem();
 				}
 				
-				listAllSales = adminController.filterSalesByCriteria(listAllSales, "username", username);
+				listAllSales = analizer.filterSalesByCriteria(listAllSales, "username", username);
 				
 				loadTableFiltered(listAllSales);
 			}
@@ -1096,7 +1123,7 @@ public class AdminWindow extends JFrame {
 					category = (String)comboBoxCategoryFilter.getSelectedItem();
 				}
 				
-				listAllSales = adminController.filterSalesByCriteria(listAllSales, "category", category);
+				listAllSales = analizer.filterSalesByCriteria(listAllSales, "category", category);
 				
 				loadTableFiltered(listAllSales);
 			}
@@ -1124,11 +1151,11 @@ public class AdminWindow extends JFrame {
 		fillComboBoxFilters(comboBoxCategoryFilter, comboBoxUsernames);
 		
 		int numberOfCategories = categoriesWithRepresentative.size() + categoriesWithoutRepresentative.size();
-		String mostSalesByCategory = adminController.getMostSalesByCriteria("category");
-		String mostSalesByProduct = adminController.getMostSalesByCriteria("product");
-		String mostSalesByRepresentative = adminController.getMostSalesByCriteria("representative_username");
-		int numberOfClients = adminController.getNumberOfClients();
-		double totalProfit = adminController.getTotalProfit();
+		String mostSalesByCategory = analizer.getMostSalesByCriteria("category");
+		String mostSalesByProduct = analizer.getMostSalesByCriteria("product");
+		String mostSalesByRepresentative = analizer.getMostSalesByCriteria("representative_username");
+		int numberOfClients = analizer.getNumberOfClients();
+		double totalProfit = analizer.getTotalProfit();
 		
 		lblNumberOfProducts.setText("Number of products: " + numberOfProducts);
 		lblNumberOfRepresentatives.setText("Number of representatives: " + numberOfRepresentatives);
@@ -1141,8 +1168,6 @@ public class AdminWindow extends JFrame {
 		lblNumberOfClients.setText("Number of clients: " + numberOfClients);
 		
 	}
-	
-
 	
 	public static void loadTablesAdmin()
 	{
@@ -1370,6 +1395,7 @@ public class AdminWindow extends JFrame {
 		model.clear();
 		categoriesWithoutRepresentative.clear();
 		categoriesWithRepresentative.clear();
+		
 		try(Connection con = DBConnection.getCon()) {
 			DBConnection dbConnection = new DBConnection();
 			

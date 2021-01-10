@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.businessapplication.Admin;
 import com.businessapplication.Representative;
+import com.databaseconnection.DBConnection;
 import com.rolecontrollers.AdminController;
 
 import javax.swing.JTabbedPane;
@@ -19,6 +20,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
@@ -123,7 +126,12 @@ public class AddAdminWindow extends JFrame {
 													  .password("1234")
 													  .build();
 				
-				adminController.addAdmin(adminToAdd);
+				try {
+					adminController.addAdmin(adminToAdd);
+				} catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, "Error with database");
+					e1.printStackTrace();
+				}
 				
 				JOptionPane.showMessageDialog(null, "Added [" + adminToAdd.getName() + " (" + adminToAdd.getUsername() + "]");
 				
@@ -138,10 +146,13 @@ public class AddAdminWindow extends JFrame {
 				Admin adminToDelete = new Admin.Builder().username(username)
 																   .build();
 				
-				adminController.deleteAdmin(adminToDelete);
-				
+				try{
+					adminController.deleteAdmin(adminToDelete);
+				} catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, "Error with database");
+					e1.printStackTrace();
+				}
 				JOptionPane.showMessageDialog(null, "Deleted  [" + adminToDelete.getUsername() + "]");
-				
 				updateComboBoxFilters(comboBoxUsername);
 			}
 		});
@@ -151,7 +162,12 @@ public class AddAdminWindow extends JFrame {
 		
 		comboBoxUsernames.removeAllItems();
 		
-		listAdminUsernames = adminController.getListOfAdminUsernames();
+		try {
+			listAdminUsernames = adminController.getListOfAdminUsernames();
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, "Problem with updating comboBoxes");
+			e.printStackTrace();
+		}
 		
 		for(String username : listAdminUsernames)
 		{

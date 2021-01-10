@@ -1,26 +1,18 @@
 package com.gui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import com.businessapplication.User;
-
-import java.awt.GridBagLayout;
+import com.rolecontrollers.UserController;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
-import java.awt.GridBagConstraints;
 import java.awt.Font;
 import javax.swing.SwingConstants;
-import java.awt.Insets;
-import java.awt.GridLayout;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class ChangePasswordWindow extends JFrame {
@@ -28,6 +20,8 @@ public class ChangePasswordWindow extends JFrame {
 	private JPanel contentPane;
 	private JPasswordField passwordField;
 	private JPasswordField passwordFieldRepeat;
+	
+	private UserController userController = new UserController();
 
 	/**
 	 * Create the frame.
@@ -79,7 +73,12 @@ public class ChangePasswordWindow extends JFrame {
 				System.out.println("passwordFieldRepeat.getPassword()" + newPasswordRepeat);
 				
 				if(newPassword.equals(newPasswordRepeat)){
-					thisUser.changePassword(newPassword);
+					try {
+						userController.changePassword(thisUser, newPassword);
+					} catch (SQLException e) {
+						JOptionPane.showMessageDialog(null, "Error with database");
+						e.printStackTrace();
+					}
 					
 					JOptionPane.showMessageDialog(null, "Passwords changed successfully!");
 				} else {
