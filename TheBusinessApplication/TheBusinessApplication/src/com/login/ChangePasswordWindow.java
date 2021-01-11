@@ -27,6 +27,7 @@ public class ChangePasswordWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public ChangePasswordWindow(int id) {
+		setResizable(false);
 		
 		User thisUser = new User(id);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -78,6 +79,7 @@ public class ChangePasswordWindow extends JFrame {
 					}
 					
 					JOptionPane.showMessageDialog(null, "Passwords changed successfully!");
+					setVisible(false);
 				} else {
 					JOptionPane.showMessageDialog(null, "Passwords in thr fields don't match");
 				}

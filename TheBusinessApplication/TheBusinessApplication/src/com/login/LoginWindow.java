@@ -60,6 +60,8 @@ public class LoginWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public LoginWindow() {
+		setTitle("TheBusinessApp - Login");
+		setResizable(false);
 		
 		LoginController loginController = new LoginController();
 		

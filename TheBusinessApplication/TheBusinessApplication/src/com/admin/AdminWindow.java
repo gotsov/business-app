@@ -122,6 +122,7 @@ public class AdminWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public AdminWindow(int id, String name, String username, String password) {
+		setResizable(false);
 		
 		Admin thisAdmin = new Admin.Builder().id(id)
 											 .name(name)

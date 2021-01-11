@@ -39,12 +39,9 @@ public class LoginController {
 	     	        String saltedHashStringDB = passwordFiled[0];
 	     	        String saltStringDB = passwordFiled[1];	       
 	     	        
-	     	        System.out.println("passwordEnteredByUser = " + passwordEnteredByUser);
-	     	        System.out.println("saltStringDB = " + saltStringDB);
-	     	        
 	     	        String saltedHashBytesToCheck = Hasher.getSaltedHash(passwordEnteredByUser, saltStringDB);
 	     	        
-	     			System.out.println("saltedHashBytesToCheck = " + saltedHashBytesToCheck);
+	     			System.out.println("saltedHashToCheck = " + saltedHashBytesToCheck);
 	     			System.out.println("saltedHash(in db)= " + saltedHashStringDB);
 	     	        	
 	        		if(saltedHashStringDB.equals(saltedHashBytesToCheck))

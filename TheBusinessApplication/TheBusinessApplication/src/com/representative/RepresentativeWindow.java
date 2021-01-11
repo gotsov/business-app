@@ -65,7 +65,8 @@ public class RepresentativeWindow extends JFrame {
 	private ArrayList<Product> yourProducts = new ArrayList<>();
 	private ArrayList<Sale> catalog = new ArrayList<>();
 	private Representative thisRepresentative;
-	private RepresentativeController repController;
+	private static SalesService salesService = new SalesService();
+	private static ClientService clientService = new ClientService();
 	private JTextField textFieldQuantityBought;
 	
 	/**
@@ -85,10 +86,7 @@ public class RepresentativeWindow extends JFrame {
 		thisRepresentative.setNumOfSales(thisRepresentative.getNumberOfSalesFromDB());
 		thisRepresentative.setProfit(thisRepresentative.getProfitFromDB());
 		
-		RepresentativeController repController = new RepresentativeController();
-		
 		this.thisRepresentative = thisRepresentative;
-		this.repController = repController;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 866, 626);
@@ -427,7 +425,7 @@ public class RepresentativeWindow extends JFrame {
 				String boughtProduct = (String)comboBoxBoughtProduct.getSelectedItem();
 				int maxQuantity;
 				try {
-					maxQuantity = repController.getQuantityOfProduct(boughtProduct);
+					maxQuantity = salesService.getQuantityOfProduct(boughtProduct);
 					lblMaxQuantity.setText(maxQuantity + " max");
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
@@ -495,7 +493,7 @@ public class RepresentativeWindow extends JFrame {
 				
 				try {
 		            if(category.equals("all")) {	            	
-		            	String categoryOfBoughtProduct = repController.getCategoryOfBoughtProduct(boughtProduct);
+		            	String categoryOfBoughtProduct = salesService.getCategoryOfBoughtProduct(boughtProduct);
 		            	
 		            	newClient = new Client.Builder().name(txtFieldClientName.getText())
 								   .email(txtFieldClientEmail.getText())
@@ -505,7 +503,7 @@ public class RepresentativeWindow extends JFrame {
 								   .dateOfSale(date)
 								   .build();
 		            	
-		            	repController.addSale(newClient, thisRepresentative);			        	
+		            	salesService.addSale(newClient, thisRepresentative);			        	
 		            	
 		            } else {
 		            	newClient = new Client.Builder().name(txtFieldClientName.getText())
@@ -516,7 +514,7 @@ public class RepresentativeWindow extends JFrame {
 								   .dateOfSale(date)
 								   .build();
 		            	
-		            	repController.addSale(newClient, thisRepresentative);	
+		            	salesService.addSale(newClient, thisRepresentative);	
 		            }
 	
 					if(newClient.isFirstTimeClient())
@@ -557,15 +555,15 @@ public class RepresentativeWindow extends JFrame {
 								.email(null)
 								.build();
 						
-						email = repController.getEmailOfClient(clientToEdit);
+						email = salesService.getEmailOfClient(clientToEdit);
 						clientToEdit.setEmail(email);
 						
 						idClient = clientToEdit.getIdOfClient();
-						idSaleByClient = repController.getIdOfSaleWithEmail(clientToEdit);
+						idSaleByClient = salesService.getIdOfSaleWithEmail(clientToEdit);
 						
 						System.out.println("idClient = " + idClient);
 						System.out.println("idSaleByClient = " + idSaleByClient);
-						repController.editClient(clientToEdit, "name", idClient, idSaleByClient);
+						clientService.editClient(clientToEdit, "name", idClient, idSaleByClient);
 						
 						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
 					}
@@ -578,15 +576,15 @@ public class RepresentativeWindow extends JFrame {
 								.email(txtFieldClientEmailEdit.getText())
 								.build();
 						
-						Client originalClient = new Client.Builder().email(repController.getOldEmailOfClient(clientToEdit))
+						Client originalClient = new Client.Builder().email(salesService.getOldEmailOfClient(clientToEdit))
 																	.build();
 						
 						
 						if(clientToEdit.isFirstTimeClient()) {
 							idClient = clientToEdit.getIdOfClient();
-							idSaleByClient = repController.getIdOfSaleWithEmail(originalClient);
+							idSaleByClient = salesService.getIdOfSaleWithEmail(originalClient);
 							
-							repController.editClient(clientToEdit, "email", idClient, idSaleByClient);
+							clientService.editClient(clientToEdit, "email", idClient, idSaleByClient);
 							
 							updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
 						}
@@ -602,16 +600,16 @@ public class RepresentativeWindow extends JFrame {
 								.email(txtFieldClientEmailEdit.getText())
 								.build();
 						
-						Client originalClient = new Client.Builder().email(repController.getOldEmailOfClient(clientToEdit))
+						Client originalClient = new Client.Builder().email(salesService.getOldEmailOfClient(clientToEdit))
 														.build();
 						
 						System.out.println(clientToEdit.isFirstTimeClient());
 						if(clientToEdit.isFirstTimeClient()) {
 							idClient = clientToEdit.getIdOfClient();
-							idSaleByClient = repController.getIdOfSaleWithEmail(originalClient);
+							idSaleByClient = salesService.getIdOfSaleWithEmail(originalClient);
 							
 							
-							repController.editClient(clientToEdit, "name & e-mail", idClient, idSaleByClient);
+							clientService.editClient(clientToEdit, "name & e-mail", idClient, idSaleByClient);
 							
 							updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
 						}
@@ -638,8 +636,8 @@ public class RepresentativeWindow extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				int id = Integer.parseInt((String) comboBoxIdClientToDelete.getSelectedItem());	
 				try {
-					String email = repController.getInfoOfClientById("email", id);
-					String name = repController.getInfoOfClientById("name", id);
+					String email = salesService.getInfoOfClientById("email", id);
+					String name = salesService.getInfoOfClientById("name", id);
 					
 					Client clientToDelete = new Client.Builder()
 												.idOfClient(id)
@@ -647,7 +645,7 @@ public class RepresentativeWindow extends JFrame {
 												.email(email)
 												.build();
 					
-					repController.deleteClient(clientToDelete);
+					salesService.deleteClient(clientToDelete);
 				
 				JOptionPane.showMessageDialog(null, "Client ["+ clientToDelete.getName() + ", " + clientToDelete.getEmail() + "] has been deleted.");
 				
@@ -668,7 +666,7 @@ public class RepresentativeWindow extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 							
 				try {
-					int id = repController.getIdOfLastClient();	
+					int id = salesService.getIdOfLastClient();	
 					
 					Client clientToAdd = new Client.Builder()
 												.idOfClient(id)
@@ -679,17 +677,17 @@ public class RepresentativeWindow extends JFrame {
 					System.out.println(clientToAdd.isFirstTimeClient());
 				
 					if(clientToAdd.isFirstTimeClient()) {
-						repController.addClient(clientToAdd);
+						salesService.addClient(clientToAdd);
 						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
 					}
 					else {
 						JOptionPane.showMessageDialog(null, "Not unique e-mail");
 					}
 					
-					repController.addClient(clientToAdd);
+					salesService.addClient(clientToAdd);
 				} catch (SQLException e) {
-					JOptionPane.showMessageDialog(null, "Error with database");
-					e.printStackTrace();
+//					JOptionPane.showMessageDialog(null, "Error with database");
+//					e.printStackTrace();
 				} catch (NegativeQuantityException e) {
 					System.out.println(e.getMessage());
 					e.printStackTrace();
@@ -709,14 +707,13 @@ public class RepresentativeWindow extends JFrame {
 	public void updateTablesAndComboBoxes(JComboBox<String> comboBoxIdClient,JComboBox<String> comboBoxIdClientToDelete,
 								JComboBox<String> comboBoxBoughtProduct) throws SQLException {
 		
-		RepresentativeController repController = new RepresentativeController();
 		loadTables();
 		fillComboBoxClient(comboBoxIdClient);
 		fillComboBoxClient(comboBoxIdClientToDelete);
 		fillComboBoxProducts(comboBoxBoughtProduct);
 		
 		String boughtProduct = (String)comboBoxBoughtProduct.getSelectedItem();
-		int maxQuantity = repController.getQuantityOfProduct(boughtProduct);
+		int maxQuantity = salesService.getQuantityOfProduct(boughtProduct);
 		lblMaxQuantity.setText(maxQuantity + " max");
 		
 		txtFieldClientEmail.setText("");
@@ -743,7 +740,7 @@ public class RepresentativeWindow extends JFrame {
 		yourProducts.clear();
 				
 		try {
-			catalog = repController.getCatalog(thisRepresentative);
+			catalog = salesService.getCatalog(thisRepresentative);
 		
         
 	        for (int i = 0; i < catalog.size(); i++) {
@@ -760,7 +757,7 @@ public class RepresentativeWindow extends JFrame {
 				modelCatalog.addRow(data);
 			}
 	        
-	        clientsFromCatalog = repController.removeRepeatingClients(catalog);
+	        clientsFromCatalog = clientService.removeRepeatingClients(catalog);
 	        
 	        for (int i = 0; i < clientsFromCatalog.size(); i++) {
 				id = clientsFromCatalog.get(i).getId();
@@ -772,7 +769,7 @@ public class RepresentativeWindow extends JFrame {
 				modelClients.addRow(data);
 			}
 	        
-	        yourProducts = repController.getProductsFromYourCategory(thisRepresentative);
+	        yourProducts = salesService.getProductsFromYourCategory(thisRepresentative);
 	        
 	        for (int i = 0; i < yourProducts.size(); i++) {
 				id = yourProducts.get(i).getId();

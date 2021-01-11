@@ -46,8 +46,6 @@ public class SalesAnalizerController {
 
 	public ArrayList<Sale> filterSalesByCriteria(ArrayList<Sale> listAllSales, String criteria, String variable)
 	{
-		System.out.println("im in filter");
-		System.out.println("criteria = " + criteria);
 		ArrayList<Sale> filteredList = new ArrayList<>();
 		
 		if(criteria.equals("username")) {

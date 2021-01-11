@@ -18,6 +18,7 @@ public class PieChartWindow extends ApplicationFrame {
    
    public PieChartWindow(String title) {
 	   super(title);
+	   setResizable(false);
 	   this.setSize( 777 , 530 );    
 	   RefineryUtilities.centerFrameOnScreen(this);    
 	   this.setVisible( true ); 

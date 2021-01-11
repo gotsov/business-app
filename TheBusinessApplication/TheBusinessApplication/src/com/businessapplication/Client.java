@@ -1,12 +1,14 @@
 package com.businessapplication;
 
 import java.sql.Date;
+
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import com.exceptions.NegativeQuantityException;
-import com.representative.RepresentativeController;
+import com.representative.ClientService;
+import com.representative.SalesService;
 
 public class Client {
 	public static int idSale = 100;
@@ -25,7 +27,8 @@ public class Client {
 	
 	public Client(Builder builder) throws SQLException,  NegativeQuantityException
 	{
-		RepresentativeController repController = new RepresentativeController();
+		ClientService clientService = new ClientService();
+		SalesService salesService = new SalesService();
 		
 		this.name = builder.name;
 		this.email = builder.email;
@@ -35,12 +38,12 @@ public class Client {
 		this.dateOfSale = builder.dateOfSale;
 		this.idOfClient = builder.idOfClient;
 		
-		repController.checkIfFirstTimeClient(this);
+		clientService.checkIfFirstTimeClient(this);
 		
 		if(this.categoryOfProductBought != null)   
 		{
-			repController.setIdSale(this);
-			repController.setIdClient(this);
+			salesService.setIdSale(this);
+			clientService.setIdClient(this);
 			setSqlDate();	
 		}
 
