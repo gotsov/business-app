@@ -1,4 +1,4 @@
-package com.rolecontrollers;
+package com.login;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,7 +7,6 @@ import java.util.Base64;
 
 import com.businessapplication.User;
 import com.databaseconnection.DBConnection;
-import com.login.Hasher;
 
 public class UserController {
 																					  //1234 by default

@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 import com.databaseconnection.DBConnection;
+import com.exceptions.NegativePriceException;
+import com.exceptions.NegativeQuantityException;
 
 public class Product {
 	
@@ -15,7 +17,7 @@ public class Product {
 	protected int quantity;
 	protected double price;
 	
-	public Product(Builder builder)
+	public Product(Builder builder) throws NegativePriceException, NegativeQuantityException
 	{
 		this.id = builder.id;
 		this.name = builder.name;
@@ -58,17 +60,27 @@ public class Product {
 			return this;
 		}
 		
-		public Builder quantity(int quantity) {
+		public Builder quantity(int quantity) throws NegativeQuantityException{
+			
+			if(quantity < 0) {
+				throw new NegativeQuantityException("Invalid quantity");
+			}
+			
 			this.quantity = quantity;
 			return this;
 		}
 		
-		public Builder price(double price) {
+		public Builder price(double price) throws NegativePriceException{
+			
+			if(price < 0) {
+				throw new NegativePriceException("Invalid quantity");
+			}
+			
 			this.price = price;
 			return this;
 		}
 		
-		public Product build() {
+		public Product build() throws NegativePriceException, NegativeQuantityException{
 			return new Product(this);
 		}
 	

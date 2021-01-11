@@ -1,12 +1,11 @@
-package com.businessapplication;
+package com.admin;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.businessapplication.Admin.Builder;
+import com.admin.Admin.Builder;
 import com.databaseconnection.DBConnection;
-import com.rolecontrollers.AdminController;
 
 public class Admin{
 	private static int idAdmin = 1;
@@ -23,8 +22,6 @@ public class Admin{
 		this.username = builder.username;
 		this.password = builder.password;
 		
-		System.out.println("im hereee");
-		System.out.println("id = " + id);
 		setIdForDB();
 
 	}
@@ -83,7 +80,6 @@ public class Admin{
 			e.printStackTrace();
 		}
 		
-		System.out.println(idAdmin);
 		this.id = idAdmin;
 	}
 

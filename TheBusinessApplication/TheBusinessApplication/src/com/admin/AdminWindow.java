@@ -1,4 +1,4 @@
-package com.gui;
+package com.admin;
 
 import java.awt.BorderLayout;
 import java.lang.Object;
@@ -40,12 +40,13 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
-import com.businessapplication.Admin;
 import com.businessapplication.Product;
-import com.businessapplication.Representative;
 import com.businessapplication.Sale;
 import com.businessapplication.Product.Builder;
 import com.databaseconnection.DBConnection;
+import com.exceptions.NegativePriceException;
+import com.exceptions.NegativeQuantityException;
+import com.exceptions.NotUniqueUsernameException;
 import com.toedter.calendar.JDateChooser;
 import javax.swing.JCheckBox;
 import java.awt.GridBagLayout;
@@ -58,8 +59,9 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
-import com.rolecontrollers.AdminController;
-import com.rolecontrollers.SalesAnalizerController;
+import com.login.ChangePasswordWindow;
+import com.login.LoginWindow;
+import com.representative.Representative;
 
 public class AdminWindow extends JFrame {
 
@@ -790,11 +792,7 @@ public class AdminWindow extends JFrame {
 		gbc_btnPieChart.gridy = 9;
 		panel_10.add(btnPieChart, gbc_btnPieChart);
 		
-		JPanel panel_12 = new JPanel();
-		tabbedPane.addTab("New tab", null, panel_12, null);
-		panel_12.setLayout(null);
-		
-		updateTablesAndComboboxes(adminController);
+		updateTablesAndComboboxes();
 				
 		mnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -820,7 +818,7 @@ public class AdminWindow extends JFrame {
 		
 		mnManageAdmins.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				AddAdminWindow addAdminWindow = new AddAdminWindow();
+				ManageAdminWindow addAdminWindow = new ManageAdminWindow();
 				addAdminWindow.setVisible(true);
 				addAdminWindow.setTitle("Add admin");
 			}
@@ -887,14 +885,16 @@ public class AdminWindow extends JFrame {
 				} catch(SQLException e) {
 					e.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Error with database");
-				}
+				} catch (NegativePriceException | NegativeQuantityException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage());
+				} 
 
 				textFieldNewCategory.setText("");
 				textFieldQuantity.setText("");
 				textFieldProductName.setText("");
 				textFieldPrice.setText("");
 						
-				updateTablesAndComboboxes(adminController);
+				updateTablesAndComboboxes();
 			}
 		});
 		
@@ -942,7 +942,7 @@ public class AdminWindow extends JFrame {
 					JOptionPane.showMessageDialog(null, "Error with database");
 				}
 				
-				updateTablesAndComboboxes(adminController);
+				updateTablesAndComboboxes();
 				
 			}
 		});	
@@ -963,7 +963,7 @@ public class AdminWindow extends JFrame {
 				
 				JOptionPane.showMessageDialog(null, "Product with [id = " + productToDelete.getId() + "] has been deleted");
 				
-				updateTablesAndComboboxes(adminController);
+				updateTablesAndComboboxes();
 			}
 		});
 		
@@ -994,16 +994,19 @@ public class AdminWindow extends JFrame {
 																				  .build();
 				
 				try {
+					adminController.checkUniqueRepresentativeUsername(represenatativeToAdd);
 					adminController.addRepresentative(represenatativeToAdd);
+					
+					JOptionPane.showMessageDialog(null, "Added [" + represenatativeToAdd.getName() + " (" + represenatativeToAdd.getUsername() + "), "
+							+ "category: " + represenatativeToAdd.getCategory() + ".");
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, "Error with database.");
 					e.printStackTrace();
+				} catch (NotUniqueUsernameException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage());
 				}
 				
-				JOptionPane.showMessageDialog(null, "Added [" + represenatativeToAdd.getName() + " (" + represenatativeToAdd.getUsername() + "), "
-																							+ "category: " + represenatativeToAdd.getCategory() + ".");
-				
-				updateTablesAndComboboxes(adminController);
+				updateTablesAndComboboxes();
 			}
 			
 		});
@@ -1025,7 +1028,7 @@ public class AdminWindow extends JFrame {
 				
 				JOptionPane.showMessageDialog(null, "Representative with [id = " + represenatativeToDelete.getId() + "] has been deleted");
 				
-				updateTablesAndComboboxes(adminController);
+				updateTablesAndComboboxes();
 				
 			}
 		});
@@ -1072,7 +1075,7 @@ public class AdminWindow extends JFrame {
 					JOptionPane.showMessageDialog(null, "Error with database");
 				}
 				
-				updateTablesAndComboboxes(adminController);
+				updateTablesAndComboboxes();
 			}
 		});
 		
@@ -1132,13 +1135,13 @@ public class AdminWindow extends JFrame {
 		btnRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-				updateTablesAndComboboxes(adminController);
+				updateTablesAndComboboxes();
 			}
 		});
 		
 	}
 	
-	public static void updateTablesAndComboboxes(AdminController adminController)
+	public static void updateTablesAndComboboxes()
 	{
 		loadTablesAdmin();
 		fillComboBoxProductsId(comboBoxIdProduct);
@@ -1155,7 +1158,7 @@ public class AdminWindow extends JFrame {
 		String mostSalesByProduct = analizer.getMostSalesByCriteria("product");
 		String mostSalesByRepresentative = analizer.getMostSalesByCriteria("representative_username");
 		int numberOfClients = analizer.getNumberOfClients();
-		double totalProfit = analizer.getTotalProfit();
+		String totalProfit = analizer.getTotalProfit();
 		
 		lblNumberOfProducts.setText("Number of products: " + numberOfProducts);
 		lblNumberOfRepresentatives.setText("Number of representatives: " + numberOfRepresentatives);
@@ -1283,7 +1286,9 @@ public class AdminWindow extends JFrame {
 	        
 		}catch(SQLException e){
 			e.printStackTrace();
-		}
+		} catch (NegativePriceException | NegativeQuantityException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage());
+		} 
 	
 	}
 	

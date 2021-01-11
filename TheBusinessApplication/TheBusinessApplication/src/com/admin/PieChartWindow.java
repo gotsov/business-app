@@ -1,8 +1,9 @@
-package com.gui;
+package com.admin;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
@@ -12,7 +13,6 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
-import com.rolecontrollers.SalesAnalizerController;
  
 public class PieChartWindow extends ApplicationFrame {
    
@@ -26,6 +26,7 @@ public class PieChartWindow extends ApplicationFrame {
 	   HashMap<String, Integer> mostSalesByCategory = analizer.getHashMapSalesByCategory();
 	   
 	   setContentPane(createDemoPanel(mostSalesByCategory));
+	   
    }
    
    private static PieDataset createDataset(HashMap<String, Integer> mostSalesByCategory) {

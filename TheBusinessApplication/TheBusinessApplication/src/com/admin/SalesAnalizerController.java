@@ -1,4 +1,4 @@
-package com.rolecontrollers;
+package com.admin;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -175,7 +175,7 @@ public class SalesAnalizerController {
 		return numOfClients;
 	}
 	
-	public double getTotalProfit()
+	public String getTotalProfit()
 	{
 		double totalProfit = 0;
 		
@@ -189,12 +189,16 @@ public class SalesAnalizerController {
 				totalProfit += rs.getDouble("price");
 			}
 			
+			String strDouble = String.format("%.2f", totalProfit);
+			
+			return strDouble;
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return totalProfit;
+		return "";
 	}
 	
 	public void findCategoriesWithNoRepresentative(DefaultListModel<String> model, ArrayList<String> categoriesWithRepresentative, 

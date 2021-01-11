@@ -5,6 +5,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import com.exceptions.NegativeQuantityException;
+import com.representative.RepresentativeController;
+
 public class Client {
 	public static int idSale = 100;
 	public static int idClient = 100;
@@ -20,8 +23,10 @@ public class Client {
 
 	private boolean firstTimeClient;
 	
-	public Client(Builder builder)
+	public Client(Builder builder) throws SQLException,  NegativeQuantityException
 	{
+		RepresentativeController repController = new RepresentativeController();
+		
 		this.name = builder.name;
 		this.email = builder.email;
 		this.categoryOfProductBought = builder.categoryOfProductBought;
@@ -30,18 +35,18 @@ public class Client {
 		this.dateOfSale = builder.dateOfSale;
 		this.idOfClient = builder.idOfClient;
 		
-		checkForUniqueEmail();
+		repController.checkIfFirstTimeClient(this);
 		
 		if(this.categoryOfProductBought != null)   
 		{
-			setIdSale();
-			setIdClient();
+			repController.setIdSale(this);
+			repController.setIdClient(this);
 			setSqlDate();	
 		}
 
 	}
 	
-	public static class Builder
+	public static class Builder 
 	{
 		private String name;
 		private String email;
@@ -71,7 +76,12 @@ public class Client {
 			return this;
 		}
 		
-		public Builder quantityBought(int quantityBought) {
+		public Builder quantityBought(int quantityBought) throws NegativeQuantityException{
+			
+			if(quantityBought <= 0) {
+				throw new NegativeQuantityException("Negative quantity");
+			}
+			
 			this.quantityBought = quantityBought;
 			return this;
 		}
@@ -86,29 +96,11 @@ public class Client {
 			return this;
 		}
 		
-		public Client build() {
+		public Client build() throws SQLException,  NegativeQuantityException{
 			return new Client(this);
 		}
 
 		
-	}
-	
-	public void setIdSale() {
-		try {
-			Representative.setIdSale(this);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void setIdClient() {
-		try {
-			Representative.setIdClient(this);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public void setSqlDate()
@@ -119,17 +111,6 @@ public class Client {
 			
 			this.sqlDateOfSale = sqlDate;
 		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-	public void checkForUniqueEmail()
-	{
-		try {
-			Representative.checkIfFirstTimeClient(this);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -195,4 +176,29 @@ public class Client {
 	{
 		return email;
 	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setCategoryOfProductBought(String categoryOfProductBought) {
+		this.categoryOfProductBought = categoryOfProductBought;
+	}
+
+	public void setProductBought(String productBought) {
+		this.productBought = productBought;
+	}
+
+	public void setQuantityBought(int quantityBought) {
+		this.quantityBought = quantityBought;
+	}
+
+	public void setDateOfSale(String dateOfSale) {
+		this.dateOfSale = dateOfSale;
+	}
+	
 }

@@ -1,21 +1,13 @@
-package com.businessapplication;
+package com.representative;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Locale;
 
-import com.businessapplication.Representative.Builder;
 import com.databaseconnection.DBConnection;
-import com.emailconnection.EmailDriver;
-import com.rolecontrollers.RepresentativeController;
 
-public class Representative extends RepresentativeController{
+public class Representative {
 	
 	private int id;
 	private String name;
@@ -159,14 +151,13 @@ public class Representative extends RepresentativeController{
 			ResultSet rs = dbConnection.getData(" SELECT id_rep FROM allrepresentatives ORDER BY id_rep DESC LIMIT 1");
 					
 			rs.next();
-			idRepresentative = rs.getInt("id_rep");
+			id = rs.getInt("id_rep");
 
-			this.id = ++idRepresentative;
+			this.id = id + 1;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 			
-		this.id = idRepresentative;
 	}
 	
 	public int getNumberOfSalesFromDB()

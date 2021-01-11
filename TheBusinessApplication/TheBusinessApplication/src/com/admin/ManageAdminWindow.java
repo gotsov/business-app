@@ -1,4 +1,4 @@
-package com.gui;
+package com.admin;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -7,10 +7,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import com.businessapplication.Admin;
-import com.businessapplication.Representative;
 import com.databaseconnection.DBConnection;
-import com.rolecontrollers.AdminController;
+import com.exceptions.NotUniqueUsernameException;
+import com.representative.Representative;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 
-public class AddAdminWindow extends JFrame {
+public class ManageAdminWindow extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField textFieldName;
@@ -39,7 +38,7 @@ public class AddAdminWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public AddAdminWindow() {		
+	public ManageAdminWindow() {		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 384, 331);
 		contentPane = new JPanel();
@@ -48,6 +47,7 @@ public class AddAdminWindow extends JFrame {
 		setContentPane(contentPane);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel panel = new JPanel();
@@ -109,10 +109,6 @@ public class AddAdminWindow extends JFrame {
 		btnDelete.setBounds(106, 104, 133, 38);
 		panel_1.add(btnDelete);
 		
-		JPanel panel_2 = new JPanel();
-		tabbedPane.addTab("Edit admin", null, panel_2, null);
-		panel_2.setLayout(null);
-		
 		updateComboBoxFilters(comboBoxUsername);
 		
 		btnAdd.addActionListener(new ActionListener() {
@@ -120,21 +116,25 @@ public class AddAdminWindow extends JFrame {
 				String name = textFieldName.getText();
 				String username = textFieldUsername.getText();
 				
-				Admin adminToAdd = new Admin.Builder().id(132)
-													  .name(name)
+				Admin adminToAdd = new Admin.Builder().name(name)
 													  .username(username)
 													  .password("1234")
 													  .build();
 				
+				
+				
 				try {
+					adminController.checkUniqueAdminUsername(adminToAdd);
 					adminController.addAdmin(adminToAdd);
+					
+					JOptionPane.showMessageDialog(null, "Added [" + adminToAdd.getName() + " (" + adminToAdd.getUsername() + "]");
 				} catch (SQLException e1) {
 					JOptionPane.showMessageDialog(null, "Error with database");
 					e1.printStackTrace();
+				} catch(NotUniqueUsernameException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage());
 				}
-				
-				JOptionPane.showMessageDialog(null, "Added [" + adminToAdd.getName() + " (" + adminToAdd.getUsername() + "]");
-				
+
 				updateComboBoxFilters(comboBoxUsername);
 			}
 		});

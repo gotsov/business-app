@@ -1,4 +1,4 @@
-package com.rolecontrollers;
+package com.admin;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -15,13 +15,14 @@ import java.util.Set;
 
 import javax.swing.DefaultListModel;
 
-import com.businessapplication.Admin;
 import com.businessapplication.Product;
-import com.businessapplication.Representative;
 import com.businessapplication.Sale;
 import com.twitterconnection.TwitterDriver;
 import com.databaseconnection.DBConnection;
 import com.emailconnection.EmailDriver;
+import com.exceptions.NotUniqueUsernameException;
+import com.login.UserController;
+import com.representative.Representative;
 
 import twitter4j.TwitterException;
 
@@ -137,10 +138,6 @@ public class AdminController {
 	public void editFieldRepresentative(Representative representativeToEdit, String fieldToEdit) throws SQLException
 	{
 		
-		
-		System.out.println("representativeToEdit = " + representativeToEdit);
-		System.out.println("fieldToEdit = " + fieldToEdit);
-		
 		try(Connection con = DBConnection.getCon()) {
 		DBConnection dbConnection = new DBConnection();
 			
@@ -186,8 +183,9 @@ public class AdminController {
 	
 	public void deleteAdmin(Admin adminToDelete) throws SQLException
 	{
-		DBConnection dbConnection = new DBConnection();
+		
 		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
 			ResultSet rs = dbConnection.getData("SELECT * FROM users WHERE username = '" + adminToDelete.getUsername() + "'");
 			rs.next();
 			adminToDelete.setId(rs.getInt("id_user"));
@@ -196,6 +194,36 @@ public class AdminController {
 		}
 	        	
 		System.out.println("admin deleted");
+	}
+	
+	public void checkUniqueAdminUsername(Admin admin) throws SQLException, NotUniqueUsernameException{
+		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
+				
+			ResultSet rs = dbConnection.getData("SELECT * FROM users");
+				
+			while(rs.next())
+			{
+				if(rs.getString("username").equals(admin.getUsername())) {
+					throw new NotUniqueUsernameException("Username already used.");
+				}
+			}
+		}
+	}
+	
+	public void checkUniqueRepresentativeUsername(Representative rep) throws SQLException, NotUniqueUsernameException{
+		try(Connection con = DBConnection.getCon()) {
+			DBConnection dbConnection = new DBConnection();
+				
+			ResultSet rs = dbConnection.getData("SELECT * FROM users");
+				
+			while(rs.next())
+			{
+				if(rs.getString("username").equals(rep.getUsername())) {
+					throw new NotUniqueUsernameException("Username already used.");
+				}
+			}
+		}
 	}
 }
 

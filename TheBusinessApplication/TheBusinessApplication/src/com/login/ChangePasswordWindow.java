@@ -1,10 +1,10 @@
-package com.gui;
+package com.login;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import com.businessapplication.User;
-import com.rolecontrollers.UserController;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import java.awt.Font;
@@ -68,9 +68,6 @@ public class ChangePasswordWindow extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {				
 				String newPassword = new String(passwordField.getPassword());
 				String newPasswordRepeat = new String( passwordFieldRepeat.getPassword());
-				
-				System.out.println("passwordField.getPassword() = " + newPassword);
-				System.out.println("passwordFieldRepeat.getPassword()" + newPasswordRepeat);
 				
 				if(newPassword.equals(newPasswordRepeat)){
 					try {

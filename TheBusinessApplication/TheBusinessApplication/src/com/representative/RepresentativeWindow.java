@@ -1,4 +1,4 @@
-package com.gui;
+package com.representative;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -21,12 +21,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import com.businessapplication.Client;
-import com.businessapplication.Representative;
 import com.businessapplication.Sale;
 import com.businessapplication.Client.Builder;
 import com.businessapplication.Product;
 import com.databaseconnection.DBConnection;
-import com.rolecontrollers.RepresentativeController;
+import com.exceptions.NegativePriceException;
+import com.exceptions.NegativeQuantityException;
+import com.login.ChangePasswordWindow;
+import com.login.LoginWindow;
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.JScrollPane;
@@ -47,18 +49,24 @@ public class RepresentativeWindow extends JFrame {
 	private static JTable tableClients;
 	private static JTable tableProducts;
 	
-	private JTextField txtFieldClientNameEdit;
-	private JTextField txtFieldClientEmailEdit;
-	private JTextField txtFieldClientNameAdd;
-	private JTextField txtFieldClientEmailAdd;
-	private JTextField txtFieldClientName;
-	private JTextField txtFieldClientEmail;
+	private static JTextField txtFieldClientNameEdit;
+	private static JTextField txtFieldClientEmailEdit;
+	private static JTextField txtFieldClientNameAdd;
+	private static JTextField txtFieldClientEmailAdd;
+	private static JTextField txtFieldClientName;
+	private static JTextField txtFieldClientEmail;
+	
+	private static JComboBox comboBoxIdClient = new JComboBox();
+	private static JComboBox comboBoxIdClientToDelete = new JComboBox();
+	private static JComboBox<String> comboBoxBoughtProduct = new JComboBox();
+	private static JLabel lblMaxQuantity = new JLabel("...........");
 	
 	private ArrayList<Sale> clientsFromCatalog  = new ArrayList<>();
 	private ArrayList<Product> yourProducts = new ArrayList<>();
 	private ArrayList<Sale> catalog = new ArrayList<>();
 	private Representative thisRepresentative;
 	private RepresentativeController repController;
+	private JTextField textFieldQuantityBought;
 	
 	/**
 	 * Create the frame.
@@ -152,15 +160,10 @@ public class RepresentativeWindow extends JFrame {
 		label_2.setBounds(12, 99, 153, 30);
 		panel3.add(label_2);
 		
-		JComboBox<String> comboBoxBoughtProduct = new JComboBox();
+		
 		comboBoxBoughtProduct.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxBoughtProduct.setBounds(177, 99, 133, 26);
 		panel3.add(comboBoxBoughtProduct);
-		
-		JComboBox<String> comboBoxQuantity = new JComboBox();
-		comboBoxQuantity.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboBoxQuantity.setBounds(177, 144, 133, 26);
-		panel3.add(comboBoxQuantity);
 		
 		JLabel label_3 = new JLabel("Quantity bought:");
 		label_3.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -184,6 +187,18 @@ public class RepresentativeWindow extends JFrame {
 		btnAdd.setBounds(111, 222, 133, 38);
 		panel3.add(btnAdd);
 		
+		textFieldQuantityBought = new JTextField();
+		textFieldQuantityBought.setText("0");
+		textFieldQuantityBought.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textFieldQuantityBought.setColumns(10);
+		textFieldQuantityBought.setBounds(177, 143, 44, 26);
+		panel3.add(textFieldQuantityBought);
+		
+		lblMaxQuantity.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblMaxQuantity.setFont(new Font("Arial", Font.PLAIN, 18));
+		lblMaxQuantity.setBounds(226, 139, 84, 30);
+		panel3.add(lblMaxQuantity);
+		
 		JPanel panel = new JPanel();
 		tabbedPane.addTab("Edit Client", null, panel, null);
 		panel.setLayout(null);
@@ -206,7 +221,7 @@ public class RepresentativeWindow extends JFrame {
 		comboBoxChange.setBounds(203, 70, 111, 26);
 		panel.add(comboBoxChange);
 		
-		JComboBox comboBoxIdClient = new JComboBox();
+		
 		comboBoxIdClient.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxIdClient.setBounds(203, 29, 55, 26);
 		panel.add(comboBoxIdClient);
@@ -253,7 +268,6 @@ public class RepresentativeWindow extends JFrame {
 		lblIdOfClient_1.setBounds(40, 98, 199, 26);
 		panel_1.add(lblIdOfClient_1);
 		
-		JComboBox comboBoxIdClientToDelete = new JComboBox();
 		comboBoxIdClientToDelete.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBoxIdClientToDelete.setBounds(243, 99, 55, 26);
 		panel_1.add(comboBoxIdClientToDelete);
@@ -408,11 +422,27 @@ public class RepresentativeWindow extends JFrame {
 		columnModelProducts.getColumn(0).setPreferredWidth(40);
 		columnModelProducts.getColumn(0).setCellRenderer(centerRenderer);
 		
-		updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct, comboBoxQuantity);		
+		comboBoxBoughtProduct.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String boughtProduct = (String)comboBoxBoughtProduct.getSelectedItem();
+				int maxQuantity;
+				try {
+					maxQuantity = repController.getQuantityOfProduct(boughtProduct);
+					lblMaxQuantity.setText(maxQuantity + " max");
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					System.out.println();
+				}
+				
+			}
+		});
 		
 		mnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				setVisible(false);
+				
+				LoginWindow loginWindow = new LoginWindow();
+				loginWindow.setVisible(true);
 			}
 		});
 		
@@ -450,12 +480,7 @@ public class RepresentativeWindow extends JFrame {
 			}
 		});
 		
-		comboBoxBoughtProduct.addActionListener(new ActionListener() {		
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				fillComboBoxQuantity(comboBoxBoughtProduct, comboBoxQuantity);
-			}
-		});
+
 		
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -464,7 +489,8 @@ public class RepresentativeWindow extends JFrame {
 	            String date = dateFormat.format(selectedDate); 
 	            
 	            String boughtProduct = (String)comboBoxBoughtProduct.getSelectedItem();
-	            int quantityBought = Integer.parseInt((String) comboBoxQuantity.getSelectedItem());
+	            String quantityBoughtString = textFieldQuantityBought.getText();
+	            int quantityBought = Integer.parseInt(quantityBoughtString);
 				Client newClient = null;
 				
 				try {
@@ -497,16 +523,20 @@ public class RepresentativeWindow extends JFrame {
 					{
 						JOptionPane.showMessageDialog(null, "Client [" + newClient.getName() + ", " + newClient.getEmail() 
 						                                   + "] bought [" + newClient.getQuantityBought() + "x " + newClient.getProductBought() + "].");
-						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
 	
 					}
 					else
 					{
 						JOptionPane.showMessageDialog(null, "Invalid information");
 					}
+					
+					updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
+					
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, "Error with database");
 					e.printStackTrace();
+				} catch (NegativeQuantityException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage());
 				}
 			}
 		});
@@ -516,42 +546,49 @@ public class RepresentativeWindow extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {	
 				
 				Client clientToEdit;
-				int idClient, idSale;
+				int idClient, idSaleByClient;
+				String email;
 				
 				try {
 					if(comboBoxChange.getSelectedItem().equals("name")) {
 						clientToEdit = new Client.Builder()
-								.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))
+								.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))    //in allclients
 								.name(txtFieldClientNameEdit.getText())
 								.email(null)
 								.build();
 						
-						System.out.println("Integer.parseInt((String) comboBoxIdClient.getSelectedItem()) = " + Integer.parseInt((String) comboBoxIdClient.getSelectedItem()));
-						
+						email = repController.getEmailOfClient(clientToEdit);
+						clientToEdit.setEmail(email);
 						
 						idClient = clientToEdit.getIdOfClient();
-						idSale = repController.getIdOfSale(thisRepresentative);
+						idSaleByClient = repController.getIdOfSaleWithEmail(clientToEdit);
 						
-						repController.editClient(clientToEdit, "name", idClient, idSale);
+						System.out.println("idClient = " + idClient);
+						System.out.println("idSaleByClient = " + idSaleByClient);
+						repController.editClient(clientToEdit, "name", idClient, idSaleByClient);
 						
-						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
 					}
 					
 					else if(comboBoxChange.getSelectedItem().equals("email")) {
+						
 						clientToEdit = new Client.Builder()
 								.idOfClient(Integer.parseInt((String) comboBoxIdClient.getSelectedItem()))
 								.name(null)
 								.email(txtFieldClientEmailEdit.getText())
 								.build();
 						
+						Client originalClient = new Client.Builder().email(repController.getOldEmailOfClient(clientToEdit))
+																	.build();
+						
 						
 						if(clientToEdit.isFirstTimeClient()) {
 							idClient = clientToEdit.getIdOfClient();
-							idSale = repController.getIdOfSale(thisRepresentative);
+							idSaleByClient = repController.getIdOfSaleWithEmail(originalClient);
 							
-							repController.editClient(clientToEdit, "email", idClient, idSale);
+							repController.editClient(clientToEdit, "email", idClient, idSaleByClient);
 							
-							updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+							updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
 						}
 						else {
 							JOptionPane.showMessageDialog(getContentPane(), "Not unique e-mail");
@@ -565,14 +602,18 @@ public class RepresentativeWindow extends JFrame {
 								.email(txtFieldClientEmailEdit.getText())
 								.build();
 						
+						Client originalClient = new Client.Builder().email(repController.getOldEmailOfClient(clientToEdit))
+														.build();
+						
 						System.out.println(clientToEdit.isFirstTimeClient());
 						if(clientToEdit.isFirstTimeClient()) {
 							idClient = clientToEdit.getIdOfClient();
-							idSale = repController.getIdOfSale(thisRepresentative);
+							idSaleByClient = repController.getIdOfSaleWithEmail(originalClient);
 							
-							repController.editClient(clientToEdit, "name & e-mail", idClient, idSale);
 							
-							updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+							repController.editClient(clientToEdit, "name & e-mail", idClient, idSaleByClient);
+							
+							updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
 						}
 						else {
 							JOptionPane.showMessageDialog(null, "Not unique e-mail");
@@ -581,6 +622,12 @@ public class RepresentativeWindow extends JFrame {
 					}
 				}catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, "Error with database");
+					e.printStackTrace();
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NegativeQuantityException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
@@ -604,29 +651,36 @@ public class RepresentativeWindow extends JFrame {
 				
 				JOptionPane.showMessageDialog(null, "Client ["+ clientToDelete.getName() + ", " + clientToDelete.getEmail() + "] has been deleted.");
 				
+				updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
+				
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, "Error with database");
 					e.printStackTrace();
+				} catch (NegativeQuantityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+				
 			}
 		});
 		
 		btnAddClient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int id = Integer.parseInt((String) comboBoxIdClientToDelete.getSelectedItem());	
-				
-				Client clientToAdd = new Client.Builder()
-											.idOfClient(id)
-											.name(txtFieldClientNameAdd.getText())
-											.email(txtFieldClientEmailAdd.getText())
-											.build();
-				
-				System.out.println(clientToAdd.isFirstTimeClient());
+							
 				try {
+					int id = repController.getIdOfLastClient();	
+					
+					Client clientToAdd = new Client.Builder()
+												.idOfClient(id)
+												.name(txtFieldClientNameAdd.getText())
+												.email(txtFieldClientEmailAdd.getText())
+												.build();
+					
+					System.out.println(clientToAdd.isFirstTimeClient());
+				
 					if(clientToAdd.isFirstTimeClient()) {
 						repController.addClient(clientToAdd);
-						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct,comboBoxQuantity);
+						updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
 					}
 					else {
 						JOptionPane.showMessageDialog(null, "Not unique e-mail");
@@ -636,22 +690,39 @@ public class RepresentativeWindow extends JFrame {
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, "Error with database");
 					e.printStackTrace();
+				} catch (NegativeQuantityException e) {
+					System.out.println(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		});
+		
+		try {
+			updateTablesAndComboBoxes(comboBoxIdClient, comboBoxIdClientToDelete, comboBoxBoughtProduct);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 	}
 	
 	public void updateTablesAndComboBoxes(JComboBox<String> comboBoxIdClient,JComboBox<String> comboBoxIdClientToDelete,
-								JComboBox<String> comboBoxBoughtProduct,JComboBox<String> comboBoxQuantity) {
+								JComboBox<String> comboBoxBoughtProduct) throws SQLException {
+		
+		RepresentativeController repController = new RepresentativeController();
 		loadTables();
 		fillComboBoxClient(comboBoxIdClient);
 		fillComboBoxClient(comboBoxIdClientToDelete);
 		fillComboBoxProducts(comboBoxBoughtProduct);
-		fillComboBoxQuantity(comboBoxBoughtProduct, comboBoxQuantity);
+		
+		String boughtProduct = (String)comboBoxBoughtProduct.getSelectedItem();
+		int maxQuantity = repController.getQuantityOfProduct(boughtProduct);
+		lblMaxQuantity.setText(maxQuantity + " max");
+		
+		txtFieldClientEmail.setText("");
+		txtFieldClientName.setText("");
 	}
-	
-	
-	
+
 	public void loadTables()
 	{	
 		DefaultTableModel modelCatalog = (DefaultTableModel)tableCatalog.getModel(); 
@@ -718,8 +789,9 @@ public class RepresentativeWindow extends JFrame {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	
+		} catch (NegativePriceException | NegativeQuantityException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage());
+		} 
 	}
 	
 	public void fillComboBoxClient(JComboBox<String> ComboBoxIdClient)
@@ -752,19 +824,6 @@ public class RepresentativeWindow extends JFrame {
 			}
 				
 		}
-	}
-	
-	public void fillComboBoxQuantity(JComboBox<String> comboBoxBoughtProduct, JComboBox<String> comboBoxQuantity)
-	{
-		
-		comboBoxQuantity.removeAllItems();
-		
-		try {
-			repController.fillWithQuantity(comboBoxBoughtProduct, comboBoxQuantity);
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, "Error with database");
-			e.printStackTrace();
-		}	
 	}
 	
 }

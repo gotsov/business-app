@@ -1,4 +1,4 @@
-package com.rolecontrollers;
+package com.representative;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -14,9 +14,10 @@ import com.businessapplication.Client;
 import com.businessapplication.Product;
 import com.businessapplication.Sale;
 import com.businessapplication.Client.Builder;
-import com.businessapplication.Representative;
 import com.databaseconnection.DBConnection;
 import com.emailconnection.EmailDriver;
+import com.exceptions.NegativePriceException;
+import com.exceptions.NegativeQuantityException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +29,6 @@ import javax.swing.JComboBox;
 
 public class RepresentativeController {
 	
-	public static int idRepresentative = 100;
 	public HashMap<String, Integer> clientsOfRepresentative = new HashMap<>();
 	
 	public boolean validateEmail(Client clientToVarify)
@@ -150,7 +150,7 @@ public class RepresentativeController {
 		}
 	}
 	
-	public static void checkIfFirstTimeClient(Client clientToCheck) throws SQLException 
+	public void checkIfFirstTimeClient(Client clientToCheck) throws SQLException 
 	{
 		try (Connection con = DBConnection.getCon()){		
 			DBConnection dbConnection = new DBConnection();
@@ -173,7 +173,7 @@ public class RepresentativeController {
 		
 	}
 	
-	public static void setIdClient(Client clientToSetId) throws SQLException
+	public void setIdClient(Client clientToSetId) throws SQLException
 	{
 		try (Connection con = DBConnection.getCon()){	
 			DBConnection dbConnection = new DBConnection();
@@ -192,7 +192,7 @@ public class RepresentativeController {
 		} 
 	}
 	
-	public static void setIdSale(Client clientToSetId) throws SQLException
+	public void setIdSale(Client clientToSetId) throws SQLException
 	{
 		try (Connection con = DBConnection.getCon()){
 			DBConnection dbConnection = new DBConnection();
@@ -218,14 +218,14 @@ public class RepresentativeController {
 		}
 	}
 	
-	public void editClient(Client clientToEdit, String fieldToEdit, int idClient, int idSale) throws SQLException
+	public void editClient(Client clientToEdit, String fieldToEdit, int idClient, int idSaleByClient) throws SQLException
 	{
 		try(Connection con = DBConnection.getCon()) {     
 			DBConnection dbConnection = new DBConnection();
 			
 				if(fieldToEdit.equals("name")) {
 					dbConnection.updateData("UPDATE allclients SET " + fieldToEdit + " = '" + clientToEdit.getName() + "'" +"WHERE id_client = " + idClient);
-					dbConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" +  clientToEdit.getName() + "'" +"WHERE id_sale = " + idSale);
+					dbConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" +  clientToEdit.getName() + "'" +"WHERE id_sale = " + idSaleByClient);
 					
 					System.out.println("new name set");
 				}
@@ -233,7 +233,7 @@ public class RepresentativeController {
 					
 					if(validateEmail(clientToEdit)) {
 						dbConnection.updateData("UPDATE allclients SET  " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_client = " + idClient);
-						dbConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSale);
+						dbConnection.updateData("UPDATE allsales SET " + fieldToEdit + " = '" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSaleByClient);
 						
 						System.out.println("new email set");
 					}
@@ -244,12 +244,12 @@ public class RepresentativeController {
 					
 					if(validateEmail(clientToEdit)) {
 						dbConnection.updateData("UPDATE allclients SET name = "+ "'" + clientToEdit.getName() + "'" +"WHERE id_client = " + idClient);
-						dbConnection.updateData("UPDATE allsales SET name = "+ "'" + clientToEdit.getName() + "'" +"WHERE id_sale = " + idSale);
+						dbConnection.updateData("UPDATE allsales SET name = "+ "'" + clientToEdit.getName() + "'" +"WHERE id_sale = " + idSaleByClient);
 						
 						System.out.println("new name set");
 						
 						dbConnection.updateData("UPDATE allclients SET email = "+ "'" + clientToEdit.getEmail() + "'" +"WHERE id_client = " + idClient);
-						dbConnection.updateData("UPDATE allsales SET email = "+ "'" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSale);
+						dbConnection.updateData("UPDATE allsales SET email = "+ "'" + clientToEdit.getEmail() + "'" +"WHERE id_sale = " + idSaleByClient);
 
 						System.out.println("new email set");
 					}
@@ -316,7 +316,7 @@ public class RepresentativeController {
 
 	}
 	
-	public ArrayList<Product> getProductsFromYourCategory(Representative rep) throws SQLException{
+	public ArrayList<Product> getProductsFromYourCategory(Representative rep) throws SQLException, NegativePriceException, NegativeQuantityException{
 		DBConnection dbConnection = new DBConnection();
 		ArrayList<Product> products = new ArrayList<>();
 		
@@ -382,17 +382,29 @@ public class RepresentativeController {
 	}
 	
 	
-	public int getIdOfSale(Representative rep) throws SQLException
+	public int getIdOfSaleWithEmail(Client clientToGetSale) throws SQLException
 	{
 		try (Connection con = DBConnection.getCon()){
 			DBConnection dbConnection = new DBConnection();
 			
-			ResultSet rs = dbConnection.getData("SELECT * FROM allsales WHERE representative_username = '" + rep.getUsername() + "'");
+			ResultSet rs = dbConnection.getData("SELECT * FROM allsales WHERE email = '" + clientToGetSale.getEmail() + "'");
 			rs.next();
 			
 			return rs.getInt("id_sale");
 		} 
 		
+	}
+	
+	public String getEmailOfClient(Client client) throws SQLException {
+		try (Connection con = DBConnection.getCon()){
+			DBConnection dbConnection = new DBConnection();
+			String email;
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allclients WHERE id_client = " + client.getIdOfClient());
+		
+			rs.next();
+			return email = rs.getString("email");
+		} 
 	}
 	
 	public String getInfoOfClientById(String toChange, int id) throws SQLException
@@ -413,23 +425,44 @@ public class RepresentativeController {
 		return null;	
 	}
 	
-	public void fillWithQuantity(JComboBox<String> comboBoxBoughtProduct, JComboBox<String> comboBoxQuantity) throws SQLException{
+	public int getQuantityOfProduct(String name) throws SQLException{
 		try(Connection con = DBConnection.getCon()){
 			DBConnection dbConnection = new DBConnection();
 			
-			ResultSet rs = dbConnection.getData("SELECT * FROM allproducts WHERE name = '" + comboBoxBoughtProduct.getSelectedItem() + "'");
+			ResultSet rs = dbConnection.getData("SELECT * FROM allproducts WHERE name = '" + name + "'");
 	        
 	        int quantity = 0;
-	        while(rs.next())
-	        {
-	        	quantity = rs.getInt("quantity");
+	        rs.next();
+	        
+	        return rs.getInt("quantity"); 
+		} 
+	}
+	
+	public String getOldEmailOfClient(Client newClient) throws SQLException {
+		
+		try(Connection con = DBConnection.getCon()){
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allclients WHERE id_client = '" + newClient.getIdOfClient() + "'");
+	        rs.next();
+	        
+	        return rs.getString("email"); 
+		} 
+	}
+	
+	public int getIdOfLastClient() throws SQLException {
+		try(Connection con = DBConnection.getCon()){
+			DBConnection dbConnection = new DBConnection();
+			
+			ResultSet rs = dbConnection.getData("SELECT * FROM allclients");
+			int id = 0;
+			
+	        while(rs.next()) {
+	        	id = rs.getInt("id_client");
 	        }
 	        
-	        for(int i = 1; i <= quantity; i++)
-	        {
-	        	comboBoxQuantity.addItem(""+i);
-	        }
 	        
+	        return ++id; 
 		} 
 	}
 }
